@@ -10,6 +10,8 @@ Changes from [VSBHDA](https://github.com/Baron-von-Riedesel/VSBHDA) and [SBEMU](
  * Resampling code giving less distorted sound when upsampling to 44100   
    (and a compile time option to avoid interpolation when resampling)
 
+A [HOWTO document](/HOWTO/CM8738-howto.md) for CMI8738-based cards is also included.
+
 Forked from v1.7 of ...
 
 # VSBHDA
