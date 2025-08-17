@@ -1,6 +1,6 @@
 # VSBCMI
 
-Sound blaster emulation via CMI/HDA/AC97/SBLive/Ensoniq.
+Sound Blaster emulation for DOS via CMI/HDA/AC97/SBLive/Ensoniq.
 
 Changes from [VSBHDA](https://github.com/Baron-von-Riedesel/VSBHDA) and [SBEMU](https://github.com/crazii/SBEMU):
  * Support for CMI8X38 using driver originally from SBEMU, MPXPlay
