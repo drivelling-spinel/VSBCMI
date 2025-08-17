@@ -1,3 +1,17 @@
+# VSBCMI
+
+Sound blaster emulation via CMI/HDA/AC97/SBLive/Ensoniq.
+
+Changes from [VSBHDA](https://github.com/Baron-von-Riedesel/VSBHDA) and [SBEMU](https://github.com/crazii/SBEMU):
+ * Support for CMI8X38 using driver originally from SBEMU, MPXPlay
+ * Legacy FM is left in initialized state for CMI8X38 (port 388) when started with /OPL0,   
+   and joystick port is always left in initialized state for CMI8X38
+ * MPU401 UART "passthrough" for CMI8X38 (following SBEMU implementation) when started with /PXXX
+ * Resampling code giving less distorted sound when upsampling to 44100   
+   (and a compile time option to avoid interpolation when resampling)
+
+Forked from v1.7 of ...
+
 # VSBHDA
 Sound blaster emulation for HDA (and AC97/SBLive); a fork of crazii's SBEMU: https://github.com/crazii/SBEMU
 
