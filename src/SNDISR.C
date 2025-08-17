@@ -22,7 +22,11 @@
 
 #include "AU.H"
 
-#if SOUNDFONT
+#define mpxplay_debugf(s, ...) dbgprintf((__VA_ARGS__))
+
+#define INTERPOLATE
+
+#if SOUNDFONT && VMPU
 #include "VMPU.H"
 //#include "../tsf/TSF.H"
 //extern tsf* tsfrenderer;
@@ -152,9 +156,81 @@ static int DecodeADPCM(uint8_t *adpcm, int bytes)
  * out: new sample cnt
  */
 
+// originally from MPXPlay
+static unsigned int mixer_speed_lq(PCM_CV_TYPE_S* source, unsigned int sourcesample, unsigned int channels, unsigned int samplerate, unsigned int newrate)
+{
+ const unsigned int instep=(samplerate<<12)/newrate;
+ const unsigned int inend=((sourcesample/channels) - 1)<< 12; //for n samples, interpolation n-1 steps
+ int16_t *pcm; int16_t const* intmp;
+ unsigned int inpos = 0;
+
+ if(!sourcesample)
+  return 0;
+ if(((sourcesample/channels)&0xFFF00000) != 0) //too many samples, need other approches.
+  return 0;
+
+#if MALLOCSTATIC
+ static int maxsample = 0;
+ static PCM_CV_TYPE_S* buff = NULL;
+#else
+ PCM_CV_TYPE_S* buff;
+#endif
+
+#if MALLOCSTATIC
+ if ( sourcesample > maxsample ) {
+  if ( buff )
+   free( buff );
+  buff = (PCM_CV_TYPE_S*)malloc(sourcesample * sizeof(PCM_CV_TYPE_S));
+  maxsample = sourcesample;
+ }
+#else
+ buff = (PCM_CV_TYPE_S*)malloc(sourcesample * sizeof(PCM_CV_TYPE_S));
+#endif
+ memcpy( buff, source, sourcesample * sizeof(PCM_CV_TYPE_S) );
+
+ pcm = source;
+ intmp = buff;
+
+ while(inpos<=inend){
+  int m1,m2;
+  unsigned int ipi,ch;
+  const int16_t *intmp1,*intmp2;
+  ipi = inpos >> 12;
+#ifdef INTERPOLATE
+  m2=inpos&0xFFF;
+  m1=4096-m2;
+#else
+  m2=0;
+  m1=4096;
+#endif
+  ch=channels;
+  ipi*=ch;
+  intmp1=intmp+ipi;
+  intmp2=intmp1+ch;
+  if(ipi+ch >= sourcesample){
+    intmp2=intmp1;
+    m2=0;
+    m1=4096;
+  }
+  do{
+   *pcm++= ((*intmp1++)*m1+(*intmp2++)*m2)/4096;// >> 12; //don't use shift, signed right shift impl defined, maybe logical shift
+  }while(--ch);
+  inpos+=instep;
+ }
+
+#if !MALLOCSTATIC
+ free(buff);
+#endif
+ return pcm - source;
+}
+
+
 static unsigned int cv_rate( PCM_CV_TYPE_S *pcmsrc, unsigned int samplenum, unsigned int channels, unsigned int srcrate, unsigned int dstrate)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 {
+#if 1
+        return mixer_speed_lq(pcmsrc, samplenum, channels, srcrate, dstrate);         
+#else
 	/* todo: what algorithm for instep is best? */
 	//const unsigned int instep = ((srcrate / dstrate) << 12) | (((4096 * (srcrate % dstrate) - 1) / (dstrate - 1)) & 0xFFF);
 	const unsigned int instep = ((srcrate / dstrate) << 12) | (((4096 * (srcrate % dstrate) + dstrate - 1 ) / dstrate) & 0xFFF);
@@ -171,7 +247,7 @@ static unsigned int cv_rate( PCM_CV_TYPE_S *pcmsrc, unsigned int samplenum, unsi
 	PCM_CV_TYPE_S* buff;
 #endif
 
-	if(!samplenum)
+        if(!samplenum)
 		return 0;
 
 #if MALLOCSTATIC
@@ -212,6 +288,7 @@ static unsigned int cv_rate( PCM_CV_TYPE_S *pcmsrc, unsigned int samplenum, unsi
 	free(buff);
 #endif
 	return pcmdst - pcmsrc;
+#endif
 }
 
 /* convert 8 to 16 bits. It's assumed that 8 bit is unsigned, 16-bit is signed */
@@ -407,7 +484,6 @@ static int SNDISR_Interrupt( void )
                 count = cv_rate( isr.pPCM + IdxSm * 2, count * channels, channels, SB_Rate, freq ) / channels;
             if( channels == 1) //should be the last step
                 cv_channels_1_to_2( isr.pPCM + IdxSm * 2, count);
-
             /* conversion done; now set new values for DMA and SB buffer;
              * in case the end of SB buffer is reached, emulate an interrupt
              * and run this loop a second time.
@@ -525,7 +601,7 @@ static int SNDISR_Interrupt( void )
 #endif
     //aui.samplenum = samples * 2;
     //aui.pcm_sample = ISR_PCM;
-#if SOUNDFONT
+#if SOUNDFONT && VMPU
     if (tsfrenderer) {
         unsigned char fpu_buffer[FPU_SRSIZE];
         fpu_save( fpu_buffer );

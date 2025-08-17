@@ -1,4 +1,3 @@
-
 # create vsbhdad.exe with DJGPP and JWasm.
 # to create a debug version, enter: make -f djgpp.mak DEBUG=1
 # note that JWasm v2.17+ is needed ( understands -djgpp option )
@@ -7,7 +6,12 @@ ifndef DEBUG
 DEBUG=0
 endif
 
+ifeq ($(NAME),)
 NAME=vsbhda
+NAME_D=$(NAME)d
+else
+NAME_D=$(NAME)
+endif
 
 ifeq ($(DEBUG),1)
 OUTD=djgppd
@@ -31,7 +35,7 @@ OBJFILES=\
 	$(OUTD)/vsb.o		$(OUTD)/vdma.o		$(OUTD)/virq.o		$(OUTD)/vopl3.o		$(OUTD)/vmpu.o		$(OUTD)/tsf.o\
 	$(OUTD)/ac97mix.o	$(OUTD)/au_cards.o\
 	$(OUTD)/dmairq.o	$(OUTD)/pcibios.o	$(OUTD)/physmem.o	$(OUTD)/timer.o\
-	$(OUTD)/sc_e1371.o	$(OUTD)/sc_ich.o	$(OUTD)/sc_inthd.o	$(OUTD)/sc_via82.o	$(OUTD)/sc_sbliv.o	$(OUTD)/sc_sbl24.o\
+	$(OUTD)/sc_e1371.o	$(OUTD)/sc_cmi.o	$(OUTD)/sc_ich.o	$(OUTD)/sc_inthd.o	$(OUTD)/sc_via82.o	$(OUTD)/sc_sbliv.o	$(OUTD)/sc_sbl24.o\
 	$(OUTD)/stackio.o	$(OUTD)/stackisr.o	$(OUTD)/sbisr.o		$(OUTD)/int31.o		$(OUTD)/rmwrap.o	$(OUTD)/mixer.o\
 	$(OUTD)/hapi.o		$(OUTD)/dprintf.o	$(OUTD)/vioout.o	$(OUTD)/djdpmi.o	$(OUTD)/uninst.o	$(OUTD)/fileacc.o
 
@@ -46,9 +50,15 @@ LD_EXTRA_FLAGS=-Map $(OUTD)/$(NAME).map
 INCLUDES=$(addprefix -I,$(INCLUDE_DIRS))
 LIBS=$(addprefix -l,stdcxx m)
 
-COMPILE.asm.o=jwasm.exe -q -djgpp -Istartup -D?MODEL=small -DDJGPP -Fo$@ $<
-COMPILE.c.o=gcc $(C_DEBUG_FLAGS) $(C_OPT_FLAGS) $(C_EXTRA_FLAGS) $(CFLAGS) $(INCLUDES) -c $< -o $@
-COMPILE.cpp.o=gcc $(C_DEBUG_FLAGS) $(C_OPT_FLAGS) $(C_EXTRA_FLAGS) $(CPPFLAGS) $(INCLUDES) -c $< -o $@
+ifeq ($(REDIR),1)
+REDIR_CMD=redir -oa error.log -eo 
+else
+REDIR_CMD=
+endif
+
+COMPILE.asm.o=$(REDIR_CMD) jwasm.exe -q -djgpp -Istartup -D?MODEL=small -DDJGPP -Fo$@ $<
+COMPILE.c.o=$(REDIR_CMD) gcc $(C_DEBUG_FLAGS) $(C_OPT_FLAGS) $(C_EXTRA_FLAGS) $(CFLAGS) $(INCLUDES) -c $< -o $@
+COMPILE.cpp.o=$(REDIR_CMD) redir -oa error.log -eo gcc $(C_DEBUG_FLAGS) $(C_OPT_FLAGS) $(C_EXTRA_FLAGS) $(CPPFLAGS) $(INCLUDES) -c $< -o $@
 
 $(OUTD)/%.o: src/%.c
 	$(COMPILE.c.o)
@@ -62,16 +72,16 @@ $(OUTD)/%.o: src/%.asm
 $(OUTD)/%.o: mpxplay/%.c
 	$(COMPILE.c.o)
 
-all:: $(OUTD) $(OUTD)/$(NAME)d.exe
+all:: $(OUTD) $(OUTD)/$(NAME_D).exe
 
 $(OUTD):
 	@mkdir $(OUTD)
 
-$(OUTD)/$(NAME)d.exe:: $(OUTD)/$(NAME).ar
+$(OUTD)/$(NAME_D).exe:: $(OUTD)/$(NAME).ar
 	gcc -o $@ $(OUTD)/main.o $(OUTD)/$(NAME).ar $(LD_FLAGS) $(LIBS)
 	strip -s $@
 	exe2coff $@
-	copy /b res\stub.bin + $(OUTD)\$(NAME)d $(OUTD)\$(NAME)d.exe
+	copy /b res\stub.bin + $(OUTD)\$(NAME_D) $(OUTD)\$(NAME_D).exe
 
 $(OUTD)/$(NAME).ar:: $(OBJFILES)
 	ar --target=coff-go32 r $(OUTD)/$(NAME).ar $(OBJFILES)
@@ -91,6 +101,7 @@ $(OUTD)/pcibios.o::  pcibios.c   pcibios.h
 $(OUTD)/physmem.o::  physmem.c
 $(OUTD)/sc_e1371.o:: sc_e1371.c  mpxplay.h au_cards.h dmairq.h pcibios.h ac97mix.h
 $(OUTD)/sc_ich.o::   sc_ich.c    mpxplay.h au_cards.h dmairq.h pcibios.h ac97mix.h
+$(OUTD)/sc_cmi.o::   sc_cmi.c    mpxplay.h au_cards.h dmairq.h pcibios.h ac97mix.h
 $(OUTD)/sc_inthd.o:: sc_inthd.c  mpxplay.h au_cards.h dmairq.h pcibios.h sc_inthd.h
 $(OUTD)/sc_sbl24.o:: sc_sbl24.c  mpxplay.h au_cards.h dmairq.h pcibios.h ac97mix.h sc_sbl24.h emu10k1.h
 $(OUTD)/sc_sbliv.o:: sc_sbliv.c  mpxplay.h au_cards.h dmairq.h pcibios.h ac97mix.h sc_sbliv.h emu10k1.h
@@ -123,7 +134,7 @@ $(OUTD)/uninst.o::   uninst.asm
 $(OUTD)/vioout.o::   vioout.asm
 
 clean::
-	del $(OUTD)\$(NAME)d.exe
+	del $(OUTD)\$(NAME_D).exe
 	del $(OUTD)\$(NAME).ar
 	del $(OUTD)\*.o
 
