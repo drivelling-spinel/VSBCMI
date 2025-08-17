@@ -33,6 +33,8 @@ extern void AU_setmixer_all( int );
 //extern void AU_clearbuffs( int );
 extern unsigned int AU_cardbuf_space( int );
 extern int  AU_writedata( int, int, void * );
+extern int AU_write_uart( int, int, int );
+extern int AU_read_uart( int, int );
 
 #ifdef __cplusplus
 }

@@ -14,14 +14,21 @@
 #include "../tsf/TSF.H"
 #endif
 
+#if OWNUART
+#include "AU.H"
+#endif
+
 #if VMPU
 
 extern struct globalvars gvars;
 
-#if SOUNDFONT
+#if SOUNDFONT 
 tsf* tsfrenderer = NULL;
+#endif
 
+#if SOUNDFONT || OWNUART
 struct VMPU_s {
+#if SOUNDFONT
     unsigned int widx;  /* current write index in buffer */
     unsigned int ridx;  /* current read index in buffer */
     int didx;           /* index for current msg data */
@@ -29,6 +36,10 @@ struct VMPU_s {
     unsigned char channel;
     unsigned char data[32]; /* data for current msg */
     unsigned char buffer[4096];
+#endif
+#if OWNUART
+    int hAU;
+#endif
 };
 static struct VMPU_s vmpu;
 
@@ -54,6 +65,9 @@ static uint8_t bUART = 0;
 static void VMPU_Write(uint16_t port, uint8_t value)
 ////////////////////////////////////////////////////
 {
+#if OWNUART
+        AU_write_uart(vmpu.hAU, port - gvars.mpu, value);
+#endif
 	dbgprintf(("VMPU_Write(%X, %X)\n", port, value ));
 	if ( port == gvars.mpu + 1 ) {	/* command port? */
 		if ( value == 0xff ) /* reset? */
@@ -72,6 +86,9 @@ static void VMPU_Write(uint16_t port, uint8_t value)
 static uint8_t VMPU_Read(uint16_t port)
 ///////////////////////////////////////
 {
+#if OWNUART
+        AU_read_uart(vmpu.hAU, port - gvars.mpu);
+#endif
 	/* data port? */
 	if ( port == gvars.mpu ) {
 		if ( bReset ) {
@@ -113,7 +130,7 @@ static uint8_t VMPU_Read(uint16_t port)
 void VMPU_SBMidi_RawWrite( uint8_t value )
 //////////////////////////////////////////
 {
-#if SOUNDFONT
+#if SOUNDFONT || OWNUART
     VMPU_Write( 0, value );
 #endif
 }
@@ -267,9 +284,12 @@ void VMPU_Process_Messages(void)
 }
 #endif
 
-void VMPU_Init( int freq )
+void VMPU_Init( int freq, int hAU )
 //////////////////////////
 {
+#if OWNUART
+    vmpu.hAU = hAU;
+#endif
 #if SOUNDFONT
     if (!gvars.soundfont) ;
     else if ( tsfrenderer = tsf_load_filename(gvars.soundfont) ) {

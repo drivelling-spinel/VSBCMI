@@ -135,7 +135,7 @@ int FAREXP AU_isirq( struct audioout_info_s *aui )
 //////////////////////////////////////////////////
 {
     /* check if the irq belongs to the sound card */
-    return( aui->card_handler->irq_routine && aui->card_handler->irq_routine(aui));
+    return( aui->card_handler->irq_routine ? aui->card_handler->irq_routine(aui) : 0);
 }
 
 void FAREXP AU_setoutbytes( struct audioout_info_s *aui )
@@ -718,4 +718,22 @@ static int aucards_writedata_normal( struct audioout_info_s *aui, unsigned long 
 	return 0;
 }
 #endif
+
+
+int FAREXP AU_write_uart( struct audioout_info_s *aui, int reg, int data )
+/////////////////////////////////////////////////////////////////////////////////////
+{
+        if(aui->card_handler->card_write_uart)
+                return aui->card_handler->card_write_uart(aui, reg, data);
+        return -1;
+}
+
+int FAREXP AU_read_uart( struct audioout_info_s *aui, int reg )
+/////////////////////////////////////////////////////////////////////////////////////
+{
+        if(aui->card_handler->card_read_uart)
+                return aui->card_handler->card_read_uart(aui, reg);
+        return -1;
+}
+
 

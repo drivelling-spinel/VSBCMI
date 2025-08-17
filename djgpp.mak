@@ -43,7 +43,7 @@ INCLUDE_DIRS=src mpxplay
 SRC_DIRS=src mpxplay
 
 C_OPT_FLAGS=-Os -fno-asynchronous-unwind-tables
-C_EXTRA_FLAGS=-march=i586
+C_EXTRA_FLAGS=-march=i586 -DVSBHDA_NAME=$(NAME)
 LD_FLAGS=$(addprefix -Xlinker ,$(LD_EXTRA_FLAGS))
 LD_EXTRA_FLAGS=-Map $(OUTD)/$(NAME).map
 
@@ -101,7 +101,7 @@ $(OUTD)/pcibios.o::  pcibios.c   pcibios.h
 $(OUTD)/physmem.o::  physmem.c
 $(OUTD)/sc_e1371.o:: sc_e1371.c  mpxplay.h au_cards.h dmairq.h pcibios.h ac97mix.h
 $(OUTD)/sc_ich.o::   sc_ich.c    mpxplay.h au_cards.h dmairq.h pcibios.h ac97mix.h
-$(OUTD)/sc_cmi.o::   sc_cmi.c    mpxplay.h au_cards.h dmairq.h pcibios.h ac97mix.h
+$(OUTD)/sc_cmi.o::   sc_cmi.c    mpxplay.h au_cards.h dmairq.h pcibios.h ac97mix.h config.h
 $(OUTD)/sc_inthd.o:: sc_inthd.c  mpxplay.h au_cards.h dmairq.h pcibios.h sc_inthd.h
 $(OUTD)/sc_sbl24.o:: sc_sbl24.c  mpxplay.h au_cards.h dmairq.h pcibios.h ac97mix.h sc_sbl24.h emu10k1.h
 $(OUTD)/sc_sbliv.o:: sc_sbliv.c  mpxplay.h au_cards.h dmairq.h pcibios.h ac97mix.h sc_sbliv.h emu10k1.h

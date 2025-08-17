@@ -27,6 +27,8 @@ externdef _AU_setmixer_outs :near32
 externdef _AU_setmixer_all  :near32
 externdef _AU_writedata     :near32
 externdef _AU_cardbuf_space :near32
+externdef _AU_write_uart    :near32
+externdef _AU_read_uart     :near32
 _TEXT ends
 
 AUEXP struct
@@ -47,6 +49,8 @@ AU_setmixer_outs dd offset _AU_setmixer_outs
 AU_setmixer_all  dd offset _AU_setmixer_all
 AU_writedata     dd offset _AU_writedata
 AU_cardbuf_space dd offset _AU_cardbuf_space
+AU_write_uart    dd offset _AU_write_uart
+AU_read_uart     dd offset _AU_read_uart
 AUEXP ends
 
 CONST segment

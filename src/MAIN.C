@@ -29,6 +29,17 @@
 
 #include "AU.H"
 
+#if !defined(VSBHDA_NAME)
+#define VSBHDA_NAME "VSBHDA"
+#else
+#define XSTR(z) STR(z)
+#define STR(z)  #z
+#define TMP_DEF VSBHDA_NAME
+#undef  VSBHDA_NAME
+#define VSBHDA_NAME XSTR(TMP_DEF)
+#undef  TMP_DEF
+#endif
+
 #define BASE_DEFAULT 0x220
 #define IRQ_DEFAULT 7
 #define DMA_DEFAULT 1
@@ -99,6 +110,7 @@ struct MAIN_s {
 	bool bQemm; /* 1=QPI API found */
 	bool bHdpmi;/* 1=HDPMI found */
 	int bHelp;  /* 1=show help */
+	int bReckless;  /* 1=ignore found SB */
 };
 
 static struct MAIN_s gm = { 0, 22050, false, false, false, false };
@@ -163,6 +175,7 @@ static const struct {
     "MV", "Set voice limit [0-256, def 64]", &gvars.voices,
 #endif
     "CF", "Set compatibility flags [def 0]", &gvars.compatflags,
+    "Q",  "Ignore found SBs [def 0]", &gm.bReckless,
     NULL, NULL, 0,
 };
 
@@ -202,7 +215,7 @@ void fatal_error( int nError )
 	_asm mov ax,3
     _asm int 10h
 #endif
-	printf("VSBHDA: fatal error %u\n", nError );
+        printf(VSBHDA_NAME ": fatal error %u\n", nError );
 	for (;;);
 }
 #endif
@@ -346,7 +359,7 @@ int main(int argc, char* argv[])
     /* if -? or unrecognised option was entered, display help and exit */
     if( gm.bHelp ) {
         gm.bHelp = false;
-        printf("VSBHDA v" VERMAJOR "." VERMINOR "; Sound Blaster emulation on HDA/AC97. Usage:\n");
+        printf(VSBHDA_NAME" v" VERMAJOR "." VERMINOR "; Sound Blaster emulation via HDA/AC97/PCI. Usage:\n");
 
         for( i = 0; GOptions[i].option; i++ ) {
             char *tmp;
@@ -429,7 +442,8 @@ int main(int argc, char* argv[])
 #endif
 
     if ( IsInstalled() ) {
-        printf("SB found - probably VSBHDA already installed\n" );
+        printf("SB found - probably " VSBHDA_NAME "already installed\n" );
+        if ( !gm.bReckless )
         return(0);
     }
     if( gvars.rm ) {
@@ -573,7 +587,7 @@ int main(int argc, char* argv[])
     }
 
 #if VMPU
-    VMPU_Init( gm.freq );
+    VMPU_Init( gm.freq, gm.hAU );
 #endif
 
     PIC_UnmaskIRQ( AU_getirq( gm.hAU ) );

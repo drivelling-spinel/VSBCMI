@@ -161,6 +161,9 @@ struct sndcard_info_s {
  void (*card_writemixer)(struct audioout_info_s *,unsigned long mixreg,unsigned long value);
  unsigned long (*card_readmixer)(struct audioout_info_s *,unsigned long mixreg);
  const struct aucards_mixerchan_s **card_mixerchans;
+
+ int (*card_write_uart)(struct audioout_info_s *,int reg,int data); 
+ int (*card_read_uart)(struct audioout_info_s *,int reg); 
 };
 
 #ifdef NOTFLAT
@@ -185,6 +188,8 @@ static void AU_clearbuffs( struct audioout_info_s * );
 extern unsigned int FAREXP AU_cardbuf_space( struct audioout_info_s * );
 extern int  FAREXP AU_writedata( struct audioout_info_s *, int, void * );
 
+extern int  FAREXP AU_write_uart( struct audioout_info_s *, int, int );
+extern int  FAREXP AU_read_uart( struct audioout_info_s *, int );
 #ifdef __cplusplus
 }
 #endif

@@ -47,6 +47,8 @@ AU_setmixer_outs dd ?
 AU_setmixer_all  dd ?
 AU_writedata     dd ?
 AU_cardbuf_space dd ?
+AU_write_uart    dd ?
+AU_reqad_uart    dd ?
 AUEXP ends
 
 	.data?
@@ -290,5 +292,21 @@ AU_cardbuf_space proc c public a1:ptr
 	ret
 
 AU_cardbuf_space endp
+
+
+AU_write_uart proc c public a1:ptr, a2:dword, a3:dword
+
+	@callexp AU_write_uart, 3
+	ret
+
+AU_write_uart endp
+
+AU_read_uart proc c public a1:ptr, a2:dword
+
+	@callexp AU_read_uart, 2
+	ret
+
+AU_read_uart endp
+
 
 	END

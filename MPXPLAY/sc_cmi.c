@@ -384,8 +384,8 @@ struct cmi8x38_card_s
  int shift;
  //int ac3_shift;    /* extra shift: 1 on soft ac3 mode */
 
- uint8_t midi_in_data;
- uint8_t midi_in_data_valid:1;
+ uint8_t uart_backlog[32];
+ uint8_t uart_in, uart_out;
 };
 
 extern unsigned int intsoundconfig,intsoundcontrol;
@@ -698,6 +698,9 @@ static int CMI8X38_adetect(struct audioout_info_s *aui)
  // init chip
  cmi8x38_chip_init(card);
 
+ card->uart_in = card->uart_out = 0;
+ snd_cmipci_read_8(card, CM_REG_MPU_PCI + 1);
+
  mpxplay_debugf(CMI_DEBUG_OUTPUT, "did init, IRQ: %d, iobase: %x", card->irq, card->iobase);
 
  return 1;
@@ -861,18 +864,6 @@ static void CMI8X38_start(struct audioout_info_s *aui)
 
  snd_cmipci_set_bit(card, CM_REG_FUNCTRL1, CM_JYSTK_EN);
 
-#if VMPU  
-  //snd_cmipci_clear_bit(card, CM_REG_FUNCTRL1, CM_UART_EN);
-  if(!aui->gvars->mpu) {
-#endif  
-   //fixme: only 330 at this time
-   //snd_cmipci_clear_bit(card, CM_REG_LEGACY_CTRL, CM_VMPU_MASK);
-   //snd_cmipci_set_bit(card, CM_REG_FUNCTRL1, CM_UART_EN);
-#if VMPU
-  }
-#endif
-
-
 #if 1 //def SBEMU
  snd_cmipci_write_32(card, CM_REG_INT_HLDCLR, CM_CH0_INT_EN);    /* enable ints */
 #endif
@@ -888,7 +879,6 @@ static void CMI8X38_stop(struct audioout_info_s *aui)
 
  snd_cmipci_clear_bit(card, CM_REG_MISC_CTRL, CM_FM_EN);
  snd_cmipci_clear_bit(card, CM_REG_FUNCTRL1, CM_JYSTK_EN);
- //snd_cmipci_clear_bit(card, CM_REG_FUNCTRL1, CM_UART_EN);
 
 #if 1 //def SBEMU
  snd_cmipci_write_32(card, CM_REG_INT_HLDCLR, 0);    /* disable ints */
@@ -981,6 +971,15 @@ static int CMI8X38_IRQRoutine(struct audioout_info_s* aui)
     //nothing we can do
   }
 
+  if (status&CM_UARTINT)
+  {
+    const uint8_t backlog = (sizeof(card->uart_backlog) / sizeof(card->uart_backlog[0]));
+    if(card->uart_in - card->uart_out < backlog)
+    {
+      card->uart_backlog[card->uart_in++%backlog] = snd_cmipci_read_8(card, CM_REG_MPU_PCI);
+    }
+  }
+
   unsigned int mask = 0;
   if (status & CM_CHINT0)
     mask |= CM_CH0_INT_EN;
@@ -989,13 +988,38 @@ static int CMI8X38_IRQRoutine(struct audioout_info_s* aui)
   snd_cmipci_clear_bit(card, CM_REG_INT_HLDCLR, mask|CM_TDMA_INT_EN); //set to 0 will disable other interrupt. or write 0 and then with full ENs will work.
   snd_cmipci_set_bit(card, CM_REG_INT_HLDCLR, mask); //re-enable hold
 
-  if (status&CM_UARTINT && !(status&(CM_CHINT0|CM_CHINT1))) {
-    return 0;
-  }
-
   return 1;
 }
 #endif
+
+
+static int CMI8X38_write_uart(struct audioout_info_s *aui, int reg, int data)
+{
+  struct cmi8x38_card_s *card=aui->card_private_data;
+  int timeout = 10000; // 100ms
+
+  if(!reg) do {
+    if (!(0x40 & snd_cmipci_read_8(card, 1 + CM_REG_MPU_PCI))) break;      
+    pds_delay_10us(1);
+  } while (--timeout);
+
+  snd_cmipci_write_8nv(card, reg + CM_REG_MPU_PCI, (uint8_t)data);
+  return (uint8_t)data;
+}
+
+static int CMI8X38_read_uart(struct audioout_info_s *aui, int reg)
+{
+  struct cmi8x38_card_s *card=aui->card_private_data;
+  if(reg || card->uart_out == card->uart_in)
+  {
+    return snd_cmipci_read_8(card, reg + CM_REG_MPU_PCI);
+  }
+  else
+  {
+    const uint8_t backlog = (sizeof(card->uart_backlog) / sizeof(card->uart_backlog[0]));
+    return card->uart_backlog[card->uart_out++%backlog];
+  }
+}
 
 //like SB16
 static struct aucards_mixerchan_s cmi8x38_master_vol={AU_MIXCHANFUNCS_PACK(AU_MIXCHAN_MASTER,AU_MIXCHANFUNC_VOLUME),2,{{0x30,31,3,0},{0x31,31,3,0}}};
@@ -1038,7 +1062,11 @@ struct sndcard_info_s CMI8X38_sndcard_info={
 
  &CMI8X38_writeMIXER,
  &CMI8X38_readMIXER,
- &cmi8x38_mixerset[0]
+ &cmi8x38_mixerset[0],
+
+ &CMI8X38_write_uart,
+ &CMI8X38_read_uart
+
 };
 
 
