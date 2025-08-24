@@ -1,14 +1,20 @@
-# VSBCMI
+# VSBCMI v1.7.2
 
 Sound Blaster emulation for DOS via CMI/HDA/AC97/SBLive/Ensoniq.
 
 Changes from [VSBHDA](https://github.com/Baron-von-Riedesel/VSBHDA) and [SBEMU](https://github.com/crazii/SBEMU):
- * Support for CMI8X38 using driver originally from SBEMU, MPXPlay
- * Legacy FM is left in initialized state for CMI8X38 (port 388) when started with /OPL0,   
-   and joystick port is always left in initialized state for CMI8X38
- * MPU401 UART "passthrough" for CMI8X38 (following SBEMU implementation) when started with /PXXX
+ * Support for CMI8X38 using driver originally from SBEMU, MPXPlay, with some changes specific to these chips:
+    * _Detected_ revision of the chip is displayed when TSR is loaded
+    * Legacy FM "passthrough" when started with /OPL0
+    * MPU401 UART "passthrough" (following SBEMU implementation) when started with /PXXX
+    * Joystick port is always left in initialized state 
+    * Digital output (S/PDIF Out) is enabled if started with /O3
+    * When digital output is enabled for chips with revision of 37 and before,   
+      legacy FM is also routed to digital output and S/PDIF In (CD-In) is enabled
+    * For chips with revision after 37, this can be achieved by starting with both /O3 and /DF2
  * Resampling code giving less distorted sound when upsampling to 44100   
    (and a compile time option to avoid interpolation when resampling)
+ * SoundFont support is switched off by default (compile time) in favor of UART port forwarding
 
 A [HOWTO document](/HOWTO/CM8738-howto.md) for CMI8738-based cards is also included.
 
