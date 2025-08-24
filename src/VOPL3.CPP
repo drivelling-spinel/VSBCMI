@@ -8,6 +8,10 @@
 #include "DBOPL.H"
 #include "VOPL3.H"
 
+#if OWNUART
+#include "AU.H"
+#endif
+
 #define VOPL3_PRIMARY 0
 #define VOPL3_SECONDARY 1
 //primary index read
@@ -57,6 +61,10 @@ uint8_t ADLG_CtrlEnable;  //seems not working for Miles Sound, don't use it
 #if NOSILENTGEN
 bool bWritten;
 #endif
+#if OWNFM
+int hAU;
+bool bPassthrough;
+#endif
 };
 
 static struct VOpl3_s opl3;
@@ -71,7 +79,20 @@ void VOPL3_Init(int samplerate)
 #if NOSILENTGEN
 	opl3.bWritten = false;
 #endif
+#if OWNFM
+        opl3.bPassthrough = false;
+#endif
 }
+
+
+#if OWNFM
+void VOPL3_Passthrough(int hAU)
+///////////////////////////////
+{
+        opl3.hAU = hAU;
+        opl3.bPassthrough = true;
+}
+#endif
 
 #if REINITOPL
 void VOPL3_Reinit(int samplerate)
@@ -99,6 +120,12 @@ int VOPL3_GenSamples(int16_t* pcm16, int count)
 ///////////////////////////////////////////////
 {
     int rc;
+#if OWNFM
+    if( opl3.bPassthrough ) {
+        return 0;
+    }
+#endif
+
     char buffer[FPU_SRSIZE];
     fpu_save(buffer);
     rc = opl3.Chip->Generate(pcm16, count);
@@ -187,29 +214,65 @@ static void VOPL3_SecondaryWriteData(uint32_t val)
 uint32_t VOPL3_388(uint32_t port, uint32_t val, uint32_t flags)
 ///////////////////////////////////////////////////////////////
 {
+#if OWNFM
+    const int reg = 0;
+    if( opl3.bPassthrough ) {
+        return (flags & TRAPF_OUT) ?
+           AU_write_fm( opl3.hAU, reg, val ) :
+           AU_read_fm( opl3.hAU, reg);
+    }
+#endif
     return (flags & TRAPF_OUT) ? VOPL3_PrimaryWriteIndex(val), val : VOPL3_PrimaryRead();
 }
 
 uint32_t VOPL3_389(uint32_t port, uint32_t val, uint32_t flags)
 ///////////////////////////////////////////////////////////////
 {
+#if OWNFM
+    const int reg = 1;
+    if( opl3.bPassthrough ) {
+        return (flags & TRAPF_OUT) ?
+           AU_write_fm( opl3.hAU, reg, val ) :
+           AU_read_fm( opl3.hAU, reg);
+    }
+#endif
     return (flags & TRAPF_OUT) ? VOPL3_PrimaryWriteData(val), val : VOPL3_PrimaryRead();
 }
 
 uint32_t VOPL3_38A(uint32_t port, uint32_t val, uint32_t flags)
 ///////////////////////////////////////////////////////////////
 {
+#if OWNFM
+    const int reg = 2;
+    if( opl3.bPassthrough ) {
+        return (flags & TRAPF_OUT) ?
+           AU_write_fm( opl3.hAU, reg, val ) :
+           AU_read_fm( opl3.hAU, reg);
+    }
+#endif
     return (flags & TRAPF_OUT) ? VOPL3_SecondaryWriteIndex(val), val : VOPL3_SecondaryRead();
 }
 uint32_t VOPL3_38B(uint32_t port, uint32_t val, uint32_t flags)
 ///////////////////////////////////////////////////////////////
 {
+#if OWNFM
+    const int reg = 3;
+    if( opl3.bPassthrough ) {
+        return (flags & TRAPF_OUT) ?
+           AU_write_fm( opl3.hAU, reg, val ) :
+           AU_read_fm( opl3.hAU, reg);
+    }
+#endif
     return (flags & TRAPF_OUT) ? VOPL3_SecondaryWriteData(val), val : VOPL3_SecondaryRead();
 }
 #if NOSILENTGEN
 bool VOPL3_IsActive( void )
 ///////////////////////////
 {
-    return opl3.bWritten;
+    return opl3.bWritten
+#if OWNFM
+           && !opl3.bPassthrough;
+#endif
+    ;
 }
 #endif

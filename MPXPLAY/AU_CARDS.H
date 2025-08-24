@@ -164,6 +164,9 @@ struct sndcard_info_s {
 
  int (*card_write_uart)(struct audioout_info_s *,int reg,int data); 
  int (*card_read_uart)(struct audioout_info_s *,int reg); 
+
+ int (*card_write_fm)(struct audioout_info_s *,int reg,int data); 
+ int (*card_read_fm)(struct audioout_info_s *,int reg); 
 };
 
 #ifdef NOTFLAT
@@ -190,6 +193,10 @@ extern int  FAREXP AU_writedata( struct audioout_info_s *, int, void * );
 
 extern int  FAREXP AU_write_uart( struct audioout_info_s *, int, int );
 extern int  FAREXP AU_read_uart( struct audioout_info_s *, int );
+
+extern int  FAREXP AU_write_fm( struct audioout_info_s *, int, int );
+extern int  FAREXP AU_read_fm( struct audioout_info_s *, int );
+
 #ifdef __cplusplus
 }
 #endif

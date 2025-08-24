@@ -37,6 +37,8 @@
 #include "PCIBIOS.H"
 #include "AC97MIX.H"
 
+#define CMI8X38_CARD "CMI 8338/8738"
+
 #define CMI8X38_LINK_MULTICHAN 1
 
 #if 1 //def SBEMU
@@ -346,6 +348,7 @@
 #define CM_CAPTURE_SPDF        CM_SPDF_1
 #endif
 
+extern struct sndcard_info_s CMI8X38_sndcard_info;
 
 struct cmi8x38_card_s
 {
@@ -698,6 +701,8 @@ static int CMI8X38_adetect(struct audioout_info_s *aui)
  // init chip
  cmi8x38_chip_init(card);
 
+ sprintf(CMI8X38_sndcard_info.shortname, CMI8X38_CARD " (%u)", card->chip_version % 1000);
+
  card->uart_in = card->uart_out = 0;
  snd_cmipci_read_8(card, CM_REG_MPU_PCI + 1);
 
@@ -844,7 +849,25 @@ static void CMI8X38_setrate(struct audioout_info_s *aui)
  //if((aui->freq_card==44100 || aui->freq_card==48000) && (aui->chan_card==2) && (aui->bits_card==16))
  // snd_cmipci_set_bit(card, CM_REG_FUNCTRL1, CM_PLAYBACK_SPDF);
  //else
-  snd_cmipci_clear_bit(card, CM_REG_FUNCTRL1, CM_PLAYBACK_SPDF);
+  if(aui->gvars->pin == 3) {
+   snd_cmipci_set_bit(card, CM_REG_FUNCTRL1, CM_PLAYBACK_SPDF);
+   snd_cmipci_set_bit(card, CM_REG_LEGACY_CTRL, CM_ENSPDOUT);
+
+   if(card->chip_version <= 37 || aui->gvars->dig_out_override) {
+    snd_cmipci_set_bit(card, CM_REG_LEGACY_CTRL, CM_DAC2SPDO);
+    int val;
+    do {
+     val = snd_cmipci_read_8(card, CM_REG_MIXER1);
+     _LOG("%x %x\n", CM_REG_MIXER1, val);
+    } while(val == -1 && card->chip_version <= 37);
+    val|= CM_CDPLAY;
+    snd_cmipci_write_8(card, CM_REG_MIXER1, val);
+   }
+  } else {
+   snd_cmipci_clear_bit(card, CM_REG_FUNCTRL1, CM_PLAYBACK_SPDF);
+  }
+
+
 
   mpxplay_debugf(CMI_DEBUG_OUTPUT, "setrate done freqnum: %d  freq: %d", freqnum, aui->freq_card);
 }
@@ -853,15 +876,8 @@ static void CMI8X38_start(struct audioout_info_s *aui)
 {
  struct cmi8x38_card_s *card=aui->card_private_data;
 
- if(aui->gvars->opl3) {
  /* disable FM */
-  snd_cmipci_clear_bit(card, CM_REG_MISC_CTRL, CM_FM_EN);
- } else {
-  //fixme: only 388 at this time
-  snd_cmipci_clear_bit(card, CM_REG_LEGACY_CTRL, CM_FMSEL_MASK);
-  snd_cmipci_set_bit(card, CM_REG_MISC_CTRL, CM_FM_EN);
- }
-
+ snd_cmipci_clear_bit(card, CM_REG_MISC_CTRL, CM_FM_EN);
  snd_cmipci_set_bit(card, CM_REG_FUNCTRL1, CM_JYSTK_EN);
 
 #if 1 //def SBEMU
@@ -877,7 +893,6 @@ static void CMI8X38_stop(struct audioout_info_s *aui)
 {
  struct cmi8x38_card_s *card=aui->card_private_data;
 
- snd_cmipci_clear_bit(card, CM_REG_MISC_CTRL, CM_FM_EN);
  snd_cmipci_clear_bit(card, CM_REG_FUNCTRL1, CM_JYSTK_EN);
 
 #if 1 //def SBEMU
@@ -1021,6 +1036,19 @@ static int CMI8X38_read_uart(struct audioout_info_s *aui, int reg)
   }
 }
 
+static int CMI8X38_write_fm(struct audioout_info_s *aui, int reg, int data)
+{
+  struct cmi8x38_card_s *card=aui->card_private_data;
+  snd_cmipci_write_8nv(card, reg + CM_REG_FM_PCI, (uint8_t)data);
+  return (uint8_t)data;
+}
+
+static int CMI8X38_read_fm(struct audioout_info_s *aui, int reg)
+{
+  struct cmi8x38_card_s *card=aui->card_private_data;
+  return snd_cmipci_read_8(card, reg + CM_REG_FM_PCI);
+}
+
 //like SB16
 static struct aucards_mixerchan_s cmi8x38_master_vol={AU_MIXCHANFUNCS_PACK(AU_MIXCHAN_MASTER,AU_MIXCHANFUNC_VOLUME),2,{{0x30,31,3,0},{0x31,31,3,0}}};
 static struct aucards_mixerchan_s cmi8x38_pcm_vol={AU_MIXCHANFUNCS_PACK(AU_MIXCHAN_PCM,AU_MIXCHANFUNC_VOLUME),      2,{{0x32,31,3,0},{0x33,31,3,0}}};
@@ -1031,7 +1059,7 @@ static struct aucards_mixerchan_s cmi8x38_micin_vol={AU_MIXCHANFUNCS_PACK(AU_MIX
 //FM for SBPro - don't write to it as in previous SBPro mixer test it might be reserved.
 //static struct aucards_mixerchan_s cmi8x38_auxin_vol={AU_MIXCHANFUNCS_PACK(AU_MIXCHAN_AUXIN,AU_MIXCHANFUNC_VOLUME),  2,{{0x26,15,4,0},{0x26,15,0,0}}}; //??? in or out?
 
-static struct aucards_mixerchan_s *cmi8x38_mixerset[]={
+const static struct aucards_mixerchan_s *cmi8x38_mixerset[]={
  &cmi8x38_master_vol,
  &cmi8x38_pcm_vol,
  &cmi8x38_synth_vol,
@@ -1043,7 +1071,7 @@ static struct aucards_mixerchan_s *cmi8x38_mixerset[]={
 };
 
 struct sndcard_info_s CMI8X38_sndcard_info={
- "CMI 8338/8738",
+ CMI8X38_CARD " (000)",
  0,
 
  NULL,
@@ -1065,7 +1093,10 @@ struct sndcard_info_s CMI8X38_sndcard_info={
  &cmi8x38_mixerset[0],
 
  &CMI8X38_write_uart,
- &CMI8X38_read_uart
+ &CMI8X38_read_uart,
+
+ &CMI8X38_write_fm,
+ &CMI8X38_read_fm
 
 };
 

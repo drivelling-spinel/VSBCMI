@@ -18,6 +18,7 @@
 #define DISPSTAT 1    /* 1=display VSB status */
 #define SOUNDFONT 0   /* 1=support soundfonts if VMPU is on */
 #define OWNUART 1     /* 1=forward to soundcard's own UART if VMPU is on*/
+#define OWNFM 1       /* 1=forward to soubdcard's own FM sound chip */
 #if SOUNDFONT
 #define VOICES_DEFAULT 64
 #endif
@@ -57,6 +58,7 @@ struct globalvars {
 	int pin;
 	int device;
 	int period_size;
+        int dig_out_override;
 };
 
 /* compatflags bits */

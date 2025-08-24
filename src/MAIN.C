@@ -31,14 +31,10 @@
 
 #if !defined(VSBHDA_NAME)
 #define VSBHDA_NAME "VSBHDA"
-#else
+#endif
+
 #define XSTR(z) STR(z)
 #define STR(z)  #z
-#define TMP_DEF VSBHDA_NAME
-#undef  VSBHDA_NAME
-#define VSBHDA_NAME XSTR(TMP_DEF)
-#undef  TMP_DEF
-#endif
 
 #define BASE_DEFAULT 0x220
 #define IRQ_DEFAULT 7
@@ -50,6 +46,9 @@
 #define HDMA_DEFAULT 5
 #endif
 #define VOL_DEFAULT 7
+
+#define OPT_DEV_RECKLESS (1)
+#define OPT_DEV_DIGOVERRIDE (2)
 
 #ifdef NOTFLAT
 bool _InstallInt31( int );
@@ -104,13 +103,13 @@ extern uint32_t STACKTOP;
 uint8_t bOMode = 1; /* 1=output DOS, 2=direct, 4=debugger */
 
 struct MAIN_s {
-	int hAU;    /* handle audioout_info; we don't want to know mpxplay internals */
-	int freq;   /* default value for AU_setrate() */
-	bool bISR;  /* 1=ISR installed */
-	bool bQemm; /* 1=QPI API found */
-	bool bHdpmi;/* 1=HDPMI found */
-	int bHelp;  /* 1=show help */
-	int bReckless;  /* 1=ignore found SB */
+        int hAU;     /* handle audioout_info; we don't want to know mpxplay internals */
+        int freq;    /* default value for AU_setrate() */
+        bool bISR;   /* 1=ISR installed */
+        bool bQemm;  /* 1=QPI API found */
+        bool bHdpmi; /* 1=HDPMI found */
+        int bHelp;   /* 1=show help */
+        int devOpts; /* bit mask to override sanity checks */
 };
 
 static struct MAIN_s gm = { 0, 22050, false, false, false, false };
@@ -164,7 +163,7 @@ static const struct {
 #if SLOWDOWN
     "SD",  "Set slowdown factor [def 0]", &gvars.slowdown,
 #endif
-    "O",  "Set output (HDA/SB Live) [0=lineout|1=speaker|2=hp, def 0]", &gvars.pin,
+    "O",  "Set output (HDA/SBLive/CMI) [0=lineout|1=speaker|2=hp|3=spdif,def 0]", &gvars.pin,
     "DEV", "Set start index for device scan (HDA only) [def 0]", &gvars.device,
 #ifdef NOTFLAT
     "DIVE", "Set Borland 'Runtime Error 200' fix [def 0]", &gvars.diverr,
@@ -175,7 +174,7 @@ static const struct {
     "MV", "Set voice limit [0-256, def 64]", &gvars.voices,
 #endif
     "CF", "Set compatibility flags [def 0]", &gvars.compatflags,
-    "Q",  "Ignore found SBs [def 0]", &gm.bReckless,
+    "DF", "Set developer override flags (see README.MD) [def 0]", &gm.devOpts,
     NULL, NULL, 0,
 };
 
@@ -215,7 +214,7 @@ void fatal_error( int nError )
 	_asm mov ax,3
     _asm int 10h
 #endif
-        printf(VSBHDA_NAME ": fatal error %u\n", nError );
+        printf(XSTR(VSBHDA_NAME) ": fatal error %u\n", nError );
 	for (;;);
 }
 #endif
@@ -359,7 +358,11 @@ int main(int argc, char* argv[])
     /* if -? or unrecognised option was entered, display help and exit */
     if( gm.bHelp ) {
         gm.bHelp = false;
-        printf(VSBHDA_NAME" v" VERMAJOR "." VERMINOR "; Sound Blaster emulation via HDA/AC97/PCI. Usage:\n");
+        printf(XSTR(VSBHDA_NAME)" v" VERMAJOR "." VERMINOR
+#ifdef VERPATCH
+        "." VERPATCH
+#endif
+        "; Sound Blaster emulation via HDA/AC97/PCI. Usage:\n");
 
         for( i = 0; GOptions[i].option; i++ ) {
             char *tmp;
@@ -406,8 +409,8 @@ int main(int argc, char* argv[])
         return(1);
     }
 #endif
-    if( gvars.pin < 0 || gvars.pin > 2) {
-        printf("Error: valid output devices: 0, 1 or 2\n" );
+    if( gvars.pin < 0 || gvars.pin > 3) {
+        printf("Error: valid output devices: 0, 1, 2 or 3\n" );
         return(1);
     }
     if( gvars.vol < 0 || gvars.vol > 9) {
@@ -441,9 +444,11 @@ int main(int argc, char* argv[])
     _linear_rmstack = _get_linear_rmstack(&rmstksel);
 #endif
 
+    gvars.dig_out_override = gm.devOpts & OPT_DEV_DIGOVERRIDE;
+
     if ( IsInstalled() ) {
-        printf("SB found - probably " VSBHDA_NAME "already installed\n" );
-        if ( !gm.bReckless )
+        printf("SB found - probably " XSTR(VSBHDA_NAME) "already installed\n" );
+        if ( !(gm.devOpts & OPT_DEV_RECKLESS) )
         return(0);
     }
     if( gvars.rm ) {
@@ -514,9 +519,21 @@ int main(int argc, char* argv[])
     gvars.opl3 = 0;
 #endif
 #if SB16
-	PTRAP_Prepare( gvars.opl3, gvars.base, gvars.dma, gvars.hdma, AU_getirq( gm.hAU ) );
+	PTRAP_Prepare(
+#if OWNFM && !defined(NOFM)
+        1,
 #else
-	PTRAP_Prepare( gvars.opl3, gvars.base, gvars.dma, 0, AU_getirq( gm.hAU ) );
+        gvars.opl3,
+#endif
+        gvars.base, gvars.dma, gvars.hdma, AU_getirq( gm.hAU ) );
+#else
+	PTRAP_Prepare(
+#if OWNFM && !defined(NOFM)
+        1,
+#else
+        gvars.opl3,
+#endif
+        gvars.base, gvars.dma, 0, AU_getirq( gm.hAU ) );
 #endif
 #if SB16
     VSB_Init( gvars.irq, gvars.dma, gvars.hdma, gvars.type );
@@ -536,6 +553,12 @@ int main(int argc, char* argv[])
         VOPL3_Init( AU_getfreq( gm.hAU ) );
         printf("OPL3 emulation: enabled at port 388h (%u Hz)\n", AU_getfreq( gm.hAU ) );
     }
+#if OWNFM
+    else {
+        VOPL3_Passthrough( gm.hAU );
+        printf("OPL3 passthrough: enabled at ports %hh, 388h\n", gvars.base);
+    }
+#endif
 #endif
     printf("SB emulation: Addr=%x, Irq=%d, Dma=%d, ", gvars.base, gvars.irq, gvars.dma );
 #if SB16

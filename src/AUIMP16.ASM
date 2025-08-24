@@ -49,6 +49,8 @@ AU_writedata     dd ?
 AU_cardbuf_space dd ?
 AU_write_uart    dd ?
 AU_reqad_uart    dd ?
+AU_write_fm      dd ?
+AU_reqad_fm      dd ?
 AUEXP ends
 
 	.data?
@@ -309,4 +311,17 @@ AU_read_uart proc c public a1:ptr, a2:dword
 AU_read_uart endp
 
 
+AU_write_fm proc c public a1:ptr, a2:dword, a3:dword
+
+        @callexp AU_write_fm, 3
+	ret
+
+AU_write_fm endp
+
+AU_read_fm proc c public a1:ptr, a2:dword
+
+        @callexp AU_read_fm, 2
+	ret
+
+AU_read_fm endp
 	END

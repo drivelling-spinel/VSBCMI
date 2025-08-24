@@ -736,4 +736,19 @@ int FAREXP AU_read_uart( struct audioout_info_s *aui, int reg )
         return -1;
 }
 
+int FAREXP AU_write_fm( struct audioout_info_s *aui, int reg, int data )
+/////////////////////////////////////////////////////////////////////////////////////
+{
+        if(aui->card_handler->card_write_fm)
+                return aui->card_handler->card_write_fm(aui, reg, data);
+        return -1;
+}
+
+int FAREXP AU_read_fm( struct audioout_info_s *aui, int reg )
+/////////////////////////////////////////////////////////////////////////////////////
+{
+        if(aui->card_handler->card_read_fm)
+                return aui->card_handler->card_read_fm(aui, reg);
+        return -1;
+}
 

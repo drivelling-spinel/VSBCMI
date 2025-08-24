@@ -35,6 +35,8 @@ extern unsigned int AU_cardbuf_space( int );
 extern int  AU_writedata( int, int, void * );
 extern int AU_write_uart( int, int, int );
 extern int AU_read_uart( int, int );
+extern int AU_write_fm( int, int, int );
+extern int AU_read_fm( int, int );
 
 #ifdef __cplusplus
 }
