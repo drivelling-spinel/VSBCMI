@@ -447,7 +447,7 @@ int main(int argc, char* argv[])
     gvars.dig_out_override = gm.devOpts & OPT_DEV_DIGOVERRIDE;
 
     if ( IsInstalled() ) {
-        printf("SB found - probably " XSTR(VSBHDA_NAME) "already installed\n" );
+        printf("SB found - probably " XSTR(VSBHDA_NAME) " already installed\n" );
         if ( !(gm.devOpts & OPT_DEV_RECKLESS) )
         return(0);
     }
@@ -556,7 +556,7 @@ int main(int argc, char* argv[])
 #if OWNFM
     else {
         VOPL3_Passthrough( gm.hAU );
-        printf("OPL3 passthrough: enabled at ports %hh, 388h\n", gvars.base);
+        printf("OPL3 passthrough: enabled at ports %xh, 388h\n", gvars.base);
     }
 #endif
 #endif
