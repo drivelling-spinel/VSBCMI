@@ -887,6 +887,11 @@ static void CMI8X38_start(struct audioout_info_s *aui)
   snd_cmipci_clear_bit(card, CM_REG_MISC_CTRL, CM_FM_EN);
  snd_cmipci_set_bit(card, CM_REG_FUNCTRL1, CM_JYSTK_EN);
 
+ if(!aui->gvars->mpu && aui->gvars->legacy_uart_enable)
+  snd_cmipci_set_bit(card, CM_REG_FUNCTRL1, CM_UART_EN);
+ else
+  snd_cmipci_clear_bit(card, CM_REG_FUNCTRL1, CM_UART_EN);
+
 #if 1 //def SBEMU
  snd_cmipci_write_32(card, CM_REG_INT_HLDCLR, CM_CH0_INT_EN);    /* enable ints */
 #endif
@@ -1000,6 +1005,9 @@ static int CMI8X38_IRQRoutine(struct audioout_info_s* aui)
     {
       card->uart_backlog[card->uart_in++%backlog] = snd_cmipci_read_8(card, CM_REG_MPU_PCI);
     }
+
+    if(!(status & (CM_CHINT0|CM_CHINT1)))
+      return -1;
   }
 
   unsigned int mask = 0;
@@ -1021,11 +1029,15 @@ static int CMI8X38_write_uart(struct audioout_info_s *aui, int reg, int data)
   int timeout = 10000; // 100ms
 
   if(!reg) do {
-    if (!(0x40 & snd_cmipci_read_8(card, 1 + CM_REG_MPU_PCI))) break;      
+    if (!(0x40 & snd_cmipci_read_8(card, 1 + CM_REG_MPU_PCI))) break;
     pds_delay_10us(1);
   } while (--timeout);
 
+  if(card->chip_version <= 37)
+   pds_delay_10us(40);
   snd_cmipci_write_8nv(card, reg + CM_REG_MPU_PCI, (uint8_t)data);
+  if(card->chip_version <= 37)
+   pds_delay_10us(40);
   return (uint8_t)data;
 }
 

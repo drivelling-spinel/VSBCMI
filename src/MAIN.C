@@ -52,6 +52,7 @@
 #define DF_CD_DISABLE   (4)
 #define DF_FM_DISABLE   (8)
 #define DF_FM_FORWARD   (0x10)
+#define DF_UART_ENABLE  (0x20)
 
 #ifdef NOTFLAT
 bool _InstallInt31( int );
@@ -160,7 +161,7 @@ static const struct {
     "OPL","Set OPL3 emulation [0|1, def 1]", &gvars.opl3,
     "PM", "Set protected-mode support [0|1, def 1]", &gvars.pm,
     "RM", "Set real-mode support [0|1, def 1]", &gvars.rm,
-    "F",  "Set frequency [11025|22050|44100, def 22050]", &gm.freq,
+    "F",  "Set frequency [11025|22050|44100|48000, def 22050]", &gm.freq,
     "VOL", "Set master volume [0-9, def 7]", &gvars.vol,
     "BS",  "Set PCM buffer size [in 4k pages, def 16]", &gvars.buffsize,
 #if SLOWDOWN
@@ -425,8 +426,8 @@ int main(int argc, char* argv[])
         printf("Error: Invalid PCM buffer size %d\n", gvars.buffsize );
         return(1);
     }
-    if( gm.freq != 11025 && gm.freq != 22050 && gm.freq != 44100 ) {
-        printf("Error: valid frequencies: 11025, 22050, 44100\n" );
+    if( gm.freq != 11025 && gm.freq != 22050 && gm.freq != 44100 && gm.freq != 48000 ) {
+        printf("Error: valid frequencies: 11025, 22050, 44100, 48000\n" );
         return(1);
     }
     if( gvars.period_size % 64 ) {
@@ -452,6 +453,7 @@ int main(int argc, char* argv[])
     gvars.cd_in_disable = gm.devOpts & DF_CD_DISABLE;
     gvars.fm_pass_override = gm.devOpts & DF_FM_FORWARD;
     gvars.legacy_fm_disable = gm.devOpts & DF_FM_DISABLE;
+    gvars.legacy_uart_enable = gm.devOpts & DF_UART_ENABLE;
 
     if ( IsInstalled() ) {
         printf("SB found - probably " XSTR(VSBHDA_NAME) " already installed\n" );
@@ -494,11 +496,13 @@ int main(int argc, char* argv[])
     gm.freq = AU_setrate( gm.hAU, gm.freq, HW_CHANNELS, HW_BITS );
 
     PTRAP_InitPortMax(); /* v1.6: init port trap ranges */
+
     if( gvars.rm ) {
         gvars.rm = PTRAP_Prepare_RM_PortTrap();
         if ( !gvars.rm ) {
             printf("Error: preparing IO port traps for real-mode failed\n");
-            return 1;
+            if( !(gm.devOpts & DF_RECKLESS) )
+                return 1;
         }
     }
     if ( !gvars.rm )
@@ -507,7 +511,8 @@ int main(int argc, char* argv[])
         printf("Protected-mode support disabled\n");
         if( !gvars.rm ) {
             printf("Error: support for both modes disabled\n");
-            return(1);
+            if( !(gm.devOpts & DF_RECKLESS) )
+                return(1);
         }
     }
     if( gvars.pm ) {
@@ -548,6 +553,7 @@ int main(int argc, char* argv[])
 #endif
         gvars.base, gvars.dma, 0, AU_getirq( gm.hAU ) );
 #endif
+
 #if SB16
     VSB_Init( gvars.irq, gvars.dma, gvars.hdma, gvars.type );
 #else
@@ -611,8 +617,9 @@ int main(int argc, char* argv[])
     if ( gvars.pm ) {
         if(( gm.bHdpmi = PTRAP_Install_PM_PortTraps()) == 0 )
             printf("Failed installing IO port trap for protected-mode\n");
-        //PTRAP_PrintPorts(); /* for debugging */
     }
+    if( gm.devOpts & DF_RECKLESS )
+        PTRAP_PrintPorts(); /* for debugging */
 
     if ( gm.bISR ) {
         VIRQ_Init( gvars.irq );
@@ -633,7 +640,7 @@ int main(int argc, char* argv[])
     AU_start( gm.hAU );
     if (bOMode & 1 ) bOMode = 2; /* switch to low-level i/o */
 
-    if( gm.bISR && ( gm.bQemm || (!gvars.rm) ) && ( gm.bHdpmi || (!gvars.pm) ) ) {
+    if( (gm.devOpts & DF_RECKLESS) || ( gm.bISR && ( gm.bQemm || (!gvars.rm) ) && ( gm.bHdpmi || (!gvars.pm) ) ) ) {
         uint32_t psp;
         __dpmi_regs r = {0};
         __dpmi_set_coprocessor_emulation( 0 );

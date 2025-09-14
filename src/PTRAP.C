@@ -317,6 +317,7 @@ bool PTRAP_Prepare_RM_PortTrap()
         dbgprintf(("PTRAP_Prepare_RM_PortTrap: range[%u]: ports %X-%X\n", j, PortTable[portranges[j]], PortTable[portranges[j+1]-1] ));
     }
 #endif
+
     r.x.ip = QPI_Entry.offset16;
     r.x.cs = QPI_Entry.segment;
     r.x.ax = 0x1A06;
@@ -662,22 +663,21 @@ uint8_t PTRAP_UntrappedIO_IN(uint16_t port)
     return _hdpmi_simulate_byte_in( port );
 }
 
-#ifdef _DEBUG
 void PTRAP_PrintPorts( void )
 /////////////////////////////
 {
     int start = 0;
     int i;
-    dbgprintf(( "ports:\n" ));
+    printf( "ports:\n" );
     for ( i = 0; i < maxports; i++ ) {
         if ( i < (maxports -1) && ( PortTable[i+1] != PortTable[i]+1 || PortState[i+1] != PortState[i] )) {
             if ( i == start )
-                dbgprintf(( "%X (%X)\n", PortTable[start], PortState[start] ));
+                printf( "%X (%X)\n", PortTable[start], PortState[start] );
             else
-                dbgprintf(( "%X-%X (%X)\n", PortTable[start], PortTable[i], PortState[start] ));
+                printf( "%X-%X (%X)\n", PortTable[start], PortTable[i], PortState[start] );
             start = i + 1;
         }
     }
     return;
 }
-#endif
+

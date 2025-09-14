@@ -62,6 +62,7 @@ struct globalvars {
         int cd_in_disable;
         int fm_pass_override;
         int legacy_fm_disable;
+        int legacy_uart_enable;
 };
 
 /* compatflags bits */

@@ -337,9 +337,17 @@ static int SNDISR_Interrupt( void )
     bool digital;
     int i;
 
+    int is_irq = AU_isirq( isr.hAU );
     /* check if the sound hw does request an interrupt. */
-    if( !AU_isirq( isr.hAU ) )
+    if(!is_irq)
         return(0);
+
+#if OWNUART
+    if(is_irq < 0) {
+        PIC_SendEOI( AU_getirq( isr.hAU ) );
+        return 0;
+    }
+#endif
 
 #if SETIF
     _enable_ints();
