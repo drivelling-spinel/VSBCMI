@@ -845,31 +845,35 @@ static void CMI8X38_setrate(struct audioout_info_s *aui)
  mpxplay_debugf(CMI_DEBUG_OUTPUT, "LEGCCTRL: %x",  snd_cmipci_read_32(card, CM_REG_LEGACY_CTRL));
  mpxplay_debugf(CMI_DEBUG_OUTPUT, "MISCCTRL: %x",  snd_cmipci_read_32(card, CM_REG_MISC_CTRL));
 
+ int dac_to_spdiff = 0;
+
  // set SPDIF
  //if((aui->freq_card==44100 || aui->freq_card==48000) && (aui->chan_card==2) && (aui->bits_card==16))
  // snd_cmipci_set_bit(card, CM_REG_FUNCTRL1, CM_PLAYBACK_SPDF);
  //else
-  if(aui->gvars->pin == 3) {
-   snd_cmipci_set_bit(card, CM_REG_FUNCTRL1, CM_PLAYBACK_SPDF);
-   snd_cmipci_set_bit(card, CM_REG_LEGACY_CTRL, CM_ENSPDOUT);
+ if(aui->gvars->pin == 3) {
+  snd_cmipci_set_bit(card, CM_REG_FUNCTRL1, CM_PLAYBACK_SPDF);
+  snd_cmipci_set_bit(card, CM_REG_LEGACY_CTRL, CM_ENSPDOUT);
 
-   if(card->chip_version <= 37 || aui->gvars->dig_out_override) {
-    snd_cmipci_set_bit(card, CM_REG_LEGACY_CTRL, CM_DAC2SPDO);
-    int val;
-    do {
-     val = snd_cmipci_read_8(card, CM_REG_MIXER1);
-     _LOG("%x %x\n", CM_REG_MIXER1, val);
-    } while(val == -1 && card->chip_version <= 37);
-    val|= CM_CDPLAY;
-    snd_cmipci_write_8(card, CM_REG_MIXER1, val);
-   }
-  } else {
-   snd_cmipci_clear_bit(card, CM_REG_FUNCTRL1, CM_PLAYBACK_SPDF);
+  if(card->chip_version <= 37 || aui->gvars->dig_out_override) {
+   snd_cmipci_set_bit(card, CM_REG_LEGACY_CTRL, CM_DAC2SPDO);
+   dac_to_spdiff = 1;
   }
+ } else {
+  snd_cmipci_clear_bit(card, CM_REG_FUNCTRL1, CM_PLAYBACK_SPDF);
+ }
 
+ if(!aui->gvars->cd_in_disable) {
+  int val;
+  do {
+   val = snd_cmipci_read_8(card, CM_REG_MIXER1);
+   _LOG("%x %x\n", CM_REG_MIXER1, val);
+  } while(val == -1 && card->chip_version <= 37);
+  val|= CM_CDPLAY;
+  snd_cmipci_write_8(card, CM_REG_MIXER1, val);
+ }
 
-
-  mpxplay_debugf(CMI_DEBUG_OUTPUT, "setrate done freqnum: %d  freq: %d", freqnum, aui->freq_card);
+ mpxplay_debugf(CMI_DEBUG_OUTPUT, "setrate done freqnum: %d  freq: %d", freqnum, aui->freq_card);
 }
 
 static void CMI8X38_start(struct audioout_info_s *aui)
@@ -877,7 +881,10 @@ static void CMI8X38_start(struct audioout_info_s *aui)
  struct cmi8x38_card_s *card=aui->card_private_data;
 
  /* disable FM */
- snd_cmipci_clear_bit(card, CM_REG_MISC_CTRL, CM_FM_EN);
+ if(!aui->gvars->opl3 && !aui->gvars->legacy_fm_disable)
+  snd_cmipci_set_bit(card, CM_REG_MISC_CTRL, CM_FM_EN);
+ else
+  snd_cmipci_clear_bit(card, CM_REG_MISC_CTRL, CM_FM_EN);
  snd_cmipci_set_bit(card, CM_REG_FUNCTRL1, CM_JYSTK_EN);
 
 #if 1 //def SBEMU

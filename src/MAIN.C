@@ -47,8 +47,11 @@
 #endif
 #define VOL_DEFAULT 7
 
-#define OPT_DEV_RECKLESS (1)
-#define OPT_DEV_DIGOVERRIDE (2)
+#define DF_RECKLESS     (1)
+#define DF_DIG_OVERRIDE (2)
+#define DF_CD_DISABLE   (4)
+#define DF_FM_DISABLE   (8)
+#define DF_FM_FORWARD   (0x10)
 
 #ifdef NOTFLAT
 bool _InstallInt31( int );
@@ -174,7 +177,7 @@ static const struct {
     "MV", "Set voice limit [0-256, def 64]", &gvars.voices,
 #endif
     "CF", "Set compatibility flags [def 0]", &gvars.compatflags,
-    "DF", "Set developer override flags (see README.MD) [def 0]", &gm.devOpts,
+    "DF", "Set developer override flags (see README.MD) [def 0, hexadecimal]", &gm.devOpts,
     NULL, NULL, 0,
 };
 
@@ -286,10 +289,11 @@ void MAIN_ReinitOPL( void )
 #endif
 
 #if VMPU
-#define IsHexOption(x) (GOptions[x].pValue == &gvars.base || GOptions[x].pValue == &gvars.mpu )
+#define IsHexOption(x) (GOptions[x].pValue == &gm.devOpts || GOptions[x].pValue == &gvars.base || GOptions[x].pValue == &gvars.mpu)
 #else
-#define IsHexOption(x) (GOptions[x].pValue == &gvars.base )
+#define IsHexOption(x) (GOptions[x].pValue == &gm.devOpts || GOptions[x].pValue == &gvars.base)
 #endif
+
 
 int main(int argc, char* argv[])
 ////////////////////////////////
@@ -444,11 +448,14 @@ int main(int argc, char* argv[])
     _linear_rmstack = _get_linear_rmstack(&rmstksel);
 #endif
 
-    gvars.dig_out_override = gm.devOpts & OPT_DEV_DIGOVERRIDE;
+    gvars.dig_out_override = gm.devOpts & DF_DIG_OVERRIDE;
+    gvars.cd_in_disable = gm.devOpts & DF_CD_DISABLE;
+    gvars.fm_pass_override = gm.devOpts & DF_FM_FORWARD;
+    gvars.legacy_fm_disable = gm.devOpts & DF_FM_DISABLE;
 
     if ( IsInstalled() ) {
         printf("SB found - probably " XSTR(VSBHDA_NAME) " already installed\n" );
-        if ( !(gm.devOpts & OPT_DEV_RECKLESS) )
+        if ( !(gm.devOpts & DF_RECKLESS) )
         return(0);
     }
     if( gvars.rm ) {
@@ -517,11 +524,17 @@ int main(int argc, char* argv[])
 
 #ifdef NOFM
     gvars.opl3 = 0;
+#else
+#ifdef OWNFM
+    int opl_flag = gvars.opl3 ? 1 :
+                     (gvars.fm_pass_override && gvars.legacy_fm_disable) ? 1 :
+                        gvars.fm_pass_override ? -1 : 0;
+#endif
 #endif
 #if SB16
 	PTRAP_Prepare(
 #if OWNFM && !defined(NOFM)
-        1,
+        opl_flag,
 #else
         gvars.opl3,
 #endif
@@ -529,7 +542,7 @@ int main(int argc, char* argv[])
 #else
 	PTRAP_Prepare(
 #if OWNFM && !defined(NOFM)
-        1,
+        opl_flag,
 #else
         gvars.opl3,
 #endif
@@ -554,9 +567,10 @@ int main(int argc, char* argv[])
         printf("OPL3 emulation: enabled at port 388h (%u Hz)\n", AU_getfreq( gm.hAU ) );
     }
 #if OWNFM
-    else {
+    else if( gvars.fm_pass_override ) {
         VOPL3_Passthrough( gm.hAU );
-        printf("OPL3 passthrough: enabled at ports %xh, 388h\n", gvars.base);
+        printf("OPL3 passthrough: enabled at port(-s) %xh%s\n", 
+               gvars.base, gvars.legacy_fm_disable ? ", 388h" : "");
     }
 #endif
 #endif

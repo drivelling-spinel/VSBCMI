@@ -603,6 +603,12 @@ void PTRAP_Prepare( int opl, int sbaddr, int dma, int hdma, int sndirq )
             PortTable[i] += sbaddr - 0x220;
 
     /* if no OPL3 emulation, skip ports 0x388-0x38b and 0x220-0x223 */
+#if OWNFM
+    if ( opl < 0 ) {
+        PDT_DelEntries( portranges[OPL3_PDT], maxports, 4 );
+    }
+    else
+#endif
     if ( !opl ) {
         PDT_DelEntries( portranges[OPL3_PDT], maxports, 4 );
         PDT_DelEntries( portranges[SB_PDT], maxports, 4 );

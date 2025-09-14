@@ -59,6 +59,9 @@ struct globalvars {
 	int device;
 	int period_size;
         int dig_out_override;
+        int cd_in_disable;
+        int fm_pass_override;
+        int legacy_fm_disable;
 };
 
 /* compatflags bits */
