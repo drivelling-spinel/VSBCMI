@@ -2,19 +2,34 @@
 
 Sound Blaster emulation for DOS via CMI/HDA/AC97/SBLive/Ensoniq.
 
+__Note:__ for current version testing is only performed with CM8738 cards. 
+          as much as the author would like to retain proper funtion with other chips original VSBHDA supports 
+          no guarantee is made VSBCMI will work with them, even if original VSBHDA does.
+
 Changes from [VSBHDA](https://github.com/Baron-von-Riedesel/VSBHDA) and [SBEMU](https://github.com/crazii/SBEMU):
  * Support for CMI8X38 using driver originally from SBEMU, MPXPlay, with some changes specific to these chips:
     * _Detected_ revision of the chip is displayed when TSR is loaded
-    * Legacy FM "passthrough" when started with /OPL0
     * MPU401 UART "passthrough" (following SBEMU implementation) when started with /PXXX
     * Joystick port is always left in initialized state 
     * Digital output (S/PDIF Out) is enabled if started with /O3
     * When digital output is enabled for chips with revision of 37 and before,   
       legacy FM is also routed to digital output and S/PDIF In (CD-In) is enabled
-    * For chips with revision after 37, this can be achieved by starting with both /O3 and /DF2
- * Resampling code giving less distorted sound when upsampling to 44100   
-   (and a compile time option to avoid interpolation when resampling)
+    * There is also an option to enable OPL ports "passthrough" (see /DF below)  
+ * Resampling code giving less distorted sound when upsampling to 44100 
+   and option to upsample to 48000 added (/F48000) 
+   There is also a compile time option to switch off interpolation when resampling.
  * SoundFont support is switched off by default (compile time) in favor of UART port forwarding
+ * /DF option added to provide bit flags in hexadecimal format that control behavior of the TSR. 
+   Several flags can be combined. The following flags are supported:
+   
+   | flag   | meaning
+   |--------|------------------------------------------------------------------------------------------|
+   | 01     | Bypass certain sanity checks when installing TSR and print additional debug information  |
+   | 02     | Enable forwarding of wave and FM sound to S/PDIF Out even for newer chips (rev. after 37)|
+   | 04     | Do not enable recording of CD-Audio dital in                                             |
+   | 08     | Disable chip built in OPL emulation on port 388                                          |
+   | 10     | Virtualize port 220 (and 388 if possible) and forward to chip internal PCI OPL ports     |
+   | 20     | Enable chip internal MPU-401 UART emulation on port 330 (unless /PXXX is given)          |
 
 A [HOWTO document](/HOWTO/CM8738-howto.md) for CMI8738-based cards is also included.
 

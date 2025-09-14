@@ -81,7 +81,9 @@ _The guide is licensed by it's author under the terms of [CC BY-NC license](http
        SET BLASTER=A220 I5 D1 H5 P330 T6
        C:\PATH\TO\VSBCMI\VSBCMI /OPL0
 
-   Now is the time to test the driver's and card's operation with games installed on the PC. If everything sounds and works correctly in "analog mode", digital sound output can be configured.   
+   Take not of the revision of the chip deteced by the driver. Behavior is slightly different with older cards (revisions 37 or less) and more modern ones (revisions after 37).
+   
+   Now is the time to test the driver's and card's operation with games installed on the PC. If everything sounds and works correctly in "analog mode", digital sound output can be configured.
 
    __Note:__ Not all  games will work after loading the driver. Some popular games, for example [Tyrian/Tyrian 2000](https://www.classicdosgames.com/game/Tyrian_2000.html), use 16-bit protected mode, and require a special version of emulator. VSBHDA ships one, but VSBCMI at the moment of writing does not. Below is a (non exhaustive) list of games that are known to __have not__ worked well, and thus are not best testing candidates:   
    
@@ -96,13 +98,11 @@ _The guide is licensed by it's author under the terms of [CC BY-NC license](http
 
 ### Word of warning
 
-At least with the following chip
+With more recent revisions of the chip (revision number after 37) - for example CMI-8738/PCI-6ch-mx - sound distortion may occur if chip's own FM playback and S/PDIF-in (e.g. from a CD/DVD-ROM drive that has digital CD-audio output) are routed via S/PDIF Out port. Because of this, for these newer chips the driver splits out only digital audio by default and lets all other "outputs" be heard from analog Speaker Out. 
 
-       CMI-8738/PCI-6ch-mx
-       Vendor ID: 13F6h (C-Media)
-       Device ID: 0111h, Revision ID: 16, Class: 04h (multimedia device)
+On the other hand, with earlier revisions of the chip (37 and before), sending both Wave Out and FM to card's S/PDIF Out seems to work correctly, so the driver will enable this feature when digital output is requested. However, at least with one chip with revision 37 listening to S/PDIF-in produced distorted sound for CD-audio still.
 
-enabling digital output splits out digital sample playback (i.e. speech, digitized music and sound effects) from the rest of the sound processing pipeline, meaning that chip's own (_i.e. not VSB*-emulated_) FM playback, line/mic/CD-in and even S/PDIF-in (e.g. for those CD/DVD-ROM drives that offer digital audio output) all remain heard from analog Speaker Out! It is advised to keep that in mind when assessing the fitness of digital output with CMI-8X38 for each individual's purposes and for planning cabling/connections "downstream" from the sound card.
+It is advised to keep that in mind when assessing the fitness of digital output with CMI-8X38 for each individual's purposes and for planning cabling/connections "downstream" from the sound card.
 
 ### Steps
 
@@ -111,45 +111,45 @@ enabling digital output splits out digital sample playback (i.e. speech, digitiz
        REM Assuming .DLL-s are already loaded with JLOAD
        C:\PATH\TO\VSBHDA.17\HDPMI32I
        SET BLASTER=A220 I5 D1 H5 P330 T6
-       C:\PATH\TO\VSBCMI\VSBCMI /OPL0 /F44100
+       C:\PATH\TO\VSBCMI\VSBCMI /OPL0 /F44100 /O3
+       
+2. Now check sound outpot with actual game, and if the sound is still a bit too high-pitched when compared with what is heard via analog output, try different frequency:
+
+       REM Assuming .DLL-s are already loaded with JLOAD
+       C:\PATH\TO\VSBHDA.17\HDPMI32I
+       SET BLASTER=A220 I5 D1 H5 P330 T6
+       C:\PATH\TO\VSBCMI\VSBCMI /OPL0 /F48000 /O3
        
    These steps can be added to `AUTOEXEC.BAT` if they worked fine.
 
-2. Use C-Media mixer program to configure SPDIF-related features available under "SPDIF-IN  Setup" menu. 
+3. _Optional:_ As explained in the warning above, for chip revisions after 37, FM will not be sent to S/PDIF Out by default. As en experiment, one can try running VSBCMI with additional `/DF2` command line argument and see if FM Output then sounds clean or distorted.
+
+4. All done, congratulations!
+
+
+## Part 4 - Using C-Media C3DMIX.COM mixer with VSBCMI
+
+1. Use C-Media mixer program to configure sound output levels 
 
        C:\PATH\TO\PCIAUD\C3DMIX 
-       
-   ![SPDIF configuration in C-Media mixer program](/HOWTO/C3DMIX1.jpg)   
-   _SPDIF configuration in C-Media mixer program_   
 
-   The recommended settings are:
+   Because VSBCMI handles configuration of digital output, there is no need to change S/PDIF settings in the mixer program.
 
-       Record from SPDIF: ON
-       Monitor SPDIF IN : ON
-       Enable SPDIF OUT : ON
-       SPDIF bypass mode: OFF
-
-3. Quit the program and take note that the output is in agreement with the desired values. 
-
-   ![Output of C-Media mixer program with selected configuration](/HOWTO/C3DMIX2.jpg)   
-   _Output of C-Media mixer program with selected configuration_   
-
-   If the output agrees, look for the lines similar to the below in `AUTOEXEC.BAT` where the program has stored the settings.
+2. Quit the program and look for the lines similar to the below in `AUTOEXEC.BAT` where the program has stored the settings.
    
        C:\PATH\TO\PCIAUD\C3DMIX /MFF000 /FFF400 /WDD400 /LDD4DD /E00500 /A00500 /C00500 /P10000 /400000 /R0f0ff /D740ff /Q0  
 
-    If these are in a _"label-protected area"_ of the file (see Step 2 of Part 1 above), they can be also copied to the part of the file immediately following VSBCMI invocation. In this way, every time mixer settings are adjusted via `C3DMIX.COM` they will also be loaded into the sound card upon next reboot.
+    If these are in a _"label-protected area"_ of the file (see Step 2 of Part 1 above), they can be also copied to the part of the file immediately following VSBCMI invocation. In this way, every time mixer settings are adjusted via `C3DMIX.COM` they will also be loaded into the sound card upon next reboot, only, __remove__ the arguments starting with `/D` and `/Q` to prevent mixer program from interfering  with digital output settings.
     
        REM Assuming the below two lines have been added to AUTOEXEC.BAT
        SET BLASTER=A220 I5 D1 H5 P330 T6
        C:\PATH\TO\VSBCMI\VSBCMI /OPL0 /F44100
        REM add mixer call after them
-       C:\PATH\TO\PCIAUD\C3DMIX /MFF000 /FFF400 /WDD400 /LDD4DD /E00500 /A00500 /C00500 /P10000 /400000 /R0f0ff /D740ff /Q0  
+       C:\PATH\TO\PCIAUD\C3DMIX /MFF000 /FFF400 /WDD400 /LDD4DD /E00500 /A00500 /C00500 /P10000 /400000 /R0f0ff  
     
-    
-4. _Optional_: To exercise more control over mixer one may want to keep the working settings permanent, and only have `C3DMIX.COM` change _current_ mixer levels until next reboot. To achieve this, retain the position of the `C3DMIX` line in `AUTOEXEC.BAT` in the _"label-protected area"_, save the stable working mixer settings in a separate BAT-file, let's say `C3DMIX_D.BAT`:
+3. _Optional_: To exercise more control over mixer one may want to keep the working settings permanent, and only have `C3DMIX.COM` change _current_ mixer levels until next reboot. To achieve this, retain the position of the `C3DMIX` line in `AUTOEXEC.BAT` in the _"label-protected area"_, save the stable working mixer settings in a separate BAT-file, let's say `C3DMIX_D.BAT`:
 
-        C:\PATH\TO\PCIAUD\C3DMIX /MFF000 /FFF400 /WDD400 /LDD4DD /E00500 /A00500 /C00500 /P10000 /400000 /R0f0ff /D740ff /Q0  
+        C:\PATH\TO\PCIAUD\C3DMIX /MFF000 /FFF400 /WDD400 /LDD4DD /E00500 /A00500 /C00500 /P10000 /400000 /R0f0ff  
 
    And then add the call to the new file from `AUTOEXEC.BAT`:
    
@@ -159,8 +159,6 @@ enabling digital output splits out digital sample playback (i.e. speech, digitiz
        REM add mixer call after them
        CALL C3DMIX_D
 
-
-5. All done, congratulations!
 
 
 2025,  
