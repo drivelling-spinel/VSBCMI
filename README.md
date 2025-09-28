@@ -64,10 +64,11 @@ VSBHDA uses some source codes from:
 
 To create the binaries, Open Watcom v2.0 is recommended, more specifically
 [this build](https://github.com/open-watcom/open-watcom-v2/releases/tag/2024-02-02-Build).
-Moreover, for 32-bit variant, a certain version of startup code may be required,
-as hilighted [here](https://github.com/Baron-von-Riedesel/VSBHDA/issues/40#issuecomment-3062018190).
 DJGPP v2.05 may also be used, but cannot create the 16-bit variant of VSBHDA.
 
 In all cases the JWasm assembler (v2.17 or better) is also needed.
 For Open Watcom, a few things from the HX development package (HXDEV)
-are required - see Makefile for details.
+are required - see Makefile for details. Moreover, for 32-bit variant, 
+a certain version of startup code may be required, as hilighted 
+[here](https://github.com/Baron-von-Riedesel/VSBHDA/issues/40#issuecomment-3062018190).
+
