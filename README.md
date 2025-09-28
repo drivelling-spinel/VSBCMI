@@ -1,4 +1,4 @@
-# VSBCMI v1.7.2
+# VSBCMI v1.7.3
 
 Sound Blaster emulation for DOS via CMI/HDA/AC97/SBLive/Ensoniq.
 
@@ -30,6 +30,7 @@ Changes from [VSBHDA](https://github.com/Baron-von-Riedesel/VSBHDA) and [SBEMU](
    | 08     | Disable chip built in OPL emulation on port 388                                          |
    | 10     | Virtualize port 220 (and 388 if possible) and forward to chip internal PCI OPL ports     |
    | 20     | Enable chip internal MPU-401 UART emulation on port 330 (unless /PXXX is given)          |
+   | 40     | Use longer delays for UART passthrough with older chips (rev. up to 37)                  |
 
 A [HOWTO document](/HOWTO/CM8738-howto.md) for CMI8738-based cards is also included.
 
@@ -61,8 +62,11 @@ VSBHDA uses some source codes from:
  * DOSBox: https://www.dosbox.com/ - OPL3 FM emulation
  * TinySoundFont: https://github.com/schellingb/TinySoundFont - MIDI synthesizer emulation
 
-To create the binaries, Open Watcom v2.0 is recommended. DJGPP v2.05
-may also be used, but cannot create the 16-bit variant of VSBHDA.
+To create the binaries, Open Watcom v2.0 is recommended, more specifically
+[this build](https://github.com/open-watcom/open-watcom-v2/releases/tag/2024-02-02-Build).
+Moreover, for 32-bit variant, a certain version of startup code may be required,
+as hilighted [here](https://github.com/Baron-von-Riedesel/VSBHDA/issues/40#issuecomment-3062018190).
+DJGPP v2.05 may also be used, but cannot create the 16-bit variant of VSBHDA.
 
 In all cases the JWasm assembler (v2.17 or better) is also needed.
 For Open Watcom, a few things from the HX development package (HXDEV)

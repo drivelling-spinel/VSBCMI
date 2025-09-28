@@ -164,17 +164,18 @@ static unsigned int mixer_speed_lq(PCM_CV_TYPE_S* source, unsigned int sourcesam
  int16_t *pcm; int16_t const* intmp;
  unsigned int inpos = 0;
 
- if(!sourcesample)
-  return 0;
- if(((sourcesample/channels)&0xFFF00000) != 0) //too many samples, need other approches.
-  return 0;
-
 #if MALLOCSTATIC
  static int maxsample = 0;
  static PCM_CV_TYPE_S* buff = NULL;
 #else
  PCM_CV_TYPE_S* buff;
 #endif
+
+ if(!sourcesample)
+  return 0;
+ if(((sourcesample/channels)&0xFFF00000) != 0) //too many samples, need other approches.
+  return 0;
+
 
 #if MALLOCSTATIC
  if ( sourcesample > maxsample ) {

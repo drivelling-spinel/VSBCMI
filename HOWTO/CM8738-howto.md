@@ -57,7 +57,7 @@ _The guide is licensed by it's author under the terms of [CC BY-NC license](http
 ### Prerequisites
 1. JemmEx (properly Jemm Extended Memory Manager) with JLOAD program. If the machine has FreeDOS installed, JemmEx is probably already there and is configured (at least for boot options that have EMS enabled). It is still advised that an up to date distribution of Jemm is used. For the purpose of the guide [v5.86](https://github.com/Baron-von-Riedesel/Jemm/releases/tag/v5.86pre1) was used.
 2. [VSBHDA v1.7](https://github.com/Baron-von-Riedesel/VSBHDA/releases/tag/v1.7) for all files VSBCMI depends for it's operation.
-3. [VSBCMI](https://github.com/drivelling-spinel/VSBCMI/releases/tag/v1.7.1) executable.
+3. [VSBCMI](https://github.com/drivelling-spinel/VSBCMI/releases/tag/v1.7.3) executable.
 
 ### Steps
 1. Ensure JemmEx is configured to load in `CONFIG.SYS`/`FDCONFIG.SYS` . For example:

@@ -48,9 +48,9 @@ AU_setmixer_all  dd ?
 AU_writedata     dd ?
 AU_cardbuf_space dd ?
 AU_write_uart    dd ?
-AU_reqad_uart    dd ?
+AU_read_uart     dd ?
 AU_write_fm      dd ?
-AU_reqad_fm      dd ?
+AU_read_fm       dd ?
 AUEXP ends
 
 	.data?

@@ -53,6 +53,7 @@
 #define DF_FM_DISABLE   (8)
 #define DF_FM_FORWARD   (0x10)
 #define DF_UART_ENABLE  (0x20)
+#define DF_SLOWER_UART  (0x40)
 
 #ifdef NOTFLAT
 bool _InstallInt31( int );
@@ -305,6 +306,7 @@ int main(int argc, char* argv[])
     void * p;
     int rmstksel;
     char* blaster = getenv("BLASTER");
+    int opl_flag;
 
     if(blaster != NULL) {
         char c;
@@ -454,6 +456,7 @@ int main(int argc, char* argv[])
     gvars.fm_pass_override = gm.devOpts & DF_FM_FORWARD;
     gvars.legacy_fm_disable = gm.devOpts & DF_FM_DISABLE;
     gvars.legacy_uart_enable = gm.devOpts & DF_UART_ENABLE;
+    gvars.try_slower_uart = gm.devOpts & DF_SLOWER_UART;
 
     if ( IsInstalled() ) {
         printf("SB found - probably " XSTR(VSBHDA_NAME) " already installed\n" );
@@ -531,7 +534,7 @@ int main(int argc, char* argv[])
     gvars.opl3 = 0;
 #else
 #ifdef OWNFM
-    int opl_flag = gvars.opl3 ? 1 :
+    opl_flag = gvars.opl3 ? 1 :
                      (gvars.fm_pass_override && gvars.legacy_fm_disable) ? 1 :
                         gvars.fm_pass_override ? -1 : 0;
 #endif

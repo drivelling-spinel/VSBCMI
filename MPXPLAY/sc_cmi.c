@@ -389,6 +389,7 @@ struct cmi8x38_card_s
 
  uint8_t uart_backlog[32];
  uint8_t uart_in, uart_out;
+ uint8_t uart_delay;
 };
 
 extern unsigned int intsoundconfig,intsoundcontrol;
@@ -459,7 +460,7 @@ static void snd_cmipci_ch_reset(struct cmi8x38_card_s *cm, int ch) //reset chann
  int reset = CM_RST_CH0 << ch;
  int adcch = CM_CHADC0 << ch;
  snd_cmipci_write_32(cm, CM_REG_FUNCTRL0, adcch|reset);
- do {pds_delay_10us(10); uint32_t x = snd_cmipci_read_32(cm,CM_REG_FUNCTRL0);} while(!(snd_cmipci_read_32(cm,CM_REG_FUNCTRL0)&reset));
+ do {uint32_t x; pds_delay_10us(10); x = snd_cmipci_read_32(cm,CM_REG_FUNCTRL0);} while(!(snd_cmipci_read_32(cm,CM_REG_FUNCTRL0)&reset));
  snd_cmipci_write_32(cm, CM_REG_FUNCTRL0, adcch&(~reset));
  do {pds_delay_10us(10);} while((snd_cmipci_read_32(cm,CM_REG_FUNCTRL0)&reset));
  pds_delay_10us(500); 
@@ -733,6 +734,8 @@ static void CMI8X38_setrate(struct audioout_info_s *aui)
 {
  struct cmi8x38_card_s *card=aui->card_private_data;
  unsigned int dmabufsize,val,freqnum;
+ int periods;
+ int dac_to_spdiff = 0;
 
  if(aui->freq_card<5512)
   aui->freq_card=5512;
@@ -775,8 +778,8 @@ static void CMI8X38_setrate(struct audioout_info_s *aui)
   return;
 
  //buffer cfg
-#if 1 //def SBEMU
- int periods = max(1, dmabufsize / PCMBUFFERPAGESIZE);
+#if 1 //SBEMU
+ periods = max(1, dmabufsize / PCMBUFFERPAGESIZE);
  card->period_size =
    (aui->gvars->period_size ? aui->gvars->period_size : dmabufsize/periods)
      >> card->shift;
@@ -845,8 +848,6 @@ static void CMI8X38_setrate(struct audioout_info_s *aui)
  mpxplay_debugf(CMI_DEBUG_OUTPUT, "LEGCCTRL: %x",  snd_cmipci_read_32(card, CM_REG_LEGACY_CTRL));
  mpxplay_debugf(CMI_DEBUG_OUTPUT, "MISCCTRL: %x",  snd_cmipci_read_32(card, CM_REG_MISC_CTRL));
 
- int dac_to_spdiff = 0;
-
  // set SPDIF
  //if((aui->freq_card==44100 || aui->freq_card==48000) && (aui->chan_card==2) && (aui->bits_card==16))
  // snd_cmipci_set_bit(card, CM_REG_FUNCTRL1, CM_PLAYBACK_SPDF);
@@ -891,6 +892,11 @@ static void CMI8X38_start(struct audioout_info_s *aui)
   snd_cmipci_set_bit(card, CM_REG_FUNCTRL1, CM_UART_EN);
  else
   snd_cmipci_clear_bit(card, CM_REG_FUNCTRL1, CM_UART_EN);
+
+ if(aui->gvars->try_slower_uart)
+  card->uart_delay = 40;
+ else 
+  card->uart_delay = 25;
 
 #if 1 //def SBEMU
  snd_cmipci_write_32(card, CM_REG_INT_HLDCLR, CM_CH0_INT_EN);    /* enable ints */
@@ -981,6 +987,7 @@ static unsigned long CMI8X38_readMIXER(struct audioout_info_s *aui,unsigned long
 static int CMI8X38_IRQRoutine(struct audioout_info_s* aui)
 {
   struct cmi8x38_card_s *card=aui->card_private_data;
+  unsigned int mask = 0;
   int status = snd_cmipci_read_32(card, CM_REG_INT_STATUS); //read only reg (R)
   if (status == -1) {
     int timeout = 2000;
@@ -1010,7 +1017,6 @@ static int CMI8X38_IRQRoutine(struct audioout_info_s* aui)
       return -1;
   }
 
-  unsigned int mask = 0;
   if (status & CM_CHINT0)
     mask |= CM_CH0_INT_EN;
   if (status & CM_CHINT1)
@@ -1034,10 +1040,10 @@ static int CMI8X38_write_uart(struct audioout_info_s *aui, int reg, int data)
   } while (--timeout);
 
   if(card->chip_version <= 37)
-   pds_delay_10us(40);
+   pds_delay_10us(card->uart_delay);
   snd_cmipci_write_8nv(card, reg + CM_REG_MPU_PCI, (uint8_t)data);
   if(card->chip_version <= 37)
-   pds_delay_10us(40);
+   pds_delay_10us(card->uart_delay);
   return (uint8_t)data;
 }
 
