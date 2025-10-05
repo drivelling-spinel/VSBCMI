@@ -33,13 +33,9 @@ Game compatibility will differ depending on which hardare and software conponent
 
 These games currently are known to crash, hang, play no sound or misbehave is some other way:
 
-* X-Wing (classic floppy version, __not Collector's CD-ROM__)
 * Blackthorne
-* Whizz
-* Black Zone
 * Inherit the Earth (CD-ROM talkie version)
 * Strike Commander 
-* The Secret of Monkey Island and Monkey Island 2 (with SoundBlaster patch by \@NewRisingSun)
 * Electro Man
 
 ## Part 3 - Games that need VSBCMI16
@@ -62,12 +58,9 @@ Here are some programs/games listed that require special actions:
 - Blood: setting SB IRQ to 2 or 5 may be required. Generally, on some
       machines the DOS/4GW DOS extender has problems with IRQ 7.
 - Creative's SB16 diagnose.exe: needs cmdline option /CF1.
-- FastTracker 2: requires Jemm's NOVCPI option AND option /CF4.
-- Jazz Jackrabbit: unpatched version requires /CF8.
 - Jungle Book: needs SETPVI.EXE to be run before launched.
 - Lemmings 2: Uses direct disk access ( Int 25h ) - hence the binary
       has to be located on a FAT12/FAT16 disk.
-- MDK: requires option /CF4.
 - Screamer: set max. XMS memory to 31MB (XMSRes 31).
 - Stargunner: to run SETUP.EXE requires Jemm's NOVCPI option; the game
       doesn't restore the SB interrupt vector - it may be necessary to reload
@@ -123,10 +116,33 @@ If one wants music via external MIDI device in Dark Forces there's the [Dark For
 _to mention another ctpax-cheater tool_
 But what about Tie Fighter? Look no further, as TIEIMUSE.COM patch patches Tie Fighter CD-ROM version of IMUSE.EXE in exactly the same way thus preventing the game from entering an infinite loop.
 
+### X-Wing
+
+For Collector's Edition CD-ROM no special steps are required.   
+Floppy version, however, needs VSBCMI started with `/CF1` option.
+
+### Monkey Island 2
+
+As with X-Wing above, with floppy version `/CF1` option is requried with VSBCMI. This applies also if game has \@NewRisingSun sound drivers patch applied.   
+CD-ROM version from 1996 does not require the special option.   
+The "Ultimate Talkie Edition" also does not require the special option, but may need system slowdown utility in order to work correctly with digitized speech.
+
 ### Kasparov's Gambit
 
 _official patch for the game_
 
+### Black Zone
+
+_to elaborate on /CF1 and any other options_
+
 ### Quake
 
 _-sspeed option and sound pack mods_
+
+
+
+
+2025,  
+[CC BY-NC]( "https://creativecommons.org/licenses/by-nc/4.0/),  
+Ludicrous_peridot
+

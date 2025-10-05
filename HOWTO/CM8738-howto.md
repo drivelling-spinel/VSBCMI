@@ -57,7 +57,7 @@ _The guide is licensed by it's author under the terms of [CC BY-NC license](http
 ### Prerequisites
 1. JemmEx (properly Jemm Extended Memory Manager) with JLOAD program. If the machine has FreeDOS installed, JemmEx is probably already there and is configured (at least for boot options that have EMS enabled). It is still advised that an up to date distribution of Jemm is used. For the purpose of the guide [v5.86](https://github.com/Baron-von-Riedesel/Jemm/releases/tag/v5.86pre1) was used.
 2. [VSBHDA v1.7](https://github.com/Baron-von-Riedesel/VSBHDA/releases/tag/v1.7) for all files VSBCMI depends for it's operation.
-3. [VSBCMI](https://github.com/drivelling-spinel/VSBCMI/releases/tag/v1.7.3) executable.
+3. [VSBCMI](https://github.com/drivelling-spinel/VSBCMI/releases/tag/v1.7.4) executable.
 
 ### Steps
 1. Ensure JemmEx is configured to load in `CONFIG.SYS`/`FDCONFIG.SYS` . For example:
@@ -74,8 +74,12 @@ _The guide is licensed by it's author under the terms of [CC BY-NC license](http
        C:\PATH\TO\JEMMB.586\JLOAD C:\PATH\TO\VSBHDA.17\JHDPMI.DLL
 
    These steps can be added to `AUTOEXEC.BAT` if they worked fine.
-   
-3. Start VSBCMI
+ 
+3. Ensure that IRQ used for VSBCMI TSR is not in use by any of the hardware conponents installed in the PC, as otherwise VSBCMI is known to have issues.   
+   One useful tool to try is SMB by \@Rayer. One can then run it with `SMB.EXE -pci` to list installed PCI devices and allocated IRQs.
+   Ideally, IRQ5 or IRQ7 should be vacant, and then VSBCMI can be configured to use it. The below guide assumes IRQ5 is the one chosen.
+  
+4. Start VSBCMI
 
        C:\PATH\TO\VSBHDA.17\HDPMI32I
        SET BLASTER=A220 I5 D1 H5 P330 T6
@@ -85,15 +89,14 @@ _The guide is licensed by it's author under the terms of [CC BY-NC license](http
    
    Now is the time to test the driver's and card's operation with games installed on the PC. If everything sounds and works correctly in "analog mode", digital sound output can be configured.
 
-   __Note:__ Not all  games will work after loading the driver. Some popular games, for example [Tyrian/Tyrian 2000](https://www.classicdosgames.com/game/Tyrian_2000.html), use 16-bit protected mode, and require a special version of emulator. Below is a (non exhaustive) list of games that are known to __have not__ worked well, and thus are not best testing candidates:   
+   __Note:__ Not all  games will work after loading the driver. Some popular games, for example [Tyrian/Tyrian 2000](https://www.classicdosgames.com/game/Tyrian_2000.html), use 16-bit protected mode, and require a special version of emulator. Some others, like Monkey Island 2 and X-Wing need certain compatibiliy options to be provided to VSBCMI. Below is a (non exhaustive) list of games that are known to __have not__ worked well, and thus are not best testing candidates:   
    
    * Electro Man (_this game works, however, with C-Media proprietary driver as advised above_)
-   * X-Wing classic (floppy edition)
    * Inherit the Earth CD-ROM
    * Strike Commander 
    * Blackthorne
-   * Whizz
-   * Black Zone
+
+   It is advised that game compatibility HOWTO document is checked to see if any extra steps are required for a particular game to be run with VSBCMI.   
 
 
 ## Part 3 - Configuring digital output

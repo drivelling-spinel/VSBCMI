@@ -1,4 +1,4 @@
-# VSBCMI v1.7.3
+# VSBCMI v1.7.4
 
 Sound Blaster emulation for DOS via CMI/HDA/AC97/SBLive/Ensoniq.
 
