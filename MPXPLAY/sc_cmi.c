@@ -1064,14 +1064,24 @@ static int CMI8X38_read_uart(struct audioout_info_s *aui, int reg)
 static int CMI8X38_write_fm(struct audioout_info_s *aui, int reg, int data)
 {
   struct cmi8x38_card_s *card=aui->card_private_data;
-  snd_cmipci_write_8nv(card, reg + CM_REG_FM_PCI, (uint8_t)data);
+  if(aui->gvars->legacy_fm_disable)
+    snd_cmipci_write_8nv(card, reg + CM_REG_FM_PCI, (uint8_t)data);
+  else if(!aui->gvars->opl3)
+    outb(0x388 + reg,data);
+  else return -1;
+
   return (uint8_t)data;
 }
 
 static int CMI8X38_read_fm(struct audioout_info_s *aui, int reg)
 {
   struct cmi8x38_card_s *card=aui->card_private_data;
-  return snd_cmipci_read_8(card, reg + CM_REG_FM_PCI);
+  if(aui->gvars->legacy_fm_disable)
+    return snd_cmipci_read_8(card, reg + CM_REG_FM_PCI);
+  else if(!aui->gvars->opl3)
+    return inb(0x388 + reg);
+  else
+    return -1;
 }
 
 //like SB16
