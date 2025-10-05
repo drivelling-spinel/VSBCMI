@@ -1,9 +1,9 @@
-# VSBCMI v1.7.4
+# VSBCMI v1.7.5
 
 Sound Blaster emulation for DOS via CMI/HDA/AC97/SBLive/Ensoniq.
 
 __Note:__ for current version testing is only performed with CM8738 cards. 
-          as much as the author would like to retain proper funtion with other chips original VSBHDA supports 
+          As much as the author would like to retain proper funtion with other chips original VSBHDA supports 
           no guarantee is made VSBCMI will work with them, even if original VSBHDA does.
 
 Changes from [VSBHDA](https://github.com/Baron-von-Riedesel/VSBHDA) and [SBEMU](https://github.com/crazii/SBEMU):
@@ -20,7 +20,8 @@ Changes from [VSBHDA](https://github.com/Baron-von-Riedesel/VSBHDA) and [SBEMU](
    There is also a compile time option to switch off interpolation when resampling.
  * SoundFont support is switched off by default (compile time) in favor of UART port forwarding
  * /DF option added to provide bit flags in hexadecimal format that control behavior of the TSR. 
-   Several flags can be combined. The following flags are supported:
+   Several flags can be combined by summing up the values, but only a single /DF option is accepted.
+   The following flags are supported:
    
    | flag   | meaning
    |--------|------------------------------------------------------------------------------------------|
@@ -28,7 +29,7 @@ Changes from [VSBHDA](https://github.com/Baron-von-Riedesel/VSBHDA) and [SBEMU](
    | 02     | Enable forwarding of wave and FM sound to S/PDIF Out even for newer chips (rev. after 37)|
    | 04     | Do not enable recording of CD-Audio dital in                                             |
    | 08     | Disable chip built in OPL emulation on port 388                                          |
-   | 10     | Virtualize port 220 (and 388 if possible) and forward to chip internal PCI OPL ports     |
+   | 10     | Virtualize port 220 (and 388 if possible) and forward to currently active OPL ports      |
    | 20     | Enable chip internal MPU-401 UART emulation on port 330 (unless /PXXX is given)          |
    | 40     | Use longer delays for UART passthrough with older chips (rev. up to 37)                  |
 

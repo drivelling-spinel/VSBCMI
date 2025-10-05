@@ -22,7 +22,7 @@ Game compatibility will differ depending on which hardare and software conponent
 | OS             | FreeDOS 1.3-RC3 release 2020-05-31                                                       |
 |                | JemmEx v5.85                                                                             |
 | Input          | A4Tech ML160 (BIOS USB compatibility on) + PS/2 wired keyboard                           | 
-|                | Logitech mouse driver v7.02 (with CLOAKING)                                               |
+|                | Logitech mouse driver v7.02 (__without__ CLOAKING)                                       |
 | Joysticks      | InterAct PC Flight Force SV-242 + SV-240 connected to game port                          |
 | Soundcard      | Leadtek WinFast 4X (PCI, CMI-8738) with TOSLINK bracket                                  |
 |                | PCIAUDIO.COM v1.98, C3DMIX.COM v0.4                                                      |
@@ -105,7 +105,17 @@ In fact a similar driver update as described above for Lands of Lore 2 also fixe
 
 ### Archimedean Dynasty / Schleichfahrt
 
-_4G.EXE files and NOVCPI option_
+Archimedean Dynasty / Schleichfahrt have two sets of `.EXE` files each:
+
+- Default `.EXE` files bound to CauseWay DOS extender
+  - `SF.EXE`
+  - `AD.EXE`
+- Files ending with `4G`, bound to DOS/4GW
+  - `SG4G.EXE`
+  - `AD4G.EXE`
+
+While both sets work with `VSBCMI`, the ones ending with `4G` are recommended.   
+To run the CauseWay-bound versions, issue `JEMMEX.EXE NOVCMI` command first.
 
 ### Dark Forces
 
@@ -113,8 +123,7 @@ If one wants music via external MIDI device in Dark Forces there's the [Dark For
 
 ### Tie Fighter 
 
-_to mention another ctpax-cheater tool_
-But what about Tie Fighter? Look no further, as TIEIMUSE.COM patch patches Tie Fighter CD-ROM version of IMUSE.EXE in exactly the same way thus preventing the game from entering an infinite loop.
+But what about Tie Fighter? Look no further than [TIEIMUSE.COM](https://ludicrous-site.vercel.app/other#tie-fighter-cd-rom-midi-fix), which patches Tie Fighter CD-ROM version of IMUSE.EXE, thus preventing the game from entering an infinite loop. Alternatively, [an iMuse patcher](https://ctpax-cheater.losthost.org/htmldocs/trouble.htm#imusefix) is available from the same group that created Dark Forcer DeHacker.
 
 ### X-Wing
 
@@ -125,20 +134,20 @@ Floppy version, however, needs VSBCMI started with `/CF1` option.
 
 As with X-Wing above, with floppy version `/CF1` option is requried with VSBCMI. This applies also if game has \@NewRisingSun sound drivers patch applied.   
 CD-ROM version from 1996 does not require the special option.   
-The "Ultimate Talkie Edition" also does not require the special option, but may need system slowdown utility in order to work correctly with digitized speech.
+The "Ultimate Talkie Edition" also does not require the special option, but may need system slowdown utility in order to work correctly with digitized speech. [CpuSpd](https://www.vogons.org/viewtopic.php?t=74359) is a recommended tool for that.
 
 ### Kasparov's Gambit
 
-_official patch for the game_
+Official 1.1 patch is requried to fix issues with video playback that the game has. Get it from, e.g., from The Patches Scrolls.
 
 ### Black Zone
 
-_to elaborate on /CF1 and any other options_
+Black Zone does not work with currently released version of `HDPMI32I.EXE` and needs a special build, posted by the maintainer in [this issue discussion](https://github.com/Baron-von-Riedesel/VSBHDA/issues/54). With this version of DOS extender, VSBCMI also needs to be started with options `/OPL0 /CF1 /DF10` (i.e. with FM port forwarding) _or_ `/OPL1 /CF1` (i.e. with software FM emulation).   
+While this allows playing the game with sound and music, __a lot__ can be done to improve how the game sounds. See [this fan site](https://black-zone-shrine.vercel.app) for details. 
 
 ### Quake
 
 _-sspeed option and sound pack mods_
-
 
 
 

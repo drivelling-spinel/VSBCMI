@@ -57,7 +57,7 @@ _The guide is licensed by it's author under the terms of [CC BY-NC license](http
 ### Prerequisites
 1. JemmEx (properly Jemm Extended Memory Manager) with JLOAD program. If the machine has FreeDOS installed, JemmEx is probably already there and is configured (at least for boot options that have EMS enabled). It is still advised that an up to date distribution of Jemm is used. For the purpose of the guide [v5.86](https://github.com/Baron-von-Riedesel/Jemm/releases/tag/v5.86pre1) was used.
 2. [VSBHDA v1.7](https://github.com/Baron-von-Riedesel/VSBHDA/releases/tag/v1.7) for all files VSBCMI depends for it's operation.
-3. [VSBCMI](https://github.com/drivelling-spinel/VSBCMI/releases/tag/v1.7.4) executable.
+3. [VSBCMI](https://github.com/drivelling-spinel/VSBCMI/releases/tag/v1.7.5) executable.
 
 ### Steps
 1. Ensure JemmEx is configured to load in `CONFIG.SYS`/`FDCONFIG.SYS` . For example:
@@ -76,7 +76,7 @@ _The guide is licensed by it's author under the terms of [CC BY-NC license](http
    These steps can be added to `AUTOEXEC.BAT` if they worked fine.
  
 3. Ensure that IRQ used for VSBCMI TSR is not in use by any of the hardware conponents installed in the PC, as otherwise VSBCMI is known to have issues.   
-   One useful tool to try is SMB by \@Rayer. One can then run it with `SMB.EXE -pci` to list installed PCI devices and allocated IRQs.
+   One useful tool to try is [SMB by \@Rayer](https://rayer.g6.cz/programm/programe.htm). One can run it with `SMB.EXE -pci` to list installed PCI devices and allocated IRQs.
    Ideally, IRQ5 or IRQ7 should be vacant, and then VSBCMI can be configured to use it. The below guide assumes IRQ5 is the one chosen.
   
 4. Start VSBCMI
@@ -89,7 +89,7 @@ _The guide is licensed by it's author under the terms of [CC BY-NC license](http
    
    Now is the time to test the driver's and card's operation with games installed on the PC. If everything sounds and works correctly in "analog mode", digital sound output can be configured.
 
-   __Note:__ Not all  games will work after loading the driver. Some popular games, for example [Tyrian/Tyrian 2000](https://www.classicdosgames.com/game/Tyrian_2000.html), use 16-bit protected mode, and require a special version of emulator. Some others, like Monkey Island 2 and X-Wing need certain compatibiliy options to be provided to VSBCMI. Below is a (non exhaustive) list of games that are known to __have not__ worked well, and thus are not best testing candidates:   
+   __Note:__ Not all  games will work after loading the driver. Some popular games, for example [Tyrian/Tyrian 2000](https://www.classicdosgames.com/game/Tyrian_2000.html), use 16-bit protected mode, and require a special version of emulator. Some others, like earlier versions of Monkey Island 2 and X-Wing, need certain compatibiliy options to be provided to VSBCMI. Below is a (non exhaustive) list of games that are known to __have not__ worked well, and thus are not best testing candidates:   
    
    * Electro Man (_this game works, however, with C-Media proprietary driver as advised above_)
    * Inherit the Earth CD-ROM
@@ -118,7 +118,7 @@ It is advised to keep that in mind when assessing the fitness of digital output 
        SET BLASTER=A220 I5 D1 H5 P330 T6
        C:\PATH\TO\VSBCMI\VSBCMI /OPL0 /F44100 /O3
        
-2. Now check sound outpot with actual game, and if the sound is still a bit too high-pitched when compared with what is heard via analog output, try different frequency:
+2. Now check sound output with actual game, and if the sound is still a bit too high-pitched when compared with what is heard via analog output, try different frequency (note `/F48000`):
 
        REM Assuming .DLL-s are already loaded with JLOAD
        C:\PATH\TO\VSBHDA.17\HDPMI32I
@@ -136,7 +136,8 @@ It is advised to keep that in mind when assessing the fitness of digital output 
 
 1. Use C-Media mixer program to configure sound output levels 
 
-       C:\PATH\TO\PCIAUD\C3DMIX 
+       CD C:\PATH\TO\PCIAUD
+       C3DMIX 
 
    Because VSBCMI handles configuration of digital output, there is no need to change S/PDIF settings in the mixer program.
 
