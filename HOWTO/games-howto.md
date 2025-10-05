@@ -110,7 +110,7 @@ Lands of Lore II works great with VSBCMI and actually sounds much better when co
 
 In fact a similar driver update as described above for Lands of Lore 2 also fixes MIDI playback with Slipsteram 5000 shareware version. It does not seem to be reqired for the full version of the game.
 
-### Archimedean Dynasty / Schlachtfaht
+### Archimedean Dynasty / Schleichfahrt
 
 _4G.EXE files and NOVCPI option_
 
@@ -130,10 +130,3 @@ _official patch for the game_
 ### Quake
 
 _-sspeed option and sound pack mods_
-
-
-
-2025,  
-[CC BY-NC]( "https://creativecommons.org/licenses/by-nc/4.0/),  
-Ludicrous_peridot
-
