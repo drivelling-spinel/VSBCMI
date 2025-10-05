@@ -81,7 +81,7 @@ _The guide is licensed by it's author under the terms of [CC BY-NC license](http
        SET BLASTER=A220 I5 D1 H5 P330 T6
        C:\PATH\TO\VSBCMI\VSBCMI /OPL0
 
-   Take not of the revision of the chip deteced by the driver. Behavior is slightly different with older cards (revisions 37 or less) and more modern ones (revisions after 37).
+   Take note of the revision of the chip deteced by the driver. Behavior is slightly different with older cards (revisions 37 or less) and more modern ones (revisions after 37).
    
    Now is the time to test the driver's and card's operation with games installed on the PC. If everything sounds and works correctly in "analog mode", digital sound output can be configured.
 

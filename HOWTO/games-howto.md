@@ -130,3 +130,10 @@ _official patch for the game_
 ### Quake
 
 _-sspeed option and sound pack mods_
+
+
+
+2025,  
+[CC BY-NC]( "https://creativecommons.org/licenses/by-nc/4.0/),  
+Ludicrous_peridot
+
