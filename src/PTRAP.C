@@ -603,16 +603,18 @@ void PTRAP_Prepare( int opl, int sbaddr, int dma, int hdma, int sndirq )
         for( i = portranges[SB_PDT]; i < portranges[SB_PDT+1]; i++ )
             PortTable[i] += sbaddr - 0x220;
 
-    /* if no OPL3 emulation, skip ports 0x388-0x38b and 0x220-0x223 */
+    /* if no OPL3 emulation, skip ports 0x388-0x38b, 0x220-0x223 and 0x228-0x229 */
 #if OWNFM
     if ( opl < 0 ) {
         PDT_DelEntries( portranges[OPL3_PDT], maxports, 4 );
+        PDT_DelEntries( portranges[SB_PDT]+3, maxports, 2 );
     }
     else
 #endif
     if ( !opl ) {
         PDT_DelEntries( portranges[OPL3_PDT], maxports, 4 );
         PDT_DelEntries( portranges[SB_PDT], maxports, 4 );
+        PDT_DelEntries( portranges[SB_PDT]+3, maxports, 2 );
     }
 
     /* delete empty port ranges */
@@ -670,7 +672,8 @@ void PTRAP_PrintPorts( void )
     int i;
     printf( "ports:\n" );
     for ( i = 0; i < maxports; i++ ) {
-        if ( i < (maxports -1) && ( PortTable[i+1] != PortTable[i]+1 || PortState[i+1] != PortState[i] )) {
+        if ( (i < (maxports -1) && ( PortTable[i+1] != PortTable[i]+1 || PortState[i+1] != PortState[i] )) ||
+             (i == (maxports - 1) && ( PortTable[i-1] == PortTable[i]-1 && PortState[i-1] == PortState[i])) ) {
             if ( i == start )
                 printf( "%X (%X)\n", PortTable[start], PortState[start] );
             else

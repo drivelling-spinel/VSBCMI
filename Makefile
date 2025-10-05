@@ -27,19 +27,19 @@ WATCOM=\ow20
 #NOFM=1
 
 # use jwlink (1) or wlink (0)
-USEJWL=1
+USEJWL=0
 
-CC=$(WATCOM)\binnt\wcc386.exe
-CPP=$(WATCOM)\binnt\wpp386.exe
+CC=$(WATCOM)\binw\wcc386.exe
+CPP=$(WATCOM)\binw\wpp386.exe
 !if $(USEJWL)
-LINK=jwlink.exe
+LINK=$(WATCOM)\binw\jwlink.exe
 !else
-LINK=$(WATCOM)\binnt\wlink.exe
+LINK=$(WATCOM)\binw\wlink.exe
 !endif
-LIB=$(WATCOM)\binnt\wlib.exe
+LIB=$(WATCOM)\binw\wlib.exe
 ASM=jwasm.exe
 
-NAME=vsbhda
+NAME=vsbcmi
 
 !if $(DEBUG)
 OUTD=owd
@@ -61,7 +61,7 @@ OBJFILES = &
 !endif
 	$(OUTD)/ac97mix.obj		$(OUTD)/au_cards.obj &
 	$(OUTD)/dmairq.obj		$(OUTD)/pcibios.obj		$(OUTD)/physmem.obj		$(OUTD)/timer.obj &
-	$(OUTD)/sc_e1371.obj	$(OUTD)/sc_ich.obj		$(OUTD)/sc_inthd.obj	$(OUTD)/sc_via82.obj	$(OUTD)/sc_sbliv.obj	$(OUTD)/sc_sbl24.obj &
+	$(OUTD)/sc_e1371.obj		$(OUTD)/sc_cmi.obj		$(OUTD)/sc_ich.obj		$(OUTD)/sc_inthd.obj	$(OUTD)/sc_via82.obj	$(OUTD)/sc_sbliv.obj	$(OUTD)/sc_sbl24.obj &
 	$(OUTD)/stackio.obj		$(OUTD)/stackisr.obj	$(OUTD)/sbisr.obj		$(OUTD)/int31.obj		$(OUTD)/rmwrap.obj		$(OUTD)/mixer.obj &
 	$(OUTD)/hapi.obj		$(OUTD)/dprintf.obj		$(OUTD)/vioout.obj		$(OUTD)/djdpmi.obj		$(OUTD)/uninst.obj &
 	$(OUTD)/malloc.obj		$(OUTD)/sbrk.obj		$(OUTD)/fileacc.obj
@@ -69,7 +69,7 @@ OBJFILES = &
 C_OPT_FLAGS=-q -mf -oxa -ecc -5s -fp5 -fpi87 -wcd=111
 # OW's wpp386 doesn't like the -ecc option
 CPP_OPT_FLAGS=-q -oxa -mf -bc -5s -fp5 -fpi87 
-C_EXTRA_FLAGS=
+C_EXTRA_FLAGS=-DVSBHDA_NAME=$(NAME)
 !ifdef NOFM
 C_EXTRA_FLAGS= $(C_EXTRA_FLAGS) -DNOFM
 !endif
@@ -80,16 +80,16 @@ INCLUDES=-I$(WATCOM)\h
 LIBS=
 
 {src}.asm{$(OUTD)}.obj
-	@$(ASM) -q -D?MODEL=flat -Istartup $(A_DEBUG_FLAGS) -Fo$@ $<
+	*@$(ASM) -q -D?MODEL=flat -Istartup $(A_DEBUG_FLAGS) -Fo$@ $<
 
 {src}.c{$(OUTD)}.obj
-	@$(CC) $(C_DEBUG_FLAGS) $(C_OPT_FLAGS) $(C_EXTRA_FLAGS) $(CFLAGS) -Isrc $(INCLUDES) -fo=$@ $<
+	*@$(CC) $(C_DEBUG_FLAGS) $(C_OPT_FLAGS) $(C_EXTRA_FLAGS) $(CFLAGS) -Isrc $(INCLUDES) -fo=$@ $<
 
 {src}.cpp{$(OUTD)}.obj
-	@$(CPP) $(C_DEBUG_FLAGS) $(CPP_OPT_FLAGS) $(C_EXTRA_FLAGS) $(CPPFLAGS) -Isrc $(INCLUDES) -fo=$@ $<
+	*@$(CPP) $(C_DEBUG_FLAGS) $(CPP_OPT_FLAGS) $(C_EXTRA_FLAGS) $(CPPFLAGS) -Isrc $(INCLUDES) -fo=$@ $<
 
 {mpxplay}.c{$(OUTD)}.obj
-	@$(CC) $(C_DEBUG_FLAGS) $(C_OPT_FLAGS) $(C_EXTRA_FLAGS) $(CFLAGS) -Impxplay -Isrc $(INCLUDES) -fo=$@ $<
+	*@$(CC) $(C_DEBUG_FLAGS) $(C_OPT_FLAGS) $(C_EXTRA_FLAGS) $(CFLAGS) -Impxplay -Isrc $(INCLUDES) -fo=$@ $<
 
 {startup}.asm{$(OUTD)}.obj
 	@$(ASM) -q -zcw -D?MODEL=flat $(A_DEBUG_FLAGS) -Fo$@ $<
@@ -100,7 +100,7 @@ $(OUTD):
 	@mkdir $(OUTD)
 
 $(OUTD)\$(NAME).exe: $(OUTD)\$(NAME).lib
-	@$(LINK) @<<
+	*@$(LINK) @<<
 format win pe runtime console
 file $(OUTD)\main.obj, $(OUTD)\linear.obj
 name $@
@@ -113,19 +113,20 @@ segment CONST readonly
 segment CONST2 readonly
 !endif
 <<
-	@patchpe $*.exe
+	@dpmild32.exe patchpe.exe $*.exe
 
 $(OUTD16)\$(NAME)16.exe: .always
 	@wmake -h -f OW16.mak debug=$(DEBUG)
 
 $(OUTD)\$(NAME).lib: $(OBJFILES)
-	@$(LIB) -q -b -n $(OUTD)\$(NAME).lib $(OBJFILES)
+	*@$(LIB) -q -b -n $(OUTD)\$(NAME).lib $(OBJFILES)
 
 $(OUTD)/ac97mix.obj:   mpxplay\ac97mix.c
 $(OUTD)/au_cards.obj:  mpxplay\au_cards.c
 $(OUTD)/dmairq.obj:    mpxplay\dmairq.c
 $(OUTD)/physmem.obj:   mpxplay\physmem.c
 $(OUTD)/pcibios.obj:   mpxplay\pcibios.c
+$(OUTD)/sc_cmi.obj:    mpxplay\sc_cmi.c
 $(OUTD)/sc_e1371.obj:  mpxplay\sc_e1371.c
 $(OUTD)/sc_ich.obj:    mpxplay\sc_ich.c
 $(OUTD)/sc_inthd.obj:  mpxplay\sc_inthd.c
@@ -157,7 +158,7 @@ $(OUTD)/vsb.obj:       src\vsb.c
 !ifndef NOFM
 $(OUTD)/dbopl.obj:     src\dbopl.cpp
 $(OUTD)/vopl3.obj:     src\vopl3.cpp
-	@$(CPP) $(C_DEBUG_FLAGS) -q -oxa -mf -bc -ecc -5s -fp5 -fpi87 $(C_EXTRA_FLAGS) $(CPPFLAGS) $(INCLUDES) -fo=$@ $<
+	*@$(CPP) $(C_DEBUG_FLAGS) -q -oxa -mf -bc -ecc -5s -fp5 -fpi87 $(C_EXTRA_FLAGS) $(CPPFLAGS) $(INCLUDES) -fo=$@ $<
 !endif
 $(OUTD)/malloc.obj:    startup\malloc.asm
 $(OUTD)/sbrk.obj:      startup\sbrk.asm

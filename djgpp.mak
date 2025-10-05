@@ -10,7 +10,7 @@ ifeq ($(NAME),)
 NAME=vsbhda
 NAME_D=$(NAME)d
 else
-NAME_D=$(NAME)
+NAME_D=$(NAME)dj
 endif
 
 ifeq ($(DEBUG),1)
