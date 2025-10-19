@@ -33,7 +33,7 @@
 
 #include "CONFIG.H"
 #include "MPXPLAY.H"
-#include "DMAIRQ.H"
+#include "DMABUF.H"
 #include "PCIBIOS.H"
 #include "AC97MIX.H"
 
@@ -357,9 +357,9 @@ struct cmi8x38_card_s
  unsigned int    irq;
  unsigned char   chiprev;
  unsigned char   device_type;
- struct pci_config_s  *pci_dev;
+ struct pci_config_s  pci_dev;
 
- struct cardmem_s *dm;
+ struct cardmem_s dm;
  char *pcmout_buffer;
  long pcmout_bufsize;
 
@@ -554,8 +554,8 @@ static void cmi8x38_chip_init(struct cmi8x38_card_s *cm)
 
  cm->chip_version = 0;
  cm->max_channels = 2;
- if (cm->pci_dev->device_id != PCI_DEVICE_ID_CMEDIA_CM8338A &&
-        cm->pci_dev->device_id != PCI_DEVICE_ID_CMEDIA_CM8338B)
+ if (cm->pci_dev.device_id != PCI_DEVICE_ID_CMEDIA_CM8338A &&
+        cm->pci_dev.device_id != PCI_DEVICE_ID_CMEDIA_CM8338B)
   query_chip(cm);
 
  mpxplay_debugf(CMI_DEBUG_OUTPUT, "chip version: %d, multi_chan: %d", cm->chip_version, cm->can_multi_ch);
@@ -573,7 +573,7 @@ static void cmi8x38_chip_init(struct cmi8x38_card_s *cm)
  mpxplay_debugf(CMI_DEBUG_OUTPUT, "MISCCTRL: %x",  snd_cmipci_read_32(cm, CM_REG_MISC_CTRL));
 
  if(cm->chip_version <= 37)
-  pcibios_WriteConfig_Dword(cm->pci_dev, 0x40, 0); //disable DMA slave
+  pcibios_WriteConfig_Dword(&cm->pci_dev, 0x40, 0); //disable DMA slave
 
  snd_cmipci_write_32(cm, CM_REG_INT_HLDCLR, 0);    /* disable ints */
  snd_cmipci_ch_reset(cm, CM_CH_PLAY);
@@ -596,7 +596,7 @@ static void cmi8x38_chip_init(struct cmi8x38_card_s *cm)
  snd_cmipci_set_bit(cm, CM_REG_FUNCTRL1, CM_BREQ);
 
  /* Assume TX and compatible chip set (Autodetection required for VX chip sets) */
- switch(cm->pci_dev->device_id) {
+ switch(cm->pci_dev.device_id) {
   case PCI_DEVICE_ID_CMEDIA_CM8738:
   case PCI_DEVICE_ID_CMEDIA_CM8738B:
        /* PCI_VENDOR_ID_INTEL, PCI_DEVICE_ID_INTEL_82437VX */
@@ -642,25 +642,15 @@ static struct pci_device_s cmi_devices[]={
 
 static void CMI8X38_close(struct audioout_info_s *aui);
 
-static void CMI8X38_card_info(struct audioout_info_s *aui)
-{
- struct cmi8x38_card_s *card=aui->card_private_data;
-#if 1
- dbgprintf(("CMI 8338/8738 : %s soundcard found on port:%4.4X irq:%d chipver:%d max-chans:%d",
-         card->pci_dev->device_name,card->iobase,card->irq,card->chip_version,card->max_channels));
-#endif
-}
-
 static unsigned int snd_cmi_buffer_init(struct cmi8x38_card_s *card, struct audioout_info_s *aui)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 {
     unsigned int bytes_per_sample = 2;
     card->pcmout_bufsize = MDma_get_max_pcmoutbufsize( aui, 0,
       aui->gvars->period_size ? aui->gvars->period_size : PCMBUFFERPAGESIZE, bytes_per_sample, 0 );
-    card->dm = MDma_alloc_cardmem(PCMBUFFERALIGNMENT + card->pcmout_bufsize);
-    if (!card->dm) return 0;
+    if (!MDma_alloc_cardmem( &card->dm, PCMBUFFERALIGNMENT + card->pcmout_bufsize)) return 0;
     /* pagetable requires 8 byte align; MDma_alloc_cardmem() returns 1kB aligned ptr */
-    card->pcmout_buffer=(void *)(((uint32_t)card->dm->pMem + PCMBUFFERALIGNMENT-1)&(~(PCMBUFFERALIGNMENT-1))); // buffer begins on page (4096 bytes) boundary
+    card->pcmout_buffer=(void *)(((uint32_t)card->dm.pMem + PCMBUFFERALIGNMENT-1)&(~(PCMBUFFERALIGNMENT-1))); // buffer begins on page (4096 bytes) boundary
     aui->card_DMABUFF = card->pcmout_buffer;
 #if 0 //def SBEMU
     memset(card->pcmout_buffer, 0, card->pcmout_bufsize);
@@ -679,22 +669,18 @@ static int CMI8X38_adetect(struct audioout_info_s *aui)
   return 0;
  aui->card_private_data=card;
 
- card->pci_dev=(struct pci_config_s *)calloc(1,sizeof(struct pci_config_s));
- if(!card->pci_dev)
-  goto err_adetect;
-
- if(pcibios_search_devices(cmi_devices,card->pci_dev)!=PCI_SUCCESSFUL)
+ if(pcibios_search_devices(cmi_devices,&card->pci_dev)!=PCI_SUCCESSFUL)
   goto err_adetect;
 
  dbgprintf(("CMI8X38_adetect: enable PCI io and busmaster\n"));
- pcibios_enable_BM_IO(card->pci_dev);
+ pcibios_enable_BM_IO(&card->pci_dev);
 
- card->iobase = pcibios_ReadConfig_Dword(card->pci_dev, PCIR_NAMBAR)&0xfff0;
+ card->iobase = pcibios_ReadConfig_Dword(&card->pci_dev, PCIR_NAMBAR)&0xfff0;
  if(!card->iobase)
   goto err_adetect;
- aui->card_irq = card->irq = pcibios_ReadConfig_Byte(card->pci_dev, PCIR_INTR_LN);
- card->chiprev=pcibios_ReadConfig_Byte(card->pci_dev, PCIR_RID);
- card->model  =pcibios_ReadConfig_Word(card->pci_dev, PCIR_SSID);
+ aui->card_irq = card->irq = pcibios_ReadConfig_Byte(&card->pci_dev, PCIR_INTR_LN);
+ card->chiprev=pcibios_ReadConfig_Byte(&card->pci_dev, PCIR_RID);
+ card->model  =pcibios_ReadConfig_Word(&card->pci_dev, PCIR_SSID);
 
  // alloc buffers
  if(!snd_cmi_buffer_init(card, aui))
@@ -722,9 +708,7 @@ static void CMI8X38_close(struct audioout_info_s *aui)
  if(card){
   if(card->iobase)
    cmi8x38_chip_close(card);
-  MDma_free_cardmem(card->dm);
-  if(card->pci_dev)
-   free(card->pci_dev);
+  MDma_free_cardmem(&card->dm);
   free(card);
   aui->card_private_data=NULL;
  }
@@ -1085,14 +1069,14 @@ static int CMI8X38_read_fm(struct audioout_info_s *aui, int reg)
 }
 
 //like SB16
-static struct aucards_mixerchan_s cmi8x38_master_vol={AU_MIXCHANFUNCS_PACK(AU_MIXCHAN_MASTER,AU_MIXCHANFUNC_VOLUME),2,{{0x30,31,3,0},{0x31,31,3,0}}};
-static struct aucards_mixerchan_s cmi8x38_pcm_vol={AU_MIXCHANFUNCS_PACK(AU_MIXCHAN_PCM,AU_MIXCHANFUNC_VOLUME),      2,{{0x32,31,3,0},{0x33,31,3,0}}};
-static struct aucards_mixerchan_s cmi8x38_synth_vol={AU_MIXCHANFUNCS_PACK(AU_MIXCHAN_SYNTH,AU_MIXCHANFUNC_VOLUME),  2,{{0x34,31,3,0},{0x35,31,3,0}}};
-static struct aucards_mixerchan_s cmi8x38_cdin_vol={AU_MIXCHANFUNCS_PACK(AU_MIXCHAN_CDIN,AU_MIXCHANFUNC_VOLUME),    2,{{0x36,31,3,0},{0x37,31,3,0}}};
-static struct aucards_mixerchan_s cmi8x38_linein_vol={AU_MIXCHANFUNCS_PACK(AU_MIXCHAN_LINEIN,AU_MIXCHANFUNC_VOLUME),2,{{0x38,31,3,0},{0x39,31,3,0}}};
-static struct aucards_mixerchan_s cmi8x38_micin_vol={AU_MIXCHANFUNCS_PACK(AU_MIXCHAN_MICIN,AU_MIXCHANFUNC_VOLUME),  1,{{0x3A,31,3,0}}};
+static struct aucards_mixerchan_s cmi8x38_master_vol={AU_MIXCHAN_MASTER,AU_MIXCHANFUNC_VOLUME,2,{{0x30,5,3,0},{0x31,5,3,0}}};
+static struct aucards_mixerchan_s cmi8x38_pcm_vol={AU_MIXCHAN_PCM,AU_MIXCHANFUNC_VOLUME,      2,{{0x32,5,3,0},{0x33,5,3,0}}};
+static struct aucards_mixerchan_s cmi8x38_synth_vol={AU_MIXCHAN_SYNTH,AU_MIXCHANFUNC_VOLUME,  2,{{0x34,5,3,0},{0x35,5,3,0}}};
+static struct aucards_mixerchan_s cmi8x38_cdin_vol={AU_MIXCHAN_CDIN,AU_MIXCHANFUNC_VOLUME,    2,{{0x36,5,3,0},{0x37,5,3,0}}};
+static struct aucards_mixerchan_s cmi8x38_linein_vol={AU_MIXCHAN_LINEIN,AU_MIXCHANFUNC_VOLUME,2,{{0x38,5,3,0},{0x39,5,3,0}}};
+static struct aucards_mixerchan_s cmi8x38_micin_vol={AU_MIXCHAN_MICIN,AU_MIXCHANFUNC_VOLUME,  1,{{0x3A,5,3,0}}};
 //FM for SBPro - don't write to it as in previous SBPro mixer test it might be reserved.
-//static struct aucards_mixerchan_s cmi8x38_auxin_vol={AU_MIXCHANFUNCS_PACK(AU_MIXCHAN_AUXIN,AU_MIXCHANFUNC_VOLUME),  2,{{0x26,15,4,0},{0x26,15,0,0}}}; //??? in or out?
+//static struct aucards_mixerchan_s cmi8x38_auxin_vol={AU_MIXCHAN_AUXIN,AU_MIXCHANFUNC_VOLUME,  2,{{0x26,4,4,0},{0x26,4,0,0}}}; //??? in or out?
 
 const static struct aucards_mixerchan_s *cmi8x38_mixerset[]={
  &cmi8x38_master_vol,
@@ -1109,10 +1093,7 @@ struct sndcard_info_s CMI8X38_sndcard_info={
  CMI8X38_CARD " (000)",
  0,
 
- NULL,
- NULL,                   // no init
  &CMI8X38_adetect,       // only autodetect
- &CMI8X38_card_info,
  &CMI8X38_start,
  &CMI8X38_stop,
  &CMI8X38_close,
