@@ -38,7 +38,7 @@ struct VMPU_s {
     unsigned char buffer[4096];
 #endif
 #if OWNUART
-    int hAU;
+    void *hAU;
 #endif
 };
 static struct VMPU_s vmpu;
@@ -284,7 +284,7 @@ void VMPU_Process_Messages(void)
 }
 #endif
 
-void VMPU_Init( int freq, int hAU )
+void VMPU_Init( int freq, void *hAU )
 //////////////////////////
 {
 #if OWNUART

@@ -360,6 +360,9 @@ int main(int argc, char* argv[])
         printf(XSTR(VSBHDA_NAME)" v" VERMAJOR "." VERMINOR
 #ifdef VERPATCH
         "." VERPATCH
+#ifdef VERCOMMT
+        "." VERCOMMT
+#endif
 #endif
         "; Sound Blaster emulation via HDA/AC97/PCI. Usage:\n");
 

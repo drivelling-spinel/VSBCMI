@@ -32,11 +32,13 @@
 
 #include "CONFIG.H"
 #include "MPXPLAY.H"
-#include "DMABUF.H"
+#include "DMABUFF.H"
 #include "PCIBIOS.H"
 #include "AC97MIX.H"
 
 #define CMI8X38_CARD "CMI 8338/8738"
+
+static char cmi8x38_shortname[] = CMI8X38_CARD " (000)  ";
 
 #define CMI8X38_LINK_MULTICHAN 1
 
@@ -599,7 +601,7 @@ static unsigned int snd_cmi_buffer_init(struct cmi8x38_card_s *card, struct audi
 {
     unsigned int bytes_per_sample = 2;
     card->pcmout_bufsize = MDma_get_max_pcmoutbufsize( aui, 0,
-      aui->gvars->period_size ? aui->gvars->period_size : PCMBUFFERPAGESIZE, bytes_per_sample, 0 );
+      aui->gvars->period_size ? aui->gvars->period_size : PCMBUFFERPAGESIZE, bytes_per_sample, 48000 );
     if (!MDma_alloc_cardmem( &card->dm, PCMBUFFERALIGNMENT + card->pcmout_bufsize)) return 0;
     /* pagetable requires 8 byte align; MDma_alloc_cardmem() returns 1kB aligned ptr */
     card->pcmout_buffer=(void *)(((uint32_t)card->dm.pMem + PCMBUFFERALIGNMENT-1)&(~(PCMBUFFERALIGNMENT-1))); // buffer begins on page (4096 bytes) boundary
@@ -640,7 +642,7 @@ static int CMI8X38_adetect(struct audioout_info_s *aui)
  // init chip
  cmi8x38_chip_init(card);
 
- sprintf(CMI8X38_sndcard_info.shortname, CMI8X38_CARD " (%u)", card->chip_version % 1000);
+ sprintf(cmi8x38_shortname, CMI8X38_CARD " (%u)", card->chip_version % 1000);
 
  card->uart_in = card->uart_out = 0;
  snd_cmipci_read_8(card, CM_REG_MPU_PCI + 1);
@@ -685,7 +687,7 @@ static void CMI8X38_setrate(struct audioout_info_s *aui)
  aui->card_wave_id=WAVEID_PCM_SLE;
 
  dmabufsize=MDma_init_pcmoutbuf(aui, card->pcmout_bufsize,
-   aui->gvars->period_size ? aui->gvars->period_size : PCMBUFFERPAGESIZE,0);
+   aui->gvars->period_size ? aui->gvars->period_size : PCMBUFFERPAGESIZE,48000);
 
  //format cfg
  card->fmt=0;
@@ -996,7 +998,7 @@ const static struct aucards_mixerchan_s *cmi8x38_mixerset[]={
 };
 
 struct sndcard_info_s CMI8X38_sndcard_info={
- CMI8X38_CARD " (000)",
+ cmi8x38_shortname,
  0,
 
  &CMI8X38_adetect,       // only autodetect
@@ -1012,7 +1014,7 @@ struct sndcard_info_s CMI8X38_sndcard_info={
 
  &CMI8X38_writeMIXER,
  &CMI8X38_readMIXER,
- &cmi8x38_mixerset[0],
+ cmi8x38_mixerset,
 
  &CMI8X38_write_uart,
  &CMI8X38_read_uart,

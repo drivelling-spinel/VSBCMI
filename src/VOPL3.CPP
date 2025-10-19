@@ -62,7 +62,7 @@ uint8_t ADLG_CtrlEnable;  //seems not working for Miles Sound, don't use it
 bool bWritten;
 #endif
 #if OWNFM
-int hAU;
+void *hAU;
 bool bPassthrough;
 #endif
 };
@@ -80,17 +80,17 @@ void VOPL3_Init(int samplerate)
 	opl3.bWritten = false;
 #endif
 #if OWNFM
-        opl3.bPassthrough = false;
+	opl3.bPassthrough = false;
 #endif
 }
 
 
 #if OWNFM
-void VOPL3_Passthrough(int hAU)
+void VOPL3_Passthrough(void *hAU)
 ///////////////////////////////
 {
-        opl3.hAU = hAU;
-        opl3.bPassthrough = true;
+	opl3.hAU = hAU;
+	opl3.bPassthrough = true;
 }
 #endif
 

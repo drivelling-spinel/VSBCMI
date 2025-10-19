@@ -42,6 +42,8 @@ extern uint8_t (*UntrappedIO_IN_Handler)(uint16_t port);
 #define UntrappedIO_OUT( a, b ) UntrappedIO_OUT_Handler( a, b )
 #define UntrappedIO_IN( a ) UntrappedIO_IN_Handler( a )
 
+void PTRAP_PrintPorts( void );
+
 #ifdef __cplusplus
 }
 #endif

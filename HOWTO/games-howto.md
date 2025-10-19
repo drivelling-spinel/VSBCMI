@@ -36,6 +36,7 @@ These games currently are known to crash, hang, play no sound or misbehave is so
 * Inherit the Earth (CD-ROM talkie version)
 * Strike Commander 
 * Blackthorne _(needs upstream bugfixes from v1.8)_
+* Electro Man
 
 _The below is copied from `vsbhda.txt`_
 * Comanche
@@ -154,7 +155,8 @@ While this allows playing the game with sound and music, __a lot__ can be done t
 
 ### Electro Man
 
-If crashes or loss of keyboard control is observed after some time spent playing (also even without VSBCMI loaded), 
+It is recommended that the game is used with C-Media proprietary driver instead of VSBCMI.
+If crashes or loss of keyboard control are observed after some time spent playing (also even with C-Medie driver), 
 switching from FreeDOS to MS-DOS may help.
 The same could apply for other X-Land games, such as "The Adventures of Robbo" and "Heartlight".
 

@@ -9,7 +9,7 @@ extern "C"
 
 void VOPL3_Init(int samplerate);
 #if OWNFM
-void VOPL3_Passthrough(int hAU);
+void VOPL3_Passthrough(void *hAU);
 #endif
 #if REINITOPL
 void VOPL3_Reinit(int samplerate);

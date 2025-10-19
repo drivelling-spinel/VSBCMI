@@ -1,4 +1,4 @@
-# VSBCMI v1.7.5
+# VSBCMI v1.8.1
 
 Sound Blaster emulation for DOS via CMI/HDA/AC97/SBLive/Ensoniq.
 
@@ -35,6 +35,13 @@ Changes from [VSBHDA](https://github.com/Baron-von-Riedesel/VSBHDA) and [SBEMU](
 
 A [HOWTO document](/HOWTO/CM8738-howto.md) for CMI8738-based cards is also included.
 
+A note on commit tags/version numbers used in VSBCMI (e.g. seen when VSBCMI.EXE is run with /?):
+
+      1.8.          - last merged tag of VSBHDA 
+          1.        - version of VSBCMI-specifc code on top of merged VSBHDA tag
+                    - or 0 when VSBHDA features are added ahead of VSBHDA tag released
+            99      - last merged VSBHDA commit number
+
 Forked from v1.7 of ...
 
 # VSBHDA
@@ -63,8 +70,7 @@ VSBHDA uses some source codes from:
  * DOSBox: https://www.dosbox.com/ - OPL3 FM emulation
  * TinySoundFont: https://github.com/schellingb/TinySoundFont - MIDI synthesizer emulation
 
-To create the binaries, Open Watcom v2.0 is recommended, more specifically
-[this build](https://github.com/open-watcom/open-watcom-v2/releases/tag/2024-02-02-Build).
+To create the binaries, the following version of Open Watcom v2.0 must be used:
+https://github.com/open-watcom/open-watcom-v2/releases/tag/2024-02-02-Build.
 DJGPP v2.05 may also be used, but cannot create the 16-bit variant of VSBHDA.
-
 In all cases the JWasm assembler (v2.17 or better) is also needed.

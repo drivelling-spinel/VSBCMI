@@ -688,7 +688,6 @@ void PTRAP_PrintPorts( void )
             start = i + 1;
         }
     }
-    return 0;
 }
 
 #if PT0V86
@@ -706,6 +705,7 @@ uint32_t PTRAP_GetPageTab0v86( void )
         __dpmi_simulate_real_mode_procedure_retf(&QPI_regs);
         if ( 0 == ( QPI_regs.x.flags & 1 ) )
             return ( QPI_regs.d.edx );
+    }
     return 0;
 }
 #endif
