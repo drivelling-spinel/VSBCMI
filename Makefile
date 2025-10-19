@@ -1,43 +1,54 @@
 
-# create vsbhda.exe with Open Watcom v2.0 and JWasm.
-# to create the binary, enter
+# Create vsbhda.exe with Open Watcom and JWasm.
+# To create the binary, enter
 #   wmake
-# optionally, for a debug version, enter
+# Optionally, for a debug version, enter
 #   wmake debug=1
 
-# the HX DOS extender is used; that means, a few
-# things from the HXDEV package are required:
+# 1. Adjust WATCOM - directory where Open Watcom is installed.
+# 2. Adjust USE19  - should be 1 if OW v1.9 is to be used.
+# 3. Adjust USEJWL - should be 0 if JWLink isn't available
+#                    and OW's WLink is to be used.
+# 4. Adjust similar settings in OW16.MAK.
+
+# The Makefile assumes that the OW Win32 branch is used for creating
+# vsbhda.exe. To use the DOS branch instead, all occurances of \binnt\
+# below have to be changed to \binw\.
+
+# A few modules from the HX DOS extender are used.
+# They are included as binaries in directory res:
 #
-# - loadpero.bin     pe loader stub attached to binary
-# - cstrtdhx.obj     startup module linked into binary
-# - patchpe.exe      patches PE signature to PX
+# 1. loadpero.bin  pe loader stub attached to binary.
+# 2. patchpe.exe   patches PE signature to PX; only needed if
+#                  OW WLink is used instead of JWLink.
 #
-# patchpe is a Win32 application; to run it in DOS, the
-# HXRT package will be needed; cstrtdx.obj should be copied
-# to the Open Watcom lib386\dos directory; and loadpero.bin
-# will be searched by the linker in the current directory
-# or in any directory contained in the PATH environment var.
+# patchpe.exe is a Win32 application; to run it in DOS, the
+# HXRT package will be needed.
 
 !ifndef DEBUG
 DEBUG=0
 !endif
 
 WATCOM=\ow20
+# use OW v2 (0) or OW v1.9 (1)
+USE19=0
+# use jwlink (1) or wlink (0)
+USEJWL=1
 # activate next line if FM synth should be deactivated
 #NOFM=1
 
-# use jwlink (1) or wlink (0)
-USEJWL=0
-
 CC=$(WATCOM)\binw\wcc386.exe
 CPP=$(WATCOM)\binw\wpp386.exe
-!if $(USEJWL)
-LINK=$(WATCOM)\binw\jwlink.exe
-!else
-LINK=$(WATCOM)\binw\wlink.exe
-!endif
 LIB=$(WATCOM)\binw\wlib.exe
 ASM=jwasm.exe
+
+!if $(USEJWL)
+LINK=jwlink.exe
+JWLHX=hx
+!else
+LINK=$(WATCOM)\binw\wlink.exe
+JWLHX=
+!endif
 
 NAME=vsbcmi
 
@@ -53,6 +64,10 @@ C_DEBUG_FLAGS=
 A_DEBUG_FLAGS=
 !endif
 
+!if $(USE19)
+OW19=-DOW19
+!endif
+
 OBJFILES = &
 	$(OUTD)/main.obj		$(OUTD)/sndisr.obj		$(OUTD)/ptrap.obj		$(OUTD)/linear.obj		$(OUTD)/pic.obj &
 	$(OUTD)/vsb.obj			$(OUTD)/vdma.obj		$(OUTD)/virq.obj		$(OUTD)/vmpu.obj		$(OUTD)/tsf.obj &
@@ -60,9 +75,9 @@ OBJFILES = &
 	$(OUTD)/dbopl.obj		$(OUTD)/vopl3.obj &
 !endif
 	$(OUTD)/ac97mix.obj		$(OUTD)/au_cards.obj &
-	$(OUTD)/dmairq.obj		$(OUTD)/pcibios.obj		$(OUTD)/physmem.obj		$(OUTD)/timer.obj &
-	$(OUTD)/sc_e1371.obj		$(OUTD)/sc_cmi.obj		$(OUTD)/sc_ich.obj		$(OUTD)/sc_inthd.obj	$(OUTD)/sc_via82.obj	$(OUTD)/sc_sbliv.obj	$(OUTD)/sc_sbl24.obj &
-	$(OUTD)/stackio.obj		$(OUTD)/stackisr.obj	$(OUTD)/sbisr.obj		$(OUTD)/int31.obj		$(OUTD)/rmwrap.obj		$(OUTD)/mixer.obj &
+	$(OUTD)/dmabuff.obj		$(OUTD)/pcibios.obj		$(OUTD)/physmem.obj		$(OUTD)/timer.obj &
+	$(OUTD)/sc_cmi.obj		$(OUTD)/sc_e1371.obj		$(OUTD)/sc_ich.obj		$(OUTD)/sc_inthd.obj		$(OUTD)/sc_via82.obj		$(OUTD)/sc_sbliv.obj		$(OUTD)/sc_sbl24.obj &
+	$(OUTD)/stackio.obj		$(OUTD)/stackisr.obj		$(OUTD)/sbisr.obj		$(OUTD)/int31.obj		$(OUTD)/rmwrap.obj		$(OUTD)/mixer.obj &
 	$(OUTD)/hapi.obj		$(OUTD)/dprintf.obj		$(OUTD)/vioout.obj		$(OUTD)/djdpmi.obj		$(OUTD)/uninst.obj &
 	$(OUTD)/malloc.obj		$(OUTD)/sbrk.obj		$(OUTD)/fileacc.obj
 	
@@ -92,28 +107,29 @@ LIBS=
 	*@$(CC) $(C_DEBUG_FLAGS) $(C_OPT_FLAGS) $(C_EXTRA_FLAGS) $(CFLAGS) -Impxplay -Isrc $(INCLUDES) -fo=$@ $<
 
 {startup}.asm{$(OUTD)}.obj
-	@$(ASM) -q -zcw -D?MODEL=flat $(A_DEBUG_FLAGS) -Fo$@ $<
+	@$(ASM) -q -zcw -D?MODEL=flat $(OW19) $(A_DEBUG_FLAGS) -Fo$@ $<
 
 all: $(OUTD) $(OUTD)\$(NAME).exe $(OUTD16)\$(NAME)16.exe
 
 $(OUTD):
 	@mkdir $(OUTD)
 
-$(OUTD)\$(NAME).exe: $(OUTD)\$(NAME).lib
+$(OUTD)\$(NAME).exe: $(OUTD)\$(NAME).lib $(OUTD)\cstrtdhx.obj
 	*@$(LINK) @<<
-format win pe runtime console
-file $(OUTD)\main.obj, $(OUTD)\linear.obj
+format win pe $(JWLHX) runtime console
+file $(OUTD)\cstrtdhx, $(OUTD)\main, $(OUTD)\linear
 name $@
 libpath $(WATCOM)\lib386\dos;$(WATCOM)\lib386
-libfile cstrtdhx.obj
 lib $(OUTD)\$(NAME).lib
-op q,m=$(OUTD)\$(NAME).map,stub=loadpero.bin,stack=0x10000,heap=0x1000
+op q,m=$(OUTD)\$(NAME).map,stub=res\loadpero.bin,stack=0x10000,heap=0x1000
 !if $(USEJWL)
 segment CONST readonly
 segment CONST2 readonly
 !endif
 <<
-	@dpmild32.exe patchpe.exe $*.exe
+!if !$(USEJWL) 
+	res\@patchpe $*.exe
+!endif
 
 $(OUTD16)\$(NAME)16.exe: .always
 	@wmake -h -f OW16.mak debug=$(DEBUG)
@@ -123,7 +139,7 @@ $(OUTD)\$(NAME).lib: $(OBJFILES)
 
 $(OUTD)/ac97mix.obj:   mpxplay\ac97mix.c
 $(OUTD)/au_cards.obj:  mpxplay\au_cards.c
-$(OUTD)/dmairq.obj:    mpxplay\dmairq.c
+$(OUTD)/dmabuff.obj:   mpxplay\dmabuff.c
 $(OUTD)/physmem.obj:   mpxplay\physmem.c
 $(OUTD)/pcibios.obj:   mpxplay\pcibios.c
 $(OUTD)/sc_cmi.obj:    mpxplay\sc_cmi.c
@@ -160,6 +176,7 @@ $(OUTD)/dbopl.obj:     src\dbopl.cpp
 $(OUTD)/vopl3.obj:     src\vopl3.cpp
 	*@$(CPP) $(C_DEBUG_FLAGS) -q -oxa -mf -bc -ecc -5s -fp5 -fpi87 $(C_EXTRA_FLAGS) $(CPPFLAGS) $(INCLUDES) -fo=$@ $<
 !endif
+$(OUTD)/cstrtdhx.obj:  startup\cstrtdhx.asm
 $(OUTD)/malloc.obj:    startup\malloc.asm
 $(OUTD)/sbrk.obj:      startup\sbrk.asm
 

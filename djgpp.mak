@@ -16,9 +16,11 @@ endif
 ifeq ($(DEBUG),1)
 OUTD=djgppd
 C_DEBUG_FLAGS=-D_DEBUG
+A_DEBUG_FLAGS=-D_DEBUG -Fl=$(OUTD)/
 else
 OUTD=djgpp
 C_DEBUG_FLAGS=
+A_DEBUG_FLAGS=
 endif
 
 vpath_src=src mpxplay
@@ -34,7 +36,7 @@ OBJFILES=\
 	$(OUTD)/main.o		$(OUTD)/sndisr.o	$(OUTD)/ptrap.o		$(OUTD)/dbopl.o		$(OUTD)/linear.o	$(OUTD)/pic.o\
 	$(OUTD)/vsb.o		$(OUTD)/vdma.o		$(OUTD)/virq.o		$(OUTD)/vopl3.o		$(OUTD)/vmpu.o		$(OUTD)/tsf.o\
 	$(OUTD)/ac97mix.o	$(OUTD)/au_cards.o\
-	$(OUTD)/dmairq.o	$(OUTD)/pcibios.o	$(OUTD)/physmem.o	$(OUTD)/timer.o\
+	$(OUTD)/dmabuff.o	$(OUTD)/pcibios.o	$(OUTD)/physmem.o	$(OUTD)/timer.o\
 	$(OUTD)/sc_e1371.o	$(OUTD)/sc_cmi.o	$(OUTD)/sc_ich.o	$(OUTD)/sc_inthd.o	$(OUTD)/sc_via82.o	$(OUTD)/sc_sbliv.o	$(OUTD)/sc_sbl24.o\
 	$(OUTD)/stackio.o	$(OUTD)/stackisr.o	$(OUTD)/sbisr.o		$(OUTD)/int31.o		$(OUTD)/rmwrap.o	$(OUTD)/mixer.o\
 	$(OUTD)/hapi.o		$(OUTD)/dprintf.o	$(OUTD)/vioout.o	$(OUTD)/djdpmi.o	$(OUTD)/uninst.o	$(OUTD)/fileacc.o
@@ -56,9 +58,9 @@ else
 REDIR_CMD=
 endif
 
-COMPILE.asm.o=$(REDIR_CMD) jwasm.exe -q -djgpp -Istartup -D?MODEL=small -DDJGPP -Fo$@ $<
+COMPILE.asm.o=$(REDIR_CMD) jwasm.exe -q -djgpp -Istartup -D?MODEL=small -DDJGPP $(A_DEBUG_FLAGS) -Fo=$@ $<
 COMPILE.c.o=$(REDIR_CMD) gcc $(C_DEBUG_FLAGS) $(C_OPT_FLAGS) $(C_EXTRA_FLAGS) $(CFLAGS) $(INCLUDES) -c $< -o $@
-COMPILE.cpp.o=$(REDIR_CMD) redir -oa error.log -eo gcc $(C_DEBUG_FLAGS) $(C_OPT_FLAGS) $(C_EXTRA_FLAGS) $(CPPFLAGS) $(INCLUDES) -c $< -o $@
+COMPILE.cpp.o=$(REDIR_CMD) gcc $(C_DEBUG_FLAGS) $(C_OPT_FLAGS) $(C_EXTRA_FLAGS) $(CPPFLAGS) $(INCLUDES) -c $< -o $@
 
 $(OUTD)/%.o: src/%.c
 	$(COMPILE.c.o)
@@ -95,17 +97,17 @@ $(OUTD)/rmwrap.o:: rmwrap.asm rmcode1.asm rmcode2.asm
 	jwasm.exe -q -djgpp -D?MODEL=small -DOUTD=$(OUTD) -Fo$@ src/rmwrap.asm
 
 $(OUTD)/ac97mix.o::  ac97mix.c   mpxplay.h au_cards.h ac97mix.h
-$(OUTD)/au_cards.o:: au_cards.c  mpxplay.h au_cards.h dmairq.h config.h
-$(OUTD)/dmairq.o::   dmairq.c    mpxplay.h au_cards.h dmairq.h
+$(OUTD)/au_cards.o:: au_cards.c  mpxplay.h au_cards.h dmabuff.h config.h
+$(OUTD)/dmabuff.o::  dmabuff.c   mpxplay.h au_cards.h dmabuff.h
 $(OUTD)/pcibios.o::  pcibios.c   pcibios.h
 $(OUTD)/physmem.o::  physmem.c
-$(OUTD)/sc_e1371.o:: sc_e1371.c  mpxplay.h au_cards.h dmairq.h pcibios.h ac97mix.h
-$(OUTD)/sc_ich.o::   sc_ich.c    mpxplay.h au_cards.h dmairq.h pcibios.h ac97mix.h
-$(OUTD)/sc_cmi.o::   sc_cmi.c    mpxplay.h au_cards.h dmairq.h pcibios.h ac97mix.h config.h
-$(OUTD)/sc_inthd.o:: sc_inthd.c  mpxplay.h au_cards.h dmairq.h pcibios.h sc_inthd.h
-$(OUTD)/sc_sbl24.o:: sc_sbl24.c  mpxplay.h au_cards.h dmairq.h pcibios.h ac97mix.h sc_sbl24.h emu10k1.h
-$(OUTD)/sc_sbliv.o:: sc_sbliv.c  mpxplay.h au_cards.h dmairq.h pcibios.h ac97mix.h sc_sbliv.h emu10k1.h
-$(OUTD)/sc_via82.o:: sc_via82.c  mpxplay.h au_cards.h dmairq.h pcibios.h ac97.h
+$(OUTD)/sc_e1371.o:: sc_e1371.c  mpxplay.h au_cards.h dmabuff.h pcibios.h ac97mix.h
+$(OUTD)/sc_ich.o::   sc_ich.c    mpxplay.h au_cards.h dmabuff.h pcibios.h ac97mix.h
+$(OUTD)/sc_cmi.o::   sc_cmi.c    mpxplay.h au_cards.h dmabuff.h pcibios.h ac97mix.h config.h
+$(OUTD)/sc_inthd.o:: sc_inthd.c  mpxplay.h au_cards.h dmabuff.h pcibios.h sc_inthd.h
+$(OUTD)/sc_sbl24.o:: sc_sbl24.c  mpxplay.h au_cards.h dmabuff.h pcibios.h ac97mix.h sc_sbl24.h emu10k1.h
+$(OUTD)/sc_sbliv.o:: sc_sbliv.c  mpxplay.h au_cards.h dmabuff.h pcibios.h ac97mix.h sc_sbliv.h emu10k1.h
+$(OUTD)/sc_via82.o:: sc_via82.c  mpxplay.h au_cards.h dmabuff.h pcibios.h ac97.h
 $(OUTD)/timer.o::    timer.c     mpxplay.h au_cards.h timer.h
 
 $(OUTD)/dbopl.o::    dbopl.cpp   dbopl.h

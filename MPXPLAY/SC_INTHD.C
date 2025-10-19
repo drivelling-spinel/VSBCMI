@@ -22,13 +22,15 @@
 
 #include "CONFIG.H"
 #include "MPXPLAY.H"
-#include "DMAIRQ.H"
+#include "DMABUFF.H"
 #include "PCIBIOS.H"
 #include "SC_INTHD.H"
 #include "LINEAR.H"
 
 #define SETPOWERSTATE 1  /* apparently necessary on some laptops */
 #define RESETCODECONCLOSE 1 /* todo: explain the benefits! */
+
+#define PCM_CHANNELS_DEFAULT 2
 
 /* config_select: bits 0-1: out device */
 #define AUCARDSCONFIG_IHD_OUT_DEV_MASK   0x3     /* 00=lineout, 01=speaker, 02=hp */
@@ -63,7 +65,7 @@ struct pcm_vol_s {
 
 struct intelhd_card_s {
     volatile struct HDAREGS_s *hdac; /* HDA controller register map address */
-    struct pci_config_s  *pci_dev;
+    struct pci_config_s pci_dev;
     unsigned int  board_driver_type; /* ATI, NVIDIA, HDMI, ... */
     long          codec_vendor_id;
     unsigned long codec_mask;
@@ -78,7 +80,7 @@ struct intelhd_card_s {
     unsigned int pcm_num_vols;            // number of PCM volumes
     struct pcm_vol_s pcm_vols[MAX_PCM_VOLS]; // PCM volume nodes
 
-    struct cardmem_s *dm; /* XMS memory struct */
+    struct cardmem_s dm; /* XMS memory struct */
     struct BDL_s  *table_buffer; /* BDL array */
     unsigned long *corb_buffer;
     unsigned long long* rirb_buffer;
@@ -134,9 +136,9 @@ static const struct hda_rate_tbl rate_bits[] = {
 };
 
 static struct aucards_mixerchan_s hda_master_vol = {
-    AU_MIXCHANFUNCS_PACK( AU_MIXCHAN_MASTER, AU_MIXCHANFUNC_VOLUME), MAX_PCM_VOLS, {
-        {0, 0x00, 0, SUBMIXCH_INFOBIT_CARD_SETVOL}, // card->pcm_vols[0] register, max, shift, infobits
-        {0, 0x00, 0, SUBMIXCH_INFOBIT_CARD_SETVOL}, // card->pcm_vols[1]
+    AU_MIXCHAN_MASTER, AU_MIXCHANFUNC_VOLUME, MAX_PCM_VOLS, {
+        {0, 0, 0, SUBMIXCH_INFOBIT_CARD_SETVOL}, // card->pcm_vols[0] register, max, shift, infobits
+        {0, 0, 0, SUBMIXCH_INFOBIT_CARD_SETVOL}, // card->pcm_vols[1]
     }
 };
 
@@ -160,42 +162,42 @@ static void azx_init_pci(struct intelhd_card_s *card)
 
 	switch(card->board_driver_type) {
 	case AZX_DRIVER_ATI:
-		update_pci_byte( card->pci_dev, ATI_SB450_HDAUDIO_MISC_CNTR2_ADDR,
+		update_pci_byte( &card->pci_dev, ATI_SB450_HDAUDIO_MISC_CNTR2_ADDR,
 			0x07, ATI_SB450_HDAUDIO_ENABLE_SNOOP ); // enable snoop
 		break;
 	case AZX_DRIVER_ATIHDMI_NS:
-		update_pci_byte( card->pci_dev, ATI_SB450_HDAUDIO_MISC_CNTR2_ADDR,
+		update_pci_byte( &card->pci_dev, ATI_SB450_HDAUDIO_MISC_CNTR2_ADDR,
 			ATI_SB450_HDAUDIO_ENABLE_SNOOP, 0 ); // disable snoop
 		break;
 	case AZX_DRIVER_NVIDIA:
-		update_pci_byte( card->pci_dev, NVIDIA_HDA_TRANSREG_ADDR,
+		update_pci_byte( &card->pci_dev, NVIDIA_HDA_TRANSREG_ADDR,
 			0x0f, NVIDIA_HDA_ENABLE_COHBITS );
-		update_pci_byte( card->pci_dev, NVIDIA_HDA_ISTRM_COH,
+		update_pci_byte( &card->pci_dev, NVIDIA_HDA_ISTRM_COH,
 			0x01, NVIDIA_HDA_ENABLE_COHBIT );
-		update_pci_byte( card->pci_dev, NVIDIA_HDA_OSTRM_COH,
+		update_pci_byte( &card->pci_dev, NVIDIA_HDA_OSTRM_COH,
 			0x01, NVIDIA_HDA_ENABLE_COHBIT );
 		break;
 	case AZX_DRIVER_SCH:
 	case AZX_DRIVER_PCH:
 	case AZX_DRIVER_SKL:
 	case AZX_DRIVER_HDMI:
-		tmp = pcibios_ReadConfig_Word(card->pci_dev, INTEL_SCH_HDA_DEVC);
+		tmp = pcibios_ReadConfig_Word(&card->pci_dev, INTEL_SCH_HDA_DEVC);
 		if(tmp & INTEL_SCH_HDA_DEVC_NOSNOOP)
-			pcibios_WriteConfig_Word(card->pci_dev, INTEL_SCH_HDA_DEVC, tmp & (~INTEL_SCH_HDA_DEVC_NOSNOOP));
+			pcibios_WriteConfig_Word(&card->pci_dev, INTEL_SCH_HDA_DEVC, tmp & (~INTEL_SCH_HDA_DEVC_NOSNOOP));
 		break;
 	case AZX_DRIVER_ULI:
-		tmp = pcibios_ReadConfig_Word(card->pci_dev, INTEL_HDA_HDCTL);
-		pcibios_WriteConfig_Word(card->pci_dev, INTEL_HDA_HDCTL, tmp | 0x10);
-		pcibios_WriteConfig_Dword(card->pci_dev, INTEL_HDA_HDBARU, 0);
+		tmp = pcibios_ReadConfig_Word(&card->pci_dev, INTEL_HDA_HDCTL);
+		pcibios_WriteConfig_Word(&card->pci_dev, INTEL_HDA_HDCTL, tmp | 0x10);
+		pcibios_WriteConfig_Dword(&card->pci_dev, INTEL_HDA_HDBARU, 0);
 		break;
 	}
 
 	/* HDA chips uses memory mapping only */
-	pcibios_enable_BM_MM(card->pci_dev);
+	pcibios_enable_BM_MM(&card->pci_dev);
 
 	/* TCSEL, bits 0-2: select traffic class */
-	if( card->pci_dev->vendor_id != 0x1002 ) // != ATI
-		update_pci_byte(card->pci_dev, HDA_PCIREG_TCSEL, 0x07, 0); /* set TC0 */
+	if( card->pci_dev.vendor_id != 0x1002 ) // != ATI
+		update_pci_byte(&card->pci_dev, HDA_PCIREG_TCSEL, 0x07, 0); /* set TC0 */
 }
 
 static void azx_single_send_cmd(struct intelhd_card_s *chip,uint32_t val)
@@ -723,9 +725,8 @@ static unsigned int hda_buffer_init( struct audioout_info_s *aui, struct intelhd
 	dbgprintf(("hda_buffer_init: period_size=%u\n", card->pcmout_period_size ));
 
 	card->pcmout_bufsize = MDma_get_max_pcmoutbufsize( aui, 0, card->pcmout_period_size, bytes_per_sample * aui->chan_card / 2, aui->freq_set);
-	card->dm = MDma_alloc_cardmem( card->pcmout_bufsize + BDL_SIZE + HDA_CORB_MAXSIZE + HDA_RIRB_MAXSIZE );
-	if(!card->dm) return 0;
-	card->table_buffer = (struct BDL_s *)card->dm->pMem;
+	if (!MDma_alloc_cardmem( &card->dm, card->pcmout_bufsize + BDL_SIZE + HDA_CORB_MAXSIZE + HDA_RIRB_MAXSIZE )) return 0;
+	card->table_buffer = (struct BDL_s *)card->dm.pMem;
 	card->corb_buffer = (unsigned long *)((uint32_t)card->table_buffer + BDL_SIZE);
 	card->rirb_buffer = (unsigned long long *)((uint32_t)card->corb_buffer + HDA_CORB_MAXSIZE);
 	card->pcmout_buffer = (char *)((uint32_t)card->rirb_buffer + HDA_RIRB_MAXSIZE);
@@ -793,8 +794,7 @@ static unsigned int azx_reset(struct intelhd_card_s *chip)
 	for( timeout = 100; (chip->hdac->corbctl & 2) && timeout; timeout--, pds_delay_10us(10));
 
 	/* STATESTS decides what codecs will be tried.
-	 * Since this fields is writeable ( write '1' to clear bits ),
-	 * it might be a good idea to reset the HDA if STATESTS is 0.
+	 * This field is wc ( writing '1' clears the bit );
 	 */
 	chip->codec_mask = chip->hdac->statests;
 
@@ -841,10 +841,9 @@ static void hda_hw_init(struct intelhd_card_s *card)
 	/* reset int errors by writing '1's in SD_STS */
 	card->sd->bSts = SD_INT_MASK;
 
-	/* should not be written - writing '1' clears bits.
-     * and STATESTS_INT_MASK is 0x7?
-	 */
+    /* v1.8: statests bit 0-3 are now cleared - makes vsbhda compatible with vmware */
 	//azx_writeb(card, STATESTS, STATESTS_INT_MASK);
+	card->hdac->statests = card->hdac->statests & 0xf;
 
 	card->hdac->rirbsts = RIRB_INT_MASK;
 
@@ -899,7 +898,7 @@ static unsigned int hda_mixer_init(struct intelhd_card_s *card)
 
 	card->afg_nodes = (struct hda_gnode *)calloc(card->afg_num_nodes,sizeof(struct hda_gnode));
 	if(!card->afg_nodes) {
-		dbgprintf(("hda_mixer_init: malloc failed\n"));
+		dbgprintf(("hda_mixer_init: calloc failed\n"));
 		goto err_out_mixinit;
 	}
 	for( i = 0; i < card->afg_num_nodes; i++, nid++ )
@@ -1052,10 +1051,6 @@ static void azx_setup_stream(struct intelhd_card_s *card)
 	card->sd->dwBDLLow = pds_cardmem_physicalptr(card->dm, card->table_buffer);
 	card->sd->dwBDLHigh = 0; // upper 32 bit
 	//card->sd->wCtl = card->sd->wCtl | SD_INT_MASK;
-#ifdef SBEMU
-	/* set stream int mask; now done later in setrate() */
-	//card->sd->wCtl = card->sd->wCtl | SD_INT_COMPLETE;
-#endif
 	pds_delay_10us(100);
 
 	if(card->dac_node[0])
@@ -1302,13 +1297,6 @@ static char *hda_search_vendorname(unsigned int vendorid)
 }
 #endif
 
-/* display card status */
-
-static void HDA_card_info( struct audioout_info_s *aui )
-////////////////////////////////////////////////////////
-{
-}
-
 /* called by HDA_adetect() if card isn't selected */
 
 static void HDA_cardclose( struct intelhd_card_s *card )
@@ -1326,10 +1314,7 @@ static void HDA_cardclose( struct intelhd_card_s *card )
 		free( card->afg_nodes );
 		card->afg_nodes = NULL;
 	}
-	if ( card->dm ) {
-		MDma_free_cardmem( card->dm );
-		card->dm = NULL;
-	}
+	MDma_free_cardmem( &card->dm );
 }
 
 static void HDA_close( struct audioout_info_s *aui );
@@ -1345,32 +1330,25 @@ static int HDA_adetect( struct audioout_info_s *aui )
 
 	card = (struct intelhd_card_s *)calloc( 1, sizeof(struct intelhd_card_s) );
 	if( !card ) {
-		dbgprintf(("HDA_adetect: 1. calloc() failed\n" ));
+		dbgprintf(("HDA_adetect: calloc() failed\n" ));
 		return 0;
 	}
 	aui->card_private_data = card;
 
-	card->pci_dev = (struct pci_config_s *)calloc( 1, sizeof(struct pci_config_s) );
-	if( !card->pci_dev ) {
-		free( card );
-		dbgprintf(("HDA_adetect: 2. calloc() failed\n" ));
-		return( 0 );
-	}
-
 	/* don't search for vendors/deviceIDs. Instead scan for HDAs only, and
 	 * use gvars.device as start index for the scan.
 	 */
-	//if(pcibios_search_devices(intelhda_devices,card->pci_dev)!=PCI_SUCCESSFUL)
+	//if(pcibios_search_devices(intelhda_devices,&card->pci_dev)!=PCI_SUCCESSFUL)
 	for ( devidx = aui->gvars->device;; devidx++ ) {
 		__dpmi_meminfo info;
 		unsigned int timeout;
 		char *pReason;
 
-		card->pci_dev->device_type = AZX_DRIVER_GENERIC; /* set as default, will be changed if device is known */
-		if(pcibios_FindDeviceClass( 4, 3, 0, devidx, intelhda_devices, card->pci_dev) != PCI_SUCCESSFUL)
+		card->pci_dev.device_type = AZX_DRIVER_GENERIC; /* set as default, will be changed if device is known */
+		if(pcibios_FindDeviceClass( 4, 3, 0, devidx, intelhda_devices, &card->pci_dev) != PCI_SUCCESSFUL)
 			break;
 
-		card->hdac = (struct HDAREGS_s *)pcibios_ReadConfig_Dword(card->pci_dev, PCIR_NAMBAR);
+		card->hdac = (struct HDAREGS_s *)pcibios_ReadConfig_Dword(&card->pci_dev, PCIR_NAMBAR);
 		if( (uint32_t)card->hdac & 0x1 ) // I/O address? - shouldn't happen with HDA; memory mapping only
 			card->hdac = 0;
 		if( !card->hdac ) {
@@ -1378,7 +1356,7 @@ static int HDA_adetect( struct audioout_info_s *aui )
 			continue;
 		}
 		if( (uint32_t)card->hdac & 4 ) {// 64-bit address? then check if it's beyond 4G...
-			uint32_t tmp = pcibios_ReadConfig_Dword(card->pci_dev, PCIR_NAMBAR+4);
+			uint32_t tmp = pcibios_ReadConfig_Dword(&card->pci_dev, PCIR_NAMBAR+4);
 			if ( tmp ) {
 				dbgprintf(("HDA_adetect: card index %u skipped (PCI base addr > 4G)\n", devidx ));
 				continue;
@@ -1396,18 +1374,18 @@ static int HDA_adetect( struct audioout_info_s *aui )
 		if( aui->gvars->pin >= 0 )
 			card->config_select = aui->gvars->pin;
 
-		card->board_driver_type = card->pci_dev->device_type;
+		card->board_driver_type = card->pci_dev.device_type;
 		if( !hda_buffer_init( aui, card )) {
 			printf("HDA: DMA buffer init failed (card %u)\n", devidx );
 			break;
 		}
 
 		aui->card_DMABUFF = card->pcmout_buffer;
-		aui->card_irq = pcibios_ReadConfig_Byte(card->pci_dev, PCIR_INTR_LN);
+		aui->card_irq = pcibios_ReadConfig_Byte(&card->pci_dev, PCIR_INTR_LN);
 
 		dbgprintf(("HDA_adetect, board type: %s (vendor/ID=%X/%X)\n",
-			  card->pci_dev->device_name ? card->pci_dev->device_name : "NULL",
-			  (long)card->pci_dev->vendor_id,(long)card->pci_dev->device_id));
+			  card->pci_dev.device_name ? card->pci_dev.device_name : "NULL",
+			  (long)card->pci_dev.vendor_id,(long)card->pci_dev.device_id));
 		hda_hw_init( card );
 		dbgprintf(("HDA_adetect: hw init done\n" ));
 
@@ -1422,8 +1400,8 @@ static int HDA_adetect( struct audioout_info_s *aui )
 				card->codec_index = i;
 				if( hda_mixer_init( card ) ) {
 					/* v1.7 set the specific device name if there's one */
-					if ( card->pci_dev->device_name )
-						HDA_sndcard_info.shortname = card->pci_dev->device_name;
+					if ( card->pci_dev.device_name )
+						HDA_sndcard_info.shortname = card->pci_dev.device_name;
 					dbgprintf(("HDA_adetect: exit, found mixer for codec %u\n", i ));
 					printf("HDA widgets to be used: DAC=%d Pin=%d Volume=%d\n",
 						(int)((card->dac_node[0]) ? card->dac_node[0]->nid: 0),
@@ -1448,26 +1426,7 @@ static void HDA_close( struct audioout_info_s *aui )
 	struct intelhd_card_s *card = aui->card_private_data;
 	dbgprintf(("HDA_close\n" ));
 	if( card ){
-		if( card->hdac ){
-			__dpmi_meminfo info;
-			hda_hw_close( card );
-			/* hdac has to be converted back to a linear address */
-			info.address = LinearAddr( (void *)(card->hdac) );
-			__dpmi_free_physical_address_mapping( &info );
-			card->hdac = 0;
-		}
-		if( card->afg_nodes ) {
-			free( card->afg_nodes );
-			card->afg_nodes = NULL;
-		}
-		if ( card->dm ) {
-			MDma_free_cardmem( card->dm );
-			card->dm = NULL;
-		}
-		if( card->pci_dev ) {
-			free( card->pci_dev );
-			card->pci_dev = NULL;
-		}
+		HDA_cardclose( card );
 		free( card );
 		aui->card_private_data = NULL;
 	}
@@ -1479,8 +1438,8 @@ static void HDA_setrate( struct audioout_info_s *aui )
 	struct intelhd_card_s *card = aui->card_private_data;
 
 	dbgprintf(("HDA_setrate: freq_card=%u\n", aui->freq_card ));
-	aui->card_wave_id = WAVEID_PCM_SLE;
-	aui->chan_card = (aui->chan_set) ? aui->chan_set : PCM_CHANNELS_DEFAULT;
+	//aui->card_wave_id = WAVEID_PCM_SLE;
+	//aui->chan_card = (aui->chan_set) ? aui->chan_set : PCM_CHANNELS_DEFAULT;
 	if( aui->chan_card > INTHD_MAX_CHANNELS )
 		aui->chan_card = INTHD_MAX_CHANNELS;
 	if(!card->dacout_num_bits) // first initialization
@@ -1629,12 +1588,16 @@ static int HDA_IRQRoutine( struct audioout_info_s* aui )
 		card->sd->bSts = status; //ack all
 
 	//ack CORB/RIRB status
-	corbsts = card->hdac->corbsts & 0x1;
-	rirbsts = card->hdac->rirbsts & RIRB_INT_MASK; /* bits 0 & 2 */
+	corbsts = card->hdac->corbsts & 0x1; /* b0 = CMEI - CORB Memory Error Indication */
+    /* v1.8: rirbsts b0 may be set, but if b0 in rirbctl isn't set, it didn't
+     * generate an interrupt:
+     */
+	//rirbsts = card->hdac->rirbsts & RIRB_INT_MASK; /* b0 & b2 */
+	rirbsts = card->hdac->rirbsts & card->hdac->rirbctl & RIRB_INT_MASK; /* b0 & b2 */
 	if(corbsts)
-		card->hdac->corbsts = corbsts; /* by writing 0 the bits are cleared */
+		card->hdac->corbsts = corbsts; /* wc; 1 clears the bits */
 	if(rirbsts)
-		card->hdac->rirbsts = rirbsts; /* by writing 0 the bits are cleared */
+		card->hdac->rirbsts = rirbsts; /* wc; 1 clears the bits */
 	return status | corbsts | rirbsts;
 }
 
@@ -1646,10 +1609,7 @@ static const struct aucards_mixerchan_s *hda_mixerset[] = {
 struct sndcard_info_s HDA_sndcard_info = {
     "Intel HDA",
     0,               /* infobits */
-    NULL,            /* card_config */
-    NULL,            /* no init */
-    &HDA_adetect,    /* only autodetect */
-    &HDA_card_info,
+    &HDA_adetect,    /* autodetect */
     &HDA_start,
     &HDA_stop,
     &HDA_close,
@@ -1658,7 +1618,7 @@ struct sndcard_info_s HDA_sndcard_info = {
     &MDma_writedata, /* =cardbuf_writedata() */
     &HDA_getbufpos,  /* =cardbuf_getpos() */
     &MDma_clearbuf,  /* =cardbuf_clear() */
-    &HDA_IRQRoutine, /* vsbhda */
+    &HDA_IRQRoutine,
     &HDA_writeMIXER, /* =card_writemixer() */
     &HDA_readMIXER,  /* =card_readmixer() */
     hda_mixerset     /* =card_mixerchans */

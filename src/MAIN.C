@@ -55,11 +55,7 @@
 #define DF_UART_ENABLE  (0x20)
 #define DF_SLOWER_UART  (0x40)
 
-#ifdef NOTFLAT
-bool _InstallInt31( int );
-#else
-bool _InstallInt31( void );
-#endif
+bool _InstallInt31( struct globalvars * );
 bool _UninstallInt31( void );
 
 #ifdef DJGPP
@@ -105,15 +101,15 @@ extern uint32_t STACKTOP;
 
 #endif
 
-uint8_t bOMode = 1; /* 1=output DOS, 2=direct, 4=debugger */
+uint8_t bOMode; /* 1=output DOS, 2=direct, 4=debugger */
 
 struct MAIN_s {
-        int hAU;     /* handle audioout_info; we don't want to know mpxplay internals */
-        int freq;    /* default value for AU_setrate() */
-        bool bISR;   /* 1=ISR installed */
-        bool bQemm;  /* 1=QPI API found */
-        bool bHdpmi; /* 1=HDPMI found */
-        int bHelp;   /* 1=show help */
+	void *hAU;  /* handle audioout_info; we don't want to know mpxplay internals */
+	int freq;   /* default value for AU_setrate() */
+	bool bISR;  /* 1=ISR installed */
+	bool bQemm; /* 1=QPI API found */
+	bool bHdpmi;/* 1=HDPMI found */
+	int bHelp;  /* 1=show help */
         int devOpts; /* bit mask to override sanity checks */
 };
 
@@ -130,9 +126,6 @@ TYPE_DEFAULT, /* /T */
 true, true, true, VOL_DEFAULT, 16, /* /OPL3, /RM, /PM, /VOL, /BS */
 #if SLOWDOWN
 0, /* /SD */
-#endif
-#ifdef NOTFLAT
-0, /* /DIVE */
 #endif
 #if SOUNDFONT
 NULL, /* /SF: */
@@ -170,9 +163,6 @@ static const struct {
 #endif
     "O",  "Set output (HDA/SBLive/CMI) [0=lineout|1=speaker|2=hp|3=spdif,def 0]", &gvars.pin,
     "DEV", "Set start index for device scan (HDA only) [def 0]", &gvars.device,
-#ifdef NOTFLAT
-    "DIVE", "Set Borland 'Runtime Error 200' fix [def 0]", &gvars.diverr,
-#endif
     "PS", "Set period size [def 512]", &gvars.period_size,
 #if SOUNDFONT
     "SF:", "Set sound font file name", (int *)&gvars.soundfont,
@@ -307,6 +297,8 @@ int main(int argc, char* argv[])
     int rmstksel;
     char* blaster = getenv("BLASTER");
     int opl_flag;
+
+    bOMode = IsDebuggerPresent() ? 4 : 1;
 
     if(blaster != NULL) {
         char c;
@@ -558,9 +550,9 @@ int main(int argc, char* argv[])
 #endif
 
 #if SB16
-    VSB_Init( gvars.irq, gvars.dma, gvars.hdma, gvars.type );
+    VSB_Init( gvars.irq, gvars.dma, gvars.hdma, gvars.type, gm.hAU );
 #else
-    VSB_Init( gvars.irq, gvars.dma, 0, gvars.type );
+    VSB_Init( gvars.irq, gvars.dma, 0, gvars.type, gm.hAU );
 #endif
     VDMA_Virtualize( gvars.dma, true );
 #if SB16
@@ -626,11 +618,7 @@ int main(int argc, char* argv[])
 
     if ( gm.bISR ) {
         VIRQ_Init( gvars.irq );
-#ifdef NOTFLAT
-        _InstallInt31(gvars.diverr);
-#else
-        _InstallInt31();
-#endif
+        _InstallInt31( &gvars );
     }
 
 #if VMPU
@@ -645,7 +633,8 @@ int main(int argc, char* argv[])
 
     if( (gm.devOpts & DF_RECKLESS) || ( gm.bISR && ( gm.bQemm || (!gvars.rm) ) && ( gm.bHdpmi || (!gvars.pm) ) ) ) {
         uint32_t psp;
-        __dpmi_regs r = {0};
+        //__dpmi_regs r = {0};
+        __dpmi_regs r;
         __dpmi_set_coprocessor_emulation( 0 );
         psp = _my_psp();
         __dpmi_free_dos_memory( ReadLinearW( psp+0x2C ) );
@@ -664,8 +653,9 @@ int main(int argc, char* argv[])
 #else
         __dpmi_free_dos_memory( rmstksel ); /* free _linear_rmstack */
 #endif
-        r.x.dx= 0x10; /* only psp remains in conv. memory */
+        r.x.dx = 0x10; /* only psp remains in conv. memory */
         r.x.ax = 0x3100;
+        r.x.ss = r.x.sp = 0;
         __dpmi_simulate_real_mode_interrupt(0x21, &r); //won't return on success
     }
     dbgprintf(("main: bISR=%u, bQemm=%u, bHdpmi=%u\n", gm.bISR, gm.bQemm, gm.bHdpmi ));

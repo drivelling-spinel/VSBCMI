@@ -29,8 +29,10 @@
    quite a bit of processing power, such a cpu very likely isn't sufficient.
    Tests revealed that a Pentium II with 266 MHz is able to handle simple games;
    a Pentium III with 500 MHz gave the impression that it could handle both
-   voice and music output smoothly. Setting the frequency ( /F cmdline option )
-   to the minimum should reduce cpu overstrain.
+   voice and music output smoothly. Note that the MPU synthesizer needs a lot
+   of FPU power - reducing the voice maximum ( see option /MV below ) may be
+   needed. Adjusting the frequency ( /F cmdline option ) to the minimum may
+   also reduce cpu overstrain.
 
 
    3. Usage
@@ -63,12 +65,12 @@
    might look like. Also supplied are STARTL.BAT and START16L.BAT - these
    variants run VSBHDA(16) without JHDPMI.DLL.
 
-    File UNINST.COM may be used to unload VSBHDA. This must be done if one
+    File UNINST.EXE may be used to unload VSBHDA. This must be done if one
    wants to switch from 32-bit to 16-bit and vice versa; the programs
    themselves have problems to detect the presence of the other variant.
 
     As already mentioned, QPIEMU.DLL is needed for real-mode port trapping;
-   also, if it's not installed, UNINST.COM won't work.
+   also, if it's not installed, UNINST.EXE won't work.
 
     Vsbhda16.exe loads file sndcard.drv during initialization. Due to
    limitations of the 16-bit environment ( a module's code/data segments must
@@ -94,7 +96,6 @@
      /SD     : Set slowdown factor
      /O      : Set output connector (HDA & SB Live! only)
      /DEV    : Set start index for device scan (HDA only)
-     /DIVE   : Set "Runtime Error 200" fix for Borland apps (VSBHDA16 only)
      /PS     : Set period size
      /SF:fn  : Set sound font filename to load
      /MV     : Set voice limit for MPU synthesizer
@@ -119,7 +120,6 @@
      This option uses the RDTSC instruction - Although usually no problem, this
      instruction is priviledged if bit TSD (bit 2) is set in register CR4; then
      running this instruction in ring3 will cause a GPF.
-   - /DIVE: the fix can only work for programs running in protected-mode!
    - /PS: "period size" is space (in bytes) for samples rendered during one
      interrupt request. A period size of 512, for example, means that about
      128 samples will be rendered ( since output is always 16-bit, stereo ).
@@ -130,11 +130,16 @@
      BLASTER variable or the /P cmdline option.
    - /MV: setting a voice limit of 0 will trigger dynamic allocation - this
      is the most flexible setting, but may not work for all applications.
-   - /O: for the SB Live card, /O1 enables the "speaker" connector; /O2
-     has no meaning for this card.
+   - /O: for SB Live/Audify cards, /O1 enables the "speaker" or "rear" jack;
+     value /O2 has no meaning for these cards.
    - /CF: defines up to 32 bits to fine tune VSBHDA's behavior.
      Bit 0: 1 = DSP cmds 0xF2/0xF3 will trigger an interrupt instantly;
             0 = interrupt will be triggered delayed (default).
+     Bit 1: 1 = enable interrupts when EOI to be sent to master/slave PIC
+                is detected.
+     Bit 2: 1 = mask PIT interrupt during sound hardware interrupt.
+     Bit 3: 1 = vsbhda16 only: fix Borland's runtime error 200 for 16-bit
+                protected-mode programs.
 
 
    4. Details/Hints
@@ -211,7 +216,18 @@
    be set *after* VSBHDA has been loaded and *before* the program is launched.
 
 
-   4.5 Windows 3.1
+   4.5 SoundBlaster IRQ Setting
+
+    The BLASTER environment variable will set the interrupt used by the emulated
+   SoundBlaster card. Most DOS programs assume that this interrupt isn't shared
+   with other devices - tool hwinfo\pciirq.exe will display all PCI devices that
+   use an interrupt, so one can verify that this is the case.
+    Since VSBHDA v1.8 most games will run with sound even if the SB interrupt is
+   shared; the SB interrupt emulation "protects" the SB interrupt routine from
+   receiving real interrupt requests. However, this protection isn't 100% safe.
+
+
+   4.6 Windows 3.1
 
     Windows 3.1 runs as a 16-bit DPMI client and is compatible with HDPMI in
    so-called Standard mode. A few things have to be considered, though:
@@ -243,7 +259,7 @@
      if the BIOS setting "Plug & Play OS" has been set to "Yes".
 
    - "SB found - probably VSBHDA already installed": a SoundBlaster was
-     detected. If it's due to an installed VSBHDA, use UNINST.COM to remove the
+     detected. If it's due to an installed VSBHDA, use UNINST.EXE to remove the
      running VSBHDA from memory.
 
    - "Jemm/Qemm not installed, or version below 7.03: x.x - disable real-mode
@@ -280,14 +296,38 @@
     - Aladdin: requires EMS, max. XMS memory is 31MB (XMSRes 31).
     - Blood: setting SB IRQ to 2 or 5 may be required. Generally, on some
       machines the DOS/4GW DOS extender has problems with IRQ 7.
+    - Creative's SB16 diagnose.exe: needs cmdline option /CF1.
+    - FastTracker 2: requires Jemm's NOVCPI option AND option /CF4.
+    - Jazz Jackrabbit: unpatched version requires /CF8.
     - Jungle Book: needs SETPVI.EXE to be run before launched.
-    - Screamer: set max. XMS memory to 31MB (XMSRes 31).
-    - Stargunner: to run SETUP.EXE requires Jemm's NOVCPI option.
-    - System Shock: set max. XMS memory to 31MB (XMSRes 31) before running
-      HDPMI32i.
-    - "Sword and Fairy 1" (Chinese Paladin): allocates a sound buffer in
-      extended memory - see notes in 4.3.2).
     - "Legend of Kyrandia 2": allocates a sound buffer in extended memory -
       see notes in 4.3.2).
+    - Lemmings 2, a pretty sensitive game:
+      + uses direct disk access ( Int 25h ); the game has to be located on a
+        FAT12/FAT16 disk.
+      + for SFX to work, vsbhda option /CF1 has to be set.
+      + SB IRQ 5/7 may cause problems, IRQ 2 seems the best to work.
+    - MDK: requires option /CF4.
+    - Monkey Island 2: requires option /CF1.
+    - Screamer: set max. XMS memory to 31MB (XMSRes 31).
+    - Stargunner: to run SETUP.EXE requires Jemm's NOVCPI option; the game
+      doesn't restore the SB interrupt vector - it may be necessary to reload
+      vsbhda after the program has been run.
+    - "Sword and Fairy 1" (Chinese Paladin): allocates a sound buffer in
+      extended memory - see notes in 4.3.2).
+    - System Shock: set max. XMS memory to 31MB (XMSRes 31) before running
+      HDPMI32i.
+    - Terminal Velocity: set max. XMS memory to 31MB (XMSRes 31).
     - "The Flight of the Amazon Queen": requires SETPVI.
+    - X128 (Sinclair Spectrum Emulator): requires Jemm's NOVCPI option.
+
+    The following (incomplete) list shows games that won't run with VSBHDA
+    because they are incompatible with either Jemm/Qemm or HDPMI:
+
+    - Comanche
+    - Privateer
+    - Rayman
+    - Strike Commander
+    - SuperFrog
+    - Zone 66
 

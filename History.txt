@@ -1,4 +1,24 @@
 
+  v1.8, 13.10.2025
+  - fixed: HDA in VmWare.
+  - fixed: SB DSP reset no longer resets SB mixer.
+  - interrupt handling for SB IRQ changed; switch HOSTRT in sbisr.asm now 0 -
+    was 1 in v1.6-v1.7; this avoids crashes if SB IRQ is also used by PCI
+    devices (esp. USB and IDE/SATA controllers).
+  - added low-level tools pciirq.exe, sblive.exe and ichac97.exe.
+  - fixed: single-cycle mode may have set a too large DMA buffer size.
+  - fixed: debug displays in 16-bit variant.
+  - fixed: case "DMA buffer < SB buffer" in single-cycle mode now handled
+    correctly.
+  - values 2,4,8 for cmdline option /CF added.
+  - fixed: SB Live/Audigy timer value (FastTracker 2).
+  - option /DIVE removed (replaced by /CF8).
+  - SB-MIDI UART modes supported.
+  - CD-IN gain changes now routed to sndcard mixer.
+  - fixed: SB sound buffer in EMS page frame.
+  - qpiemu.dll: v1.2 - new function ax=5000h for read access v86 page table 0.
+  - fixed: /OPL0 didn't remove ports 0x228/0x229 from the trap list.
+
   v1.7, 11.8.2025
   - fixed: clear CF in case int 31h hook proc handles the function (ax=0x20x).
   - added soundfont support from VSBHDASF; new cmdline options /SF, /MV, /PS.
@@ -6,7 +26,7 @@
   - fixed: handling of DSP cmd E2 (DMA identification).
   - DSP cmd 14h with size < 32 will trigger an IRQ at once; this should make
     more detection routines to work.
-  - qpiemu.dll: bit 1 of register CH now holds IF.
+  - qpiemu.dll: v1.1 - bit 1 of register CH now holds IF.
   - XMSRes.exe: option -H added.
   - SB16: 8-bit signed PCM mode (C6h 10h) supported.
   - HDA: reset controller if no codecs are attached.

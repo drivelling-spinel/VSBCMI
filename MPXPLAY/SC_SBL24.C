@@ -23,7 +23,7 @@
 
 #include "CONFIG.H"
 #include "MPXPLAY.H"
-#include "DMAIRQ.H"
+#include "DMABUFF.H"
 #include "PCIBIOS.H"
 #include "SC_SBLIV.H"
 #include "AC97MIX.H"
@@ -226,9 +226,8 @@ static unsigned int snd_live24_buffer_init( struct emu10k1_card *card, struct au
 {
 	unsigned int bytes_per_sample = (aui->bits_set >= 24) ? 4 : 2;
     card->pcmout_bufsize = MDma_get_max_pcmoutbufsize(aui, 0, aui->gvars->period_size ? aui->gvars->period_size : CA0106_DMABUF_ALIGN, bytes_per_sample, 0);
-	card->dm = MDma_alloc_cardmem(CA0106_DMABUF_PERIODS * 2 * sizeof(uint32_t) + card->pcmout_bufsize);
-	if (!card->dm) return 0;
-	card->virtualpagetable = (uint32_t *)card->dm->pMem;
+	if (! MDma_alloc_cardmem(&card->dm, CA0106_DMABUF_PERIODS * 2 * sizeof(uint32_t) + card->pcmout_bufsize) ) return 0;
+	card->virtualpagetable = (uint32_t *)card->dm.pMem;
 	card->pcmout_buffer = ((char *)card->virtualpagetable)+CA0106_DMABUF_PERIODS * 2 * sizeof(uint32_t);
 	dbgprintf(("buffer init: pagetable:%8X pcmoutbuf:%8X size:%d\n",(unsigned long)card->virtualpagetable,(unsigned long)card->pcmout_buffer,card->pcmout_bufsize));
 	return 1;
@@ -423,22 +422,22 @@ static int snd_live24_isr( struct emu10k1_card *card)
 #endif
 
 static const struct aucards_mixerchan_s emu_live24_analog_front = {
- AU_MIXCHANFUNCS_PACK(AU_MIXCHAN_MASTER,AU_MIXCHANFUNC_VOLUME),2,
+ AU_MIXCHAN_MASTER,AU_MIXCHANFUNC_VOLUME,2,
  {
-  {((CONTROL_FRONT_CHANNEL << 8) | PLAYBACK_VOLUME2), 0xff, 24, SUBMIXCH_INFOBIT_REVERSEDVALUE},
-  {((CONTROL_FRONT_CHANNEL << 8) | PLAYBACK_VOLUME2), 0xff, 16, SUBMIXCH_INFOBIT_REVERSEDVALUE}
-  //{((CONTROL_REAR_CHANNEL << 8) | PLAYBACK_VOLUME2), 0xff, 24, SUBMIXCH_INFOBIT_REVERSEDVALUE}, // !!! bad place
-  //{((CONTROL_REAR_CHANNEL << 8) | PLAYBACK_VOLUME2), 0xff, 16, SUBMIXCH_INFOBIT_REVERSEDVALUE}
+  {((CONTROL_FRONT_CHANNEL << 8) | PLAYBACK_VOLUME2), 8, 24, SUBMIXCH_INFOBIT_REVERSEDVALUE},
+  {((CONTROL_FRONT_CHANNEL << 8) | PLAYBACK_VOLUME2), 8, 16, SUBMIXCH_INFOBIT_REVERSEDVALUE}
+  //{((CONTROL_REAR_CHANNEL << 8) | PLAYBACK_VOLUME2), 8, 24, SUBMIXCH_INFOBIT_REVERSEDVALUE}, // !!! bad place
+  //{((CONTROL_REAR_CHANNEL << 8) | PLAYBACK_VOLUME2), 8, 16, SUBMIXCH_INFOBIT_REVERSEDVALUE}
  }
 };
 
 static const struct aucards_mixerchan_s emu_live24_spdif_front = {
- AU_MIXCHANFUNCS_PACK(AU_MIXCHAN_SPDIFOUT,AU_MIXCHANFUNC_VOLUME),2,
+ AU_MIXCHAN_SPDIFOUT,AU_MIXCHANFUNC_VOLUME,2,
  {
-  {((CONTROL_FRONT_CHANNEL << 8) | PLAYBACK_VOLUME1), 0xff, 24, SUBMIXCH_INFOBIT_REVERSEDVALUE},
-  {((CONTROL_FRONT_CHANNEL << 8) | PLAYBACK_VOLUME1), 0xff, 16, SUBMIXCH_INFOBIT_REVERSEDVALUE}
-  //{((CONTROL_REAR_CHANNEL << 8) | PLAYBACK_VOLUME1), 0xff, 24, SUBMIXCH_INFOBIT_REVERSEDVALUE}, // !!! bad place
-  //{((CONTROL_REAR_CHANNEL << 8) | PLAYBACK_VOLUME1), 0xff, 16, SUBMIXCH_INFOBIT_REVERSEDVALUE}
+  {((CONTROL_FRONT_CHANNEL << 8) | PLAYBACK_VOLUME1), 8, 24, SUBMIXCH_INFOBIT_REVERSEDVALUE},
+  {((CONTROL_FRONT_CHANNEL << 8) | PLAYBACK_VOLUME1), 8, 16, SUBMIXCH_INFOBIT_REVERSEDVALUE}
+  //{((CONTROL_REAR_CHANNEL << 8) | PLAYBACK_VOLUME1), 8, 24, SUBMIXCH_INFOBIT_REVERSEDVALUE}, // !!! bad place
+  //{((CONTROL_REAR_CHANNEL << 8) | PLAYBACK_VOLUME1), 8, 16, SUBMIXCH_INFOBIT_REVERSEDVALUE}
  }
 };
 

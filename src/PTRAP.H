@@ -31,8 +31,9 @@ bool PTRAP_Uninstall_PM_PortTraps( void );
 void    PTRAP_UntrappedIO_OUT(uint16_t port, uint8_t value);
 uint8_t PTRAP_UntrappedIO_IN(uint16_t port);
 
-#ifdef _DEBUG
-void PTRAP_PrintPorts( void ); /* display trapped ports in protected-mode */
+#if PT0V86
+/* v1.8: physical address v86 pagetab 0 */
+uint32_t PTRAP_GetPageTab0v86( void );
 #endif
 
 extern void    (*UntrappedIO_OUT_Handler)(uint16_t port, uint8_t value);

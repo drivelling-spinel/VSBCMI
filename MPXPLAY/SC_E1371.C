@@ -26,7 +26,7 @@
 
 #include "CONFIG.H"
 #include "MPXPLAY.H"
-#include "DMAIRQ.H"
+#include "DMABUFF.H"
 #include "PCIBIOS.H"
 #include "AC97MIX.H"
 
@@ -202,9 +202,8 @@ struct ensoniq_card_s
  unsigned long   infobits;/* ENSONIQ_CARD_INFOBIT_xxx flags */
  unsigned long   port;    /* PCIR_NAMBAR ( dword, config space 10 ) */
  unsigned int    chiprev; /* PCIR_RID ( word, config space 08 ) */
- struct pci_config_s  *pci_dev;
-
- struct cardmem_s *dm;
+ struct pci_config_s pci_dev;
+ struct cardmem_s dm;
  char *pcmout_buffer;
  long pcmout_bufsize;
 
@@ -473,10 +472,8 @@ static unsigned int snd_es1371_buffer_init( struct ensoniq_card_s *card, struct 
 	/* v1.7: use /PS cmdline option if set */
 	//card->pcmout_bufsize = MDma_get_max_pcmoutbufsize( aui, 0, ES1371_DMABUF_ALIGN, bytes_per_sample, 0);
 	card->pcmout_bufsize = MDma_get_max_pcmoutbufsize( aui, 0, aui->gvars->period_size ? aui->gvars->period_size : ES1371_DMABUF_ALIGN, bytes_per_sample, 0);
-	card->dm = MDma_alloc_cardmem( card->pcmout_bufsize );
-	if (!card->dm)
-		return 0;
-	card->pcmout_buffer = card->dm->pMem;
+	if (!MDma_alloc_cardmem( &card->dm, card->pcmout_bufsize ) ) return 0;
+	card->pcmout_buffer = card->dm.pMem;
 	aui->card_DMABUFF = card->pcmout_buffer;
 	dbgprintf(("buffer init: pcmout_buffer:%X size:%d\n",(unsigned long)card->pcmout_buffer,card->pcmout_bufsize));
 	return 1;
@@ -606,14 +603,6 @@ static const struct pci_device_s amplifier_hack_devices[] = {
 
 static void ES1371_close( struct audioout_info_s *aui );
 
-static void ES1371_card_info( struct audioout_info_s *aui )
-///////////////////////////////////////////////////////////
-{
-	//struct ensoniq_card_s *card = aui->card_private_data;
-	//printf("ENS : Ensoniq %s found on port:%X irq:%d rev:%X\n",
-	//	   card->pci_dev->device_name, card->port, aui->card_irq, card->chiprev);
-}
-
 static int ES1371_adetect( struct audioout_info_s *aui )
 ////////////////////////////////////////////////////////
 {
@@ -624,25 +613,21 @@ static int ES1371_adetect( struct audioout_info_s *aui )
 		return 0;
 	aui->card_private_data = card;
 
-	card->pci_dev = (struct pci_config_s *)calloc(1,sizeof(struct pci_config_s));
-	if(!card->pci_dev)
-		goto err_adetect;
-
-	if(pcibios_search_devices( ensoniq_devices, card->pci_dev ) != PCI_SUCCESSFUL)
+	if(pcibios_search_devices( ensoniq_devices, &card->pci_dev ) != PCI_SUCCESSFUL)
 		goto err_adetect;
 
 	dbgprintf(("ES1371_adetect: known card found, enable PCI io and busmaster\n"));
-	pcibios_enable_BM_IO( card->pci_dev );
+	pcibios_enable_BM_IO( &card->pci_dev );
 
-	card->port = pcibios_ReadConfig_Dword(card->pci_dev, PCIR_NAMBAR);
+	card->port = pcibios_ReadConfig_Dword(&card->pci_dev, PCIR_NAMBAR);
 	if(!card->port)
 		goto err_adetect;
-	aui->card_irq = pcibios_ReadConfig_Byte(card->pci_dev, PCIR_INTR_LN);
-	card->chiprev= pcibios_ReadConfig_Byte(card->pci_dev, PCIR_RID);
+	aui->card_irq = pcibios_ReadConfig_Byte(&card->pci_dev, PCIR_INTR_LN);
+	card->chiprev= pcibios_ReadConfig_Byte(&card->pci_dev, PCIR_RID);
 
-	if((card->pci_dev->vendor_id == 0x1274)
-	   && ( ((card->pci_dev->device_id == 0x1371) && ((card->chiprev == ES1371REV_CT5880_A) || (card->chiprev == ES1371REV_ES1373_8)))
-		|| ((card->pci_dev->device_id == 0x5880) && ((card->chiprev == CT5880REV_CT5880_C) || (card->chiprev == CT5880REV_CT5880_D) || (card->chiprev == CT5880REV_CT5880_E)))
+	if((card->pci_dev.vendor_id == 0x1274)
+	   && ( ((card->pci_dev.device_id == 0x1371) && ((card->chiprev == ES1371REV_CT5880_A) || (card->chiprev == ES1371REV_ES1373_8)))
+		|| ((card->pci_dev.device_id == 0x5880) && ((card->chiprev == CT5880REV_CT5880_C) || (card->chiprev == CT5880REV_CT5880_D) || (card->chiprev == CT5880REV_CT5880_E)))
 	   ) ) {
 		card->infobits |= ENSONIQ_CARD_INFOBIT_AC97RESETHACK;
 		/* v1.7 fix: to enable 5880, bit 29 has to be set IN THE STATUS register */
@@ -655,7 +640,7 @@ static int ES1371_adetect( struct audioout_info_s *aui )
 		card->ctrl |= ES_1371_GPIO_OUT(1); // turn on amplifier
 
 	dbgprintf(("ES1371_adetect: vend_id=%X dev_id=%X port=%X irq=%u rev=%X info=%X\n",
-			  card->pci_dev->vendor_id,card->pci_dev->device_id,card->port,aui->card_irq,card->chiprev,card->infobits));
+			  card->pci_dev.vendor_id,card->pci_dev.device_id,card->port,aui->card_irq,card->chiprev,card->infobits));
 	card->port &= 0xfff0;
 
 	if(!snd_es1371_buffer_init(card,aui))
@@ -678,9 +663,7 @@ static void ES1371_close( struct audioout_info_s *aui )
 	dbgprintf(("ES1371_close\n"));
 	if(card){
 		snd_es1371_chip_close(card);
-		MDma_free_cardmem(card->dm);
-		if(card->pci_dev)
-			free(card->pci_dev);
+		MDma_free_cardmem(&card->dm);
 		free(card);
 		aui->card_private_data = NULL;
 	}
@@ -694,9 +677,9 @@ static void ES1371_setrate( struct audioout_info_s *aui )
 	unsigned int pagesize = aui->gvars->period_size ? aui->gvars->period_size : ES1371_DMABUF_ALIGN;
 
 	dbgprintf(("ES1371_setrate\n"));
-	aui->card_wave_id = WAVEID_PCM_SLE;
-	aui->chan_card = 2;
-	aui->bits_card = 16;
+	//aui->card_wave_id = WAVEID_PCM_SLE;
+	//aui->chan_card = 2;
+	//aui->bits_card = 16;
 
 	if(aui->freq_card < 3000)
 		aui->freq_card = 3000;
@@ -789,10 +772,7 @@ static int ES1371_IRQRoutine( struct audioout_info_s *aui )
 const struct sndcard_info_s ES1371_sndcard_info = {
  "ENS",
  0,
- NULL,
- NULL,                 // no init
- &ES1371_adetect,      // only autodetect
- &ES1371_card_info,
+ &ES1371_adetect,
  &ES1371_start,
  &ES1371_stop,
  &ES1371_close,
@@ -801,9 +781,7 @@ const struct sndcard_info_s ES1371_sndcard_info = {
  &MDma_writedata,
  &ES1371_getbufpos,
  &MDma_clearbuf,
- //&MDma_interrupt_monitor,
- &ES1371_IRQRoutine, /* vsbhda */
-
+ &ES1371_IRQRoutine,
  &ES1371_writeMIXER,
  &ES1371_readMIXER,
  aucards_ac97chan_mixerset

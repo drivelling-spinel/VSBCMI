@@ -1,4 +1,4 @@
 
 #define VERMAJOR "1"
-#define VERMINOR "7"
-#define VERPATCH "5"
+#define VERMINOR "8"
+#define VERPATCH "1"

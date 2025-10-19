@@ -170,10 +170,10 @@
 #define HCFG_LEGACYFUNC_MASK    0xe0000000    /* Legacy function number */
 #define HCFG_LEGACYFUNC_MPU     0x00000000    /* Legacy MPU */
 #define HCFG_LEGACYFUNC_SB      0x40000000    /* Legacy SB */
-#define HCFG_LEGACYFUNC_AD      0x60000000    /* Legacy AD */
+#define HCFG_LEGACYFUNC_ADLIB   0x60000000    /* Legacy ADLIB */
 #define HCFG_LEGACYFUNC_MPIC    0x80000000    /* Legacy MPIC */
 #define HCFG_LEGACYFUNC_MDMA    0xa0000000    /* Legacy MDMA */
-#define HCFG_LEGACYFUNC_SPCI    0xc0000000    /* Legacy SPCI */
+#define HCFG_LEGACYFUNC_SPIC    0xc0000000    /* Legacy SPIC */
 #define HCFG_LEGACYFUNC_SDMA    0xe0000000    /* Legacy SDMA */
 #define HCFG_IOCAPTUREADDR      0x1f000000    /* The 4 LSBs of the captured I/O address. */
 #define HCFG_LEGACYWRITE        0x00800000    /* 1 = write, 0 = read */
@@ -261,7 +261,7 @@
                         /* before the new rate is guaranteed accurate.    */
 #define TIMER_RATE_MASK        0x000003ff    /* Timer interrupt rate in sample periods    */
                         /* 0 == 1024 periods, [1..4] are not useful    */
-#define TIMER_RATE        0x0a00001a
+//#define TIMER_RATE        0x0a00001a
 
 #define AC97DATA        0x1c        /* AC97 register set data register (16 bit)    */
 
@@ -789,12 +789,14 @@
 #define A_FXWC1            0x74            /* Selects 0x7f-0x60 for FX recording */
 #define A_FXWC2            0x75            /* Selects 0x9f-0x80 for FX recording */
 
-#define A_SPDIF_SAMPLERATE    0x76         /* Set the sample rate of SPDIF output */
+#define A_EHC                 0x76         /* extended hardware control */
+#define A_SPDIF_SAMPLERATE    A_EHC        /* Set the sample rate of SPDIF output */
 //#define A_SPDIF_RATE_MASK    0x000000c0
 //#define A_SPDIF_48000        0x00000000
 //#define A_SPDIF_44100        0x00000080
 //#define A_SPDIF_96000        0x00000040
 //#define A_SPDIF_192000       0x00000020
+/* apparently bits 5-7 set the SPDIF rate, while bits 9-11 set the PCM rate */
 #define A_SPDIF_RATE_MASK    0x0000e0e0
 #define A_SPDIF_48000        0x00000000
 #define A_SPDIF_44100        0x00008080

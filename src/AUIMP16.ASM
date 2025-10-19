@@ -44,7 +44,7 @@ AU_setrate       dd ?
 AU_setmixer_init dd ?
 AU_setmixer_one  dd ?
 AU_setmixer_outs dd ?
-AU_setmixer_all  dd ?
+;AU_setmixer_all  dd ?
 AU_writedata     dd ?
 AU_cardbuf_space dd ?
 AU_write_uart    dd ?
@@ -270,12 +270,14 @@ AU_setmixer_outs proc c public a1:ptr, a2:dword, a3:dword
 
 AU_setmixer_outs endp
 
+if 0
 AU_setmixer_all proc c public a1:ptr
 
 	@callexp AU_setmixer_all, 1
 	ret
 
 AU_setmixer_all endp
+endif
 
 AU_writedata proc c public a1:ptr, a2:dword, pPCM:ptr
 

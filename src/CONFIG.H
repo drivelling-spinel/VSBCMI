@@ -6,7 +6,8 @@
 
 #define SB16 1        /* 1=support SB16 */
 #define ADPCM 1       /* 1=support ADPCM */
-#define SETIF 1       /* 1=enable interrupts when ISR is entered */
+#define SETIF 1       /* 1=enable interrupts when ISR is entered (also see config.inc!) */
+#define COMPAT4 1     /* 1=support /CF4 - mask PIT interrupt during snd interrupt */
 #ifndef NOFM
 #define REINITOPL 1   /* 1=reinit OPL during RESET */
 #else
@@ -22,6 +23,7 @@
 #if SOUNDFONT
 #define VOICES_DEFAULT 64
 #endif
+#define PT0V86 1      /* 1=support read access to v86 page table 0 */
 
 #ifdef __cplusplus
 extern "C"
@@ -47,9 +49,6 @@ struct globalvars {
 #if SLOWDOWN
 	int slowdown;
 #endif
-#ifdef NOTFLAT
-	int diverr; /* /DIVE value */
-#endif
 #if SOUNDFONT
 	char *soundfont;
 	int voices;
@@ -72,6 +71,7 @@ enum {
 };
 
 int _dprintf(const char *fmt, ... );
+int IsDebuggerPresent( void );
 void SetBorder( uint8_t );
 void fatal_error( int );
 

@@ -17,9 +17,14 @@ TRAPF_OUT  equ 4
 
 IRQCOMPAT  equ 0	; 1=generate a compatible stack frame so VIRQ_Invoke can be called
 
-;--- todo: detailed description for what apps this setting is needed.
+;--- description for what apps the following setting may be needed:
+;--- tyrian 2000?
 
-IRETFIX16  equ 1	; 1=hackish fix for "interrupts remain disabled after IRET" problem (16-bit)
+IRETFIX    equ 1	; 1=support cmdline option /CF2 (fix for "interrupts remain disabled after IRET" problem)
+
+if IRETFIX
+externdef gvars:GLOBALVARS
+endif
 
 PTRAP_PM_TrapHandler proto :word, :dword, :dword
 
@@ -28,7 +33,6 @@ ifdef NOTFLAT
 STACKCORR equ 2048
 ASSUMEDS textequ <DGROUP>
 insRETF  textequ <retw>
-insLODSW textequ <lodsw [si]>
 PRFXDS   textequ <cs:>
 
 else
@@ -36,7 +40,6 @@ else
 STACKCORR equ 4096
 ASSUMEDS textequ <_DATA>
 insRETF textequ <retd>
-insLODSW textequ <lodsw>
 PRFXDS  textequ <>
 
 endif
@@ -99,20 +102,27 @@ endif
 	cld
 	mov ds, cs:[dwDS]
 
-ifdef NOTFLAT
- if IRETFIX16
-	cmp dx, 20h ; port 20h?
+	assume ds:ASSUMEDS
+
+;--- v1.8: IRETFIX now for both 32- and 16-bit;
+;---       also: to become active, /CF2 has to be set!
+if IRETFIX
+	cmp dx, 20h ; master PIC?
 	jnz @F
-	cmp al, 20h	; just the unspecific EOI is detected!?
-	jnz @F
-	test cl, TRAPF_OUT	; out instr? so it's an EOI sent to master PIC
+	test cl, TRAPF_OUT	; OUT instr?
 	jz @F
+ if 0
+	cmp al, 20h	; just the unspecific EOI is detected!
+	jnz @F
+ else
+	test al, 20h; v1.8: all EOIs are detected!
+	jz @F
+ endif
+	bt gvars.compatflags,1	;watch EOIs (for both master & slave)?
+	jnc @F
 	or byte ptr [ebp].IOEXCFR._fl+1, 2	; set IF=1
 @@:
- endif
 endif
-
-	assume ds:ASSUMEDS
 
 	mov ch, byte ptr [ebp].IOEXCFR._fl+1   ;v1.7: CH[1] holds IF
 
@@ -171,19 +181,15 @@ SwitchStackIOrmcb proc
 	cld
 ifdef NOTFLAT
 	movzx edi, di
+	mov eax, [si]
+else
+	mov eax, [esi]
 endif
-	insLODSW
-	mov es:[edi].RMCS.rIP, ax
-	insLODSW
-	mov es:[edi].RMCS.rCS, ax
+	mov es:[edi].RMCS.rCSIP, eax
 	add es:[edi].RMCS.rSP, 2+2
 
 ifdef _DEBUG ;v1.6: dwDS may not be set yet, at least in debug version
-	mov eax, cs:[dwDS]
-	and eax, eax
-	jnz @F
 	mov eax, es
-@@:
 	mov ds, eax
 else
 	mov ds, cs:[dwDS]
@@ -208,15 +214,15 @@ endif
 	push ebp
 if COPYRMCS
 	mov esi, edi
-	push es
-	pop ds
-	mov es, eax
+;	push es
+;	pop ds
+;	mov es, eax
 	sub esp, sizeof RMCS+2
 	mov ecx, (sizeof RMCS+2) shr 2
 	mov edi, esp
 	rep movsd
 	mov edi, esp
-	mov ds, eax
+;	mov ds, eax
 endif
 ife COPYRMCS
 	push es
@@ -286,6 +292,8 @@ IRETDS ends
 endif
 
 _hdpmi_CliHandler proc public
+
+	assume ds:nothing
 	push ds
 	push esi
 
@@ -296,6 +304,8 @@ ifdef NOTFLAT
 	lds si, dword ptr [esp+2*4].IRETWS.rIp
 	movzx esi, si
 else
+;	bt cs:gvars.compatflags,16
+;	jc unchanged
 	lds esi, fword ptr [esp+2*4].IRETDS.rEip
 endif
 	cmp esi, 3
@@ -306,8 +316,9 @@ endif
 	jnz unchanged
 enable:
 	push eax
+	insPUSHF
 	mov ax,901h
-	int 31h
+	call cs:[oldint31]
 	pop eax
 unchanged:
 	pop esi

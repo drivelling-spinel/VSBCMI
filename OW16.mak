@@ -1,5 +1,5 @@
 
-# create vsbhda16.exe with Open Watcom v2.0 and JWasm.
+# create vsbhda16.exe with Open Watcom and JWasm.
 # to create the binary, enter
 #   wmake -f ow16.mak
 # optionally, for a debug version, enter
@@ -10,6 +10,9 @@ DEBUG=0
 !endif
 
 WATCOM=\ow20
+# use OW v2 (0) or OW v1.9 (1)
+USE19=0
+
 # activate next line if FM synth should be deactivated
 #NOFM=1
 
@@ -33,6 +36,10 @@ C_DEBUG_FLAGS=-D_LOG
 A_DEBUG_FLAGS=
 !endif
 
+!if $(USE19)
+OW19=-DOW19
+!endif
+
 OBJFILES = &
 	$(OUTD)/main.obj		$(OUTD)/sndisr.obj		$(OUTD)/ptrap.obj		$(OUTD)/linear.obj		$(OUTD)/pic.obj &
 	$(OUTD)/vsb.obj			$(OUTD)/vdma.obj		$(OUTD)/virq.obj		$(OUTD)/vmpu.obj		$(OUTD)/tsf.obj &
@@ -46,8 +53,8 @@ OBJFILES = &
 
 OBJFILES2 = &
 	$(OUTD)/ac97mix.obj		$(OUTD)/au_cards.obj &
-	$(OUTD)/dmairq.obj		$(OUTD)/pcibios.obj		$(OUTD)/physmem.obj		$(OUTD)/timer.obj &
-	$(OUTD)/sc_cmi.obj		$(OUTD)/sc_e1371.obj		$(OUTD)/sc_ich.obj		$(OUTD)/sc_inthd.obj	$(OUTD)/sc_via82.obj	$(OUTD)/sc_sbliv.obj	$(OUTD)/sc_sbl24.obj &
+	$(OUTD)/dmabuff.obj		$(OUTD)/pcibios.obj		$(OUTD)/physmem.obj		$(OUTD)/timer.obj &
+	$(OUTD)/sc_cmi.obj		$(OUTD)/sc_e1371.obj		$(OUTD)/sc_ich.obj		$(OUTD)/sc_inthd.obj		$(OUTD)/sc_via82.obj		$(OUTD)/sc_sbliv.obj	$(OUTD)/sc_sbl24.obj &
 	$(OUTD)/djdpmi.obj		$(OUTD)/dprintf.obj		$(OUTD)/vioout.obj		$(OUTD)/sbrk.obj		$(OUTD)/malloc.obj &
 	$(OUTD)/libmain.obj   
 
@@ -75,7 +82,7 @@ LIBS=
 	*@$(CC) $(C_DEBUG_FLAGS) $(C_OPT_FLAGS) $(C_EXTRA_FLAGS) $(CFLAGS) -Impxplay -Isrc $(INCLUDES) -fo=$@ $<
 
 {startup}.asm{$(OUTD)}.obj
-	@$(ASM) -q -zcw -DNOTFLAT -D?MODEL=small $(A_DEBUG_FLAGS) -Fo$@ $<
+	@$(ASM) -q -zcw -DNOTFLAT -D?MODEL=small $(OW19) $(A_DEBUG_FLAGS) -Fo$@ $<
 
 {startup}.c{$(OUTD)}.obj
 	*@$(CC) $(C_DEBUG_FLAGS) $(C_OPT_FLAGS) $(C_EXTRA_FLAGS) $(CFLAGS) $(INCLUDES) -fo=$@ $<
@@ -113,7 +120,7 @@ $(OUTD)\$(NAME2).lib: $(OBJFILES2)
 
 $(OUTD)/ac97mix.obj:   mpxplay\ac97mix.c
 $(OUTD)/au_cards.obj:  mpxplay\au_cards.c
-$(OUTD)/dmairq.obj:    mpxplay\dmairq.c
+$(OUTD)/dmabuff.obj:   mpxplay\dmabuff.c
 $(OUTD)/physmem.obj:   mpxplay\physmem.c
 $(OUTD)/pcibios.obj:   mpxplay\pcibios.c
 $(OUTD)/sc_cmi.obj:    mpxplay\sc_cmi.c
@@ -169,7 +176,7 @@ $(OUTD)/libmain.obj:   startup\libmain.c
 $(OUTD)/rmwrap.obj:    src\rmwrap.asm src\rmcode1.asm src\rmcode2.asm
 	@$(ASM) -q -bin -Fl$(OUTD)\ -Fo$(OUTD)\rmcode1.bin src\rmcode1.asm
 	@$(ASM) -q -bin -Fl$(OUTD)\ -Fo$(OUTD)\rmcode2.bin src\rmcode2.asm
-	@$(ASM) -q -DNOTFLAT -D?MODEL=small -Fo$@ -DOUTD=$(OUTD) src\rmwrap.asm
+	@$(ASM) -q -DNOTFLAT -D?MODEL=small -Fl$(OUTD)\ -Fo$@ -DOUTD=$(OUTD) src\rmwrap.asm
 
 clean: .SYMBOLIC
 	@del $(OUTD)\$(NAME).lib
