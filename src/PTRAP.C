@@ -317,7 +317,6 @@ bool PTRAP_Prepare_RM_PortTrap()
         dbgprintf(("PTRAP_Prepare_RM_PortTrap: range[%u]: ports %X-%X\n", j, PortTable[portranges[j]], PortTable[portranges[j+1]-1] ));
     }
 #endif
-
     r.x.ip = QPI_Entry.offset16;
     r.x.cs = QPI_Entry.segment;
     r.x.ax = 0x1A06;
@@ -683,4 +682,3 @@ void PTRAP_PrintPorts( void )
     }
     return;
 }
-
