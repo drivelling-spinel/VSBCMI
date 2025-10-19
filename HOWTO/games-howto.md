@@ -33,10 +33,17 @@ Game compatibility will differ depending on which hardare and software conponent
 
 These games currently are known to crash, hang, play no sound or misbehave is some other way:
 
-* Blackthorne
 * Inherit the Earth (CD-ROM talkie version)
 * Strike Commander 
-* Electro Man
+* Blackthorne _(needs upstream bugfixes from v1.8)_
+
+_The below is copied from `vsbhda.txt`_
+* Comanche
+* Privateer
+* Rayman
+* SuperFrog
+* Zone 66
+
 
 ## Part 3 - Games that need VSBCMI16
 
@@ -144,6 +151,18 @@ Official 1.1 patch is requried to fix issues with video playback that the game h
 
 Black Zone does not work with currently released version of `HDPMI32I.EXE` and needs a special build, posted by the maintainer in [this issue discussion](https://github.com/Baron-von-Riedesel/VSBHDA/issues/54). With this version of DOS extender, VSBCMI also needs to be started with options `/OPL0 /CF1 /DF10` (i.e. with FM port forwarding) _or_ `/OPL1 /CF1` (i.e. with software FM emulation).   
 While this allows playing the game with sound and music, __a lot__ can be done to improve how the game sounds. See [this fan site](https://black-zone-shrine.vercel.app) for details. 
+
+### Electro Man
+
+If crashes or loss of keyboard control is observed after some time spent playing (also even without VSBCMI loaded), 
+switching from FreeDOS to MS-DOS may help.
+The same could apply for other X-Land games, such as "The Adventures of Robbo" and "Heartlight".
+
+### Whizz
+
+Game is not compatible with FreeDOS and requires MS-DOS to run.
+It also fails to detect SoundBlaster when `/CF1` option is given to VSBCMI.
+
 
 ### Quake
 

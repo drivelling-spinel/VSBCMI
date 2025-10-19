@@ -493,6 +493,7 @@ static int SNDISR_Interrupt( void )
                 count = cv_rate( isr.pPCM + IdxSm * 2, count * channels, channels, SB_Rate, freq ) / channels;
             if( channels == 1) //should be the last step
                 cv_channels_1_to_2( isr.pPCM + IdxSm * 2, count);
+
             /* conversion done; now set new values for DMA and SB buffer;
              * in case the end of SB buffer is reached, emulate an interrupt
              * and run this loop a second time.

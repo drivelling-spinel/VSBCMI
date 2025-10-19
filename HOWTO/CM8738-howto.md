@@ -89,12 +89,15 @@ _The guide is licensed by it's author under the terms of [CC BY-NC license](http
    
    Now is the time to test the driver's and card's operation with games installed on the PC. If everything sounds and works correctly in "analog mode", digital sound output can be configured.
 
-   __Note:__ Not all  games will work after loading the driver. Some popular games, for example [Tyrian/Tyrian 2000](https://www.classicdosgames.com/game/Tyrian_2000.html), use 16-bit protected mode, and require a special version of emulator. Some others, like earlier versions of Monkey Island 2 and X-Wing, need certain compatibiliy options to be provided to VSBCMI. Below is a (non exhaustive) list of games that are known to __have not__ worked well, and thus are not best testing candidates:   
+   __Note:__ Not all  games will work after loading the driver. Some popular games, for example [Tyrian/Tyrian 2000](https://www.classicdosgames.com/game/Tyrian_2000.html), use 16-bit protected mode, and require a special version of emulator. Some others, like earlier versions of Monkey Island 2 and X-Wing, need certain compatibiliy options to be provided to VSBCMI. And then there are games like Whizz or Electro Man that have compatiblity issues with FreeDOS. Below is a (non exhaustive) list of games that are known to __have not__ worked well, and thus are not best testing candidates:   
    
-   * Electro Man (_this game works, however, with C-Media proprietary driver as advised above_)
    * Inherit the Earth CD-ROM
    * Strike Commander 
-   * Blackthorne
+   * Comanche
+   * Privateer
+   * Rayman
+   * SuperFrog
+   * Zone 66
 
    It is advised that game compatibility HOWTO document is checked to see if any extra steps are required for a particular game to be run with VSBCMI.   
 
