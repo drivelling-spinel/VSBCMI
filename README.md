@@ -39,7 +39,6 @@ A note on commit tags/version numbers used in VSBCMI (e.g. seen when VSBCMI.EXE 
 
       1.8.          - last merged tag of VSBHDA 
           1.        - version of VSBCMI-specifc code on top of merged VSBHDA tag
-                    - or 0 when VSBHDA features are added ahead of VSBHDA tag released
             99      - last merged VSBHDA commit number
 
 Forked from v1.7 of ...

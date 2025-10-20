@@ -2,4 +2,4 @@
 #define VERMAJOR "1"
 #define VERMINOR "8"
 #define VERPATCH "1"
-#define VERCOMMT "99"
+#define VERCOMMT "100"
