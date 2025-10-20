@@ -151,18 +151,17 @@ The "Ultimate Talkie Edition" also does not require the special option, but may 
 
 ### Kasparov's Gambit
 
-Official 1.1 patch is requried to fix issues with video playback that the game has. Get it from, e.g., from The Patches Scrolls.
+Official 1.1 patch is requried to fix issues with sound during video playback that the game has. Get it from, e.g., from The Patches Scrolls.
 
 ### Black Zone
 
-Black Zone does not work with currently released version of `HDPMI32I.EXE` and needs a special build, posted by the maintainer in [this issue discussion](https://github.com/Baron-von-Riedesel/VSBHDA/issues/54). With this version of DOS extender, VSBCMI also needs to be started with options `/OPL0 /CF1 /DF10` (i.e. with FM port forwarding) _or_ `/OPL1 /CF1` (i.e. with software FM emulation).   
+Black Zone requires a recently released `HDPMI32I.EXE` to work, like the one found with versions v1.8 and above of VSBHDA, or v2.23 or later when [downloaded directly](https://github.com/Baron-von-Riedesel/HX/releases/tag/v2.23). VSBCMI also needs to be started with options `/OPL0 /CF1 /DF10` (i.e. with FM port forwarding) _or_ `/OPL1 /CF1` (i.e. with software FM emulation).   
 While this allows playing the game with sound and music, __a lot__ can be done to improve how the game sounds. See [this fan site](https://black-zone-shrine.vercel.app) for details. 
 
 ### Electro Man
 
 It is recommended that the game is used with C-Media proprietary driver instead of VSBCMI.
-If crashes or loss of keyboard control are observed after some time spent playing (also even with C-Medie driver), 
-switching from FreeDOS to MS-DOS may help.
+If crashes or loss of keyboard control are observed after some time spent playing (also even with C-Media driver), switching from FreeDOS to MS-DOS may help.
 The same could apply for other X-Land games, such as "The Adventures of Robbo" and "Heartlight".
 
 ### Whizz
