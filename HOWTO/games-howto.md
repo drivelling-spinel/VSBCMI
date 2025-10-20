@@ -35,8 +35,6 @@ These games currently are known to crash, hang, play no sound or misbehave is so
 
 * Inherit the Earth (CD-ROM talkie version)
 * Strike Commander 
-* Blackthorne _(needs upstream bugfixes from v1.8)_
-* Electro Man
 
 _The below is copied from `vsbhda.txt`_
 * Comanche
@@ -64,22 +62,29 @@ Here are some programs/games listed that require special actions:
 
 - Aladdin: requires EMS, max. XMS memory is 31MB (XMSRes 31).
 - Blood: setting SB IRQ to 2 or 5 may be required. Generally, on some
-      machines the DOS/4GW DOS extender has problems with IRQ 7.
+  machines the DOS/4GW DOS extender has problems with IRQ 7.
 - Creative's SB16 diagnose.exe: needs cmdline option /CF1.
+- FastTracker 2: requires Jemm's NOVCPI option AND option /CF4.
+- Jazz Jackrabbit: unpatched version requires /CF8.
 - Jungle Book: needs SETPVI.EXE to be run before launched.
-- Lemmings 2: Uses direct disk access ( Int 25h ) - hence the binary
-      has to be located on a FAT12/FAT16 disk.
+- Lemmings 2, a pretty sensitive game:
+  + uses direct disk access ( Int 25h ); the game has to be located on a
+    FAT12/FAT16 disk.
+  + for SFX to work, vsbhda option /CF1 has to be set.
+  + SB IRQ 5/7 may cause problems, IRQ 2 seems the best to work.
+- MDK: requires option /CF4.
 - Screamer: set max. XMS memory to 31MB (XMSRes 31).
-- Stargunner: to run SETUP.EXE requires Jemm's NOVCPI option; the game
-      doesn't restore the SB interrupt vector - it may be necessary to reload
-      vsbhda after the program has been run.
+- Stargunner: requires Jemm's NOVCPI option; the game doesn't restore the
+  SB interrupt vector - it may be necessary to reload vsbhda after the
+  program has been run.
 - "Sword and Fairy 1" (Chinese Paladin): allocates a sound buffer in
-      extended memory - see notes in 4.3.2).
-- System Shock: set max. XMS memory to 31MB (XMSRes 31) before running
-      HDPMI32i.
+  extended memory - see notes in 4.3.2).
+- System Shock: set max. XMS memory to 31MB (XMSRes 31) before running HDPMI32i.
 - Terminal Velocity: set max. XMS memory to 31MB (XMSRes 31).
 - "The Flight of the Amazon Queen": requires SETPVI.
 - X128 (Sinclair Spectrum Emulator): requires Jemm's NOVCPI option.
+
+
 
 ### Legend of Kyrandia CD-ROM
 
