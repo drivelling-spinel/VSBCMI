@@ -158,6 +158,13 @@ Official 1.1 patch is requried to fix issues with sound during video playback th
 Black Zone requires a recently released `HDPMI32I.EXE` to work, like the one found with versions v1.8 and above of VSBHDA, or v2.23 or later when [downloaded directly](https://github.com/Baron-von-Riedesel/HX/releases/tag/v2.23). VSBCMI also needs to be started with options `/OPL0 /CF1 /DF10` (i.e. with FM port forwarding) _or_ `/OPL1 /CF1` (i.e. with software FM emulation).   
 While this allows playing the game with sound and music, __a lot__ can be done to improve how the game sounds. See [this fan site](https://black-zone-shrine.vercel.app) for details. 
 
+### Blackthorne (aka Blackhawk)
+
+VSBCMI needs to be started with options `/OPL0 /DF90` (i.e. with FM port forwarding) _or_ `/OPL1 /DF80` (i.e. with software FM emulation).   
+When no FM (non-Roland) music is heard during the introduction or in a level, toggling music playback by pressitng `[Alt]+[M]` two times should bring it back.   
+The game includes several drivers for FM-based music playback via OPL, so if it sounds strange, select another driver in the setup program.
+Sound Blaster (i.e. not Pro) should work fine most of the time.
+
 ### Electro Man
 
 It is recommended that the game is used with C-Media proprietary driver instead of VSBCMI.

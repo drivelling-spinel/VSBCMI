@@ -1,4 +1,4 @@
-# VSBCMI v1.8.1
+# VSBCMI v1.8.2
 
 Sound Blaster emulation for DOS via CMI/HDA/AC97/SBLive/Ensoniq.
 
@@ -32,13 +32,14 @@ Changes from [VSBHDA](https://github.com/Baron-von-Riedesel/VSBHDA) and [SBEMU](
    | 10     | Virtualize port 220 (and 388 if possible) and forward to currently active OPL ports      |
    | 20     | Enable chip internal MPU-401 UART emulation on port 330 (unless /PXXX is given)          |
    | 40     | Use longer delays for UART passthrough with older chips (rev. up to 37)                  |
+   | 80     | Let XXC DSP port make unsolicited status changes that some games expect                  |
 
 A [HOWTO document](/HOWTO/CM8738-howto.md) for CMI8738-based cards is also included.
 
 A note on commit tags/version numbers used in VSBCMI (e.g. seen when VSBCMI.EXE is run with /?):
 
       1.8.          - last merged tag of VSBHDA 
-          1.        - version of VSBCMI-specifc code on top of merged VSBHDA tag
+          2.        - version of VSBCMI-specifc code on top of merged VSBHDA tag
             99      - last merged VSBHDA commit number
 
 Forked from v1.7 of ...
