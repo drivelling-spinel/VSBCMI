@@ -54,6 +54,7 @@
 #define DF_FM_FORWARD   (0x10)
 #define DF_UART_ENABLE  (0x20)
 #define DF_SLOWER_UART  (0x40)
+#define DF_NUDGE_SB     (0x80)
 
 bool _InstallInt31( struct globalvars * );
 bool _UninstallInt31( void );
@@ -452,6 +453,7 @@ int main(int argc, char* argv[])
     gvars.legacy_fm_disable = gm.devOpts & DF_FM_DISABLE;
     gvars.legacy_uart_enable = gm.devOpts & DF_UART_ENABLE;
     gvars.try_slower_uart = gm.devOpts & DF_SLOWER_UART;
+    gvars.nudge_sb = gm.devOpts & DF_NUDGE_SB;
 
     if ( IsInstalled() ) {
         printf("SB found - probably " XSTR(VSBHDA_NAME) " already installed\n" );

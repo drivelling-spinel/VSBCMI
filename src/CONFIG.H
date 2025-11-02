@@ -64,6 +64,7 @@ struct globalvars {
         int legacy_fm_disable;
         int legacy_uart_enable;
         int try_slower_uart;
+        int nudge_sb;
 };
 
 /* compatflags bits */

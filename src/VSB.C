@@ -1081,3 +1081,9 @@ uint8_t VSB_DSP_Acc0F( uint16_t port, uint8_t val, uint16_t flags )
 {
     return (flags & TRAPF_OUT) ? val : DSP_Read0F();
 }
+
+void VSB_Nudge( )
+{
+  if(gvars.nudge_sb)
+    vsb.WS |= 0x80;
+}

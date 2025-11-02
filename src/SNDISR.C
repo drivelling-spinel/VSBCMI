@@ -369,6 +369,8 @@ static int SNDISR_Interrupt( void )
     int loop;
 #endif
 
+    static int nudge_count = 0;
+
     int is_irq = AU_isirq( isr.hAU );
     /* check if the sound hw does request an interrupt. */
     if(!is_irq)
@@ -380,6 +382,8 @@ static int SNDISR_Interrupt( void )
         return 0;
     }
 #endif
+   
+    nudge_count += 1;
 
 #if COMPAT4
     /* v1.8: /CF4 */
@@ -393,8 +397,10 @@ static int SNDISR_Interrupt( void )
      * DSP cmds 0xF2/0xF3 (trigger IRQ).
      * Todo: check if SB emulated Irq is masked; if yes, don't trigger!
      */
-    if ( VSB_GetIRQStatus() )
+    if ( VSB_GetIRQStatus() ) {
+        nudge_count = 0;
         VIRQ_Invoke();
+    }
 
 #if SETIF
     _enable_ints();
@@ -546,6 +552,7 @@ static int SNDISR_Interrupt( void )
                 VSB_SetPos(0);
             else
                 VSB_Stop(); /* v1.8: does no longer reset SB position */
+            nudge_count = 0;
             VIRQ_Invoke();
         } else {
 #ifdef SNDISRLOG
@@ -704,6 +711,12 @@ static int SNDISR_Interrupt( void )
     }
 #endif
     AU_writedata( isr.hAU, samples * 2, isr.pPCM );
+
+    if ( nudge_count >= 10 ) {
+       nudge_count = 0;
+       VSB_Nudge();
+    }
+     
 
 #if SLOWDOWN
     if ( gvars.slowdown )

@@ -50,6 +50,8 @@ int VSB_GetIRQStatus( void );
 uint8_t VSB_GetMixerReg(uint8_t index);
 int VSB_ReadDirectSamples(uint8_t *);
 
+void VSB_Nudge();
+
 #ifdef __cplusplus
 }
 #endif
