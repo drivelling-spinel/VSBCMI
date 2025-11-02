@@ -23,7 +23,7 @@
 #endif
 #include <string.h>
 
-#define _LOG(...) dbgprintf((__VA_ARGS__))
+#define _CMI_LOG(...) dbgprintf((__VA_ARGS__))
 #define mpxplay_debugf(s, ...) dbgprintf((__VA_ARGS__))
 
 //ref: CMI-8738/PCI-SX AUDIO Specification
@@ -384,12 +384,12 @@ extern unsigned int intsoundconfig,intsoundcontrol;
 //-------------------------------------------------------------------------
 // low level write & read
 
-#define snd_cmipci_write_8(cm,reg,data)  do { outb(cm->iobase+reg,data); _LOG("%x: %x %x\n",reg,data,inb(cm->iobase+reg)); } while(cm->chip_version<=37 && inb(cm->iobase+reg) != (data))
-#define snd_cmipci_write_8nv(cm,reg,data)  do { outb(cm->iobase+reg,data); _LOG("%x: %x %x\n",reg,data,inb(cm->iobase+reg)); } while(0)
-#define snd_cmipci_write_16(cm,reg,data) do { outw(cm->iobase+reg,data); _LOG("%x: %x %x\n",reg,data,inw(cm->iobase+reg)); } while(cm->chip_version<=37 && inw(cm->iobase+reg) != (data))
-#define snd_cmipci_write_16nv(cm,reg,data) do { outw(cm->iobase+reg,data); _LOG("%x: %x %x\n",reg,data,inw(cm->iobase+reg)); } while(0)
-#define snd_cmipci_write_32(cm,reg,data) do { outl(cm->iobase+reg,data); _LOG("%x: %x %x\n",reg,data,inl(cm->iobase+reg)); } while(cm->chip_version<=37 && inl(cm->iobase+reg) != (data))
-#define snd_cmipci_write_32m(cm,reg,data,mask) do { outl(cm->iobase+reg,data); _LOG("%x: %x %x\n",reg,data,inl(cm->iobase+reg)); } while(cm->chip_version<=37 && (inl(cm->iobase+reg)&(mask)) != ((data)&mask))
+#define snd_cmipci_write_8(cm,reg,data)  do { outb(cm->iobase+reg,data); _CMI_LOG("%x: %x %x\n",reg,data,inb(cm->iobase+reg)); } while(cm->chip_version<=37 && inb(cm->iobase+reg) != (data))
+#define snd_cmipci_write_8nv(cm,reg,data)  do { outb(cm->iobase+reg,data); _CMI_LOG("%x: %x %x\n",reg,data,inb(cm->iobase+reg)); } while(0)
+#define snd_cmipci_write_16(cm,reg,data) do { outw(cm->iobase+reg,data); _CMI_LOG("%x: %x %x\n",reg,data,inw(cm->iobase+reg)); } while(cm->chip_version<=37 && inw(cm->iobase+reg) != (data))
+#define snd_cmipci_write_16nv(cm,reg,data) do { outw(cm->iobase+reg,data); _CMI_LOG("%x: %x %x\n",reg,data,inw(cm->iobase+reg)); } while(0)
+#define snd_cmipci_write_32(cm,reg,data) do { outl(cm->iobase+reg,data); _CMI_LOG("%x: %x %x\n",reg,data,inl(cm->iobase+reg)); } while(cm->chip_version<=37 && inl(cm->iobase+reg) != (data))
+#define snd_cmipci_write_32m(cm,reg,data,mask) do { outl(cm->iobase+reg,data); _CMI_LOG("%x: %x %x\n",reg,data,inl(cm->iobase+reg)); } while(cm->chip_version<=37 && (inl(cm->iobase+reg)&(mask)) != ((data)&mask))
 #define snd_cmipci_read_8(cm,reg)  inb(cm->iobase+reg)
 #define snd_cmipci_read_16(cm,reg) inw(cm->iobase+reg)
 #define snd_cmipci_read_32(cm,reg) inl(cm->iobase+reg)
@@ -399,7 +399,7 @@ static void snd_cmipci_set_bit(struct cmi8x38_card_s *cm, unsigned int cmd, unsi
  unsigned int val;
  do {
  val = snd_cmipci_read_32(cm, cmd);
- _LOG("%x %x\n",cmd, val);
+ _CMI_LOG("%x %x\n",cmd, val);
  } while(val == -1 && cm->chip_version <= 37);
  val|= flag;
  snd_cmipci_write_32(cm, cmd, val);
@@ -410,7 +410,7 @@ static void snd_cmipci_clear_bit(struct cmi8x38_card_s *cm, unsigned int cmd, un
  unsigned int val;
  do {
  val = snd_cmipci_read_32(cm, cmd);
- _LOG("%x %x\n",cmd, val);
+ _CMI_LOG("%x %x\n",cmd, val);
  } while(val == -1 && cm->chip_version <= 37);
  val&= ~flag;
  snd_cmipci_write_32(cm, cmd, val);
@@ -780,7 +780,7 @@ static void CMI8X38_setrate(struct audioout_info_s *aui)
   int val;
   do {
    val = snd_cmipci_read_8(card, CM_REG_MIXER1);
-   _LOG("%x %x\n", CM_REG_MIXER1, val);
+   _CMI_LOG("%x %x\n", CM_REG_MIXER1, val);
   } while(val == -1 && card->chip_version <= 37);
   val|= CM_CDPLAY;
   snd_cmipci_write_8(card, CM_REG_MIXER1, val);

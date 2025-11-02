@@ -33,7 +33,7 @@ WATCOM=\ow20
 # use OW v2 (0) or OW v1.9 (1)
 USE19=0
 # use jwlink (1) or wlink (0)
-USEJWL=1
+USEJWL=0
 # activate next line if FM synth should be deactivated
 #NOFM=1
 
@@ -128,7 +128,7 @@ segment CONST2 readonly
 !endif
 <<
 !if !$(USEJWL) 
-	res\@patchpe $*.exe
+	res\patchpe $*.exe
 !endif
 
 $(OUTD16)\$(NAME)16.exe: .always
