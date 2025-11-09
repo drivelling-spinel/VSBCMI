@@ -796,6 +796,7 @@ static uint8_t DSP_Read0A( void )
 static uint8_t DSP_Read0C( void )
 /////////////////////////////////
 {
+    if ( vsb.bWS != CMDPORTMASK ) return 0x7f;
     /* v1.9: cmd port status will be returned as busy "every now and then" */
     vsb.bWS++;
     return ((vsb.bWS & CMDPORTMASK) == 0 ) ? 0xff : 0x7f;
@@ -1087,5 +1088,5 @@ uint8_t VSB_DSP_Acc0F( uint16_t port, uint8_t val, uint16_t flags )
 void VSB_Nudge( )
 {
   if(gvars.nudge_sb)
-    vsb.WS |= 0x80;
+    vsb.bWS = CMDPORTMASK;
 }
