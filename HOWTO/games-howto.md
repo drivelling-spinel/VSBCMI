@@ -42,6 +42,7 @@ _The below is copied from `vsbhda.txt`_
 * Rayman
 * SuperFrog
 * Zone 66
+* San & Max Hit the Road
 
 
 ## Part 3 - Games that need VSBCMI16

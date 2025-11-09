@@ -59,7 +59,7 @@ Supported Sound cards:
 Emulated modes/cards:
 8-bit, 16-bit, mono, stereo, high-speed;
 Sound blaster 1.0, 2.0, Pro, Pro2, 16.
-
+ 
 Requirements:
  * HDPMI32i - DPMI host with port trapping; 32-bit protected-mode
  * HDPMI16i - DPMI host with port trapping; 16-bit protected-mode
@@ -70,7 +70,8 @@ VSBHDA uses some source codes from:
  * DOSBox: https://www.dosbox.com/ - OPL3 FM emulation
  * TinySoundFont: https://github.com/schellingb/TinySoundFont - MIDI synthesizer emulation
 
-To create the binaries, the following version of Open Watcom v2.0 must be used:
-https://github.com/open-watcom/open-watcom-v2/releases/tag/2024-02-02-Build.
-DJGPP v2.05 may also be used, but cannot create the 16-bit variant of VSBHDA.
-In all cases the JWasm assembler (v2.17 or better) is also needed.
+To create the binaries, stable version of [Open Watcom v1.9](https://openwatcom.org/ftp/install) is recommended.   
+Open Watcom v2.0 ([specifically this version](https://github.com/open-watcom/open-watcom-v2/releases/tag/2024-02-02-Build)) or 
+DJGPP v2.05 may also be used, but the latter cannot create the 16-bit variant of VSBHD.   
+In all cases the [JWasm assembler](https://github.com/Baron-von-Riedesel/JWasm) (v2.17 or better) is also needed 
+and [jwlink](https://github.com/Baron-von-Riedesel/jwlink) is recommended.
