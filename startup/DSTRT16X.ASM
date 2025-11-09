@@ -245,9 +245,15 @@ endif
 	jmp L7
 
 	public  __do_exit_with_msg_
+ifdef OW19
+public   __do_exit_with_msg__
+endif
 
 ; input: ( char *msg, int rc )  always in registers
 
+ifdef OW19
+__do_exit_with_msg__::
+endif
 __do_exit_with_msg_::
 	push edx 				; save return code
 	push eax 				; save address of msg

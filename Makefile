@@ -29,9 +29,9 @@
 DEBUG=0
 !endif
 
-WATCOM=\ow20
+WATCOM=\WATCOM
 # use OW v2 (0) or OW v1.9 (1)
-USE19=0
+USE19=1
 # use jwlink (1) or wlink (0)
 USEJWL=0
 # activate next line if FM synth should be deactivated
