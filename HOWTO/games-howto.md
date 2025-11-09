@@ -32,9 +32,8 @@ Game compatibility will differ depending on which hardare and software conponent
 ## Part 2 - Incompatible games
 
 These games currently are known to crash, hang, play no sound or misbehave is some other way:
-
-* Inherit the Earth (CD-ROM talkie version)
 * Strike Commander 
+* San & Max Hit the Road
 
 _The below is copied from `vsbhda.txt`_
 * Comanche
@@ -42,7 +41,6 @@ _The below is copied from `vsbhda.txt`_
 * Rayman
 * SuperFrog
 * Zone 66
-* San & Max Hit the Road
 
 
 ## Part 3 - Games that need VSBCMI16
@@ -65,6 +63,8 @@ Here are some programs/games listed that require special actions:
 - Blood: setting SB IRQ to 2 or 5 may be required. Generally, on some
   machines the DOS/4GW DOS extender has problems with IRQ 7.
 - Creative's SB16 diagnose.exe: needs cmdline option /CF1.
+- Daggerfall: uses the CauseWay DOS extender - requires either Jemm's
+  NOVCPI option or environment variable CAUSEWAY=DPMI.
 - FastTracker 2: requires Jemm's NOVCPI option AND option /CF4.
 - Jazz Jackrabbit: unpatched version requires /CF8.
 - Jungle Book: needs SETPVI.EXE to be run before launched.
@@ -78,11 +78,11 @@ Here are some programs/games listed that require special actions:
 - Stargunner: requires Jemm's NOVCPI option; the game doesn't restore the
   SB interrupt vector - it may be necessary to reload vsbhda after the
   program has been run.
-- "Sword and Fairy 1" (Chinese Paladin): allocates a sound buffer in
+- Sword and Fairy 1 (Chinese Paladin): allocates a sound buffer in
   extended memory - see notes in 4.3.2).
 - System Shock: set max. XMS memory to 31MB (XMSRes 31) before running HDPMI32i.
 - Terminal Velocity: set max. XMS memory to 31MB (XMSRes 31).
-- "The Flight of the Amazon Queen": requires SETPVI.
+- The Flight of the Amazon Queen: requires SETPVI.
 - X128 (Sinclair Spectrum Emulator): requires Jemm's NOVCPI option.
 
 
@@ -176,6 +176,19 @@ The same could apply for other X-Land games, such as "The Adventures of Robbo" a
 
 Game is not compatible with FreeDOS and requires MS-DOS to run.
 It also fails to detect SoundBlaster when `/CF1` option is given to VSBCMI.
+
+### Inherit the Earth: Quest for the Orb (CD-ROM)
+
+VSBCMI needs to be started with options `/OPL0 /DF10` (i.e. with FM port forwarding) _or_ `/OPL1` (i.e. with software FM emulation).   
+If the game prints `"Cannot initialize scene cache"` message at the start and quits, then the machine has too much physical memory installed for the game to run with VSBCMI. At the moment of writing there was no workaround in HDPMI32 for this.
+On machines with less memory installed (_reasonable_ amount being 32-64 Mb) the game is still extremely sensitive to the sound settings chosen, in particular sound effects and music card combination, probably due to its usage of two independent popular sound driver packages __at once__.
+Here are the settings that have worked with VSBCMI so far (note that ports, IRQ and DMA need to correspond to VSBCMI own configuration):
+```
+REM Sound Blaster Pro with FM music
+install.exe /mce /mp0x220 /scb /sa0x220 /si7 /sd1 
+REM Sound Blaster Pro with Roland MT-32 via MPU-401
+install.exe /mci /mp0x330 /scb /sa0x220 /si7 /sd1 
+```
 
 
 ### Quake

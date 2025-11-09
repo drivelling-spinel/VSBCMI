@@ -70,8 +70,8 @@ VSBHDA uses some source codes from:
  * DOSBox: https://www.dosbox.com/ - OPL3 FM emulation
  * TinySoundFont: https://github.com/schellingb/TinySoundFont - MIDI synthesizer emulation
 
-To create the binaries, stable version of [Open Watcom v1.9](https://openwatcom.org/ftp/install) is recommended.   
+To create the binaries, stable version of [Open Watcom v1.9](https://openwatcom.org/ftp/install) is recommended. 
 Open Watcom v2.0 ([specifically this version](https://github.com/open-watcom/open-watcom-v2/releases/tag/2024-02-02-Build)) or 
-DJGPP v2.05 may also be used, but the latter cannot create the 16-bit variant of VSBHD.   
+DJGPP v2.05 may also be used, but the latter cannot create the 16-bit variant of VSBHD. 
 In all cases the [JWasm assembler](https://github.com/Baron-von-Riedesel/JWasm) (v2.17 or better) is also needed 
 and [jwlink](https://github.com/Baron-von-Riedesel/jwlink) is recommended.
