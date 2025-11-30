@@ -157,13 +157,15 @@ local szVar[128]:byte
 
 	invoke GetEnvironmentVariableA, offset szBlaster, addr szVar, sizeof szVar
 	.if !ax
-		print <"no BLASTER environment variable found",13,10,'$'>
-		jmp exit
-	.endif
+		print <"Warning: no BLASTER environment variable found",13,10,'$'>
+		print <"         attempting to go ahead with address base 0x220",13,10,'$'>
+		mov wBase, 220h
+	.else
 	invoke scanvar, addr szVar
 	.if (wBase == -1)
-		print <"error: address base is invalid",13,10,'$'>
+		print <"Error:   address base is invalid",13,10,'$'>
 		jmp exit
+	.endif
 	.endif
 
 	mov dx, wBase
@@ -193,7 +195,8 @@ local szVar[128]:byte
 exit:
 	ret
 novsbhda:
-	print <"VSBHDA not loaded",13,10,'$'>
+	print <"Error:   no response from TSR",13,10,'$'>
+	print <"         not loaded or loaded with real mode support switched off",13,10,'$'>
 	ret
 main endp
 

@@ -116,7 +116,7 @@ LIBS=
 {startup}.asm{$(OUTD)}.obj
 	@$(ASM) -q -zcw -D?MODEL=flat $(OW19) $(A_DEBUG_FLAGS) -Fo$@ $<
 
-all: $(OUTD) $(OUTD)\$(NAME).exe $(OUTD16)\$(NAME)16.exe
+all: $(OUTD) $(OUTD)\$(NAME).exe $(OUTD16)\$(NAME)16.exe $(OUTD)\UNINST.EXE
 
 $(OUTD):
 	@mkdir $(OUTD)
@@ -192,6 +192,9 @@ $(OUTD)/rmwrap.obj:    src\rmwrap.asm src\rmcode1.asm src\rmcode2.asm
 	@$(ASM) -q -bin -Fl$(OUTD)\ -Fo$(OUTD)\rmcode1.bin src\rmcode1.asm
 	@$(ASM) -q -bin -Fl$(OUTD)\ -Fo$(OUTD)\rmcode2.bin src\rmcode2.asm
 	@$(ASM) -q -D?MODEL=flat $(OW19) -Fo$@ -DOUTD=$(OUTD) src\rmwrap.asm
+
+$(OUTD)\UNINST.EXE:    uninst\uninst.asm
+	@$(ASM) -q -mz -Fo$(OUTD)\UNINST.EXE uninst\uninst.asm
 
 clean: .SYMBOLIC
 	@wmake -h -f OW16.mak debug=$(DEBUG) clean
