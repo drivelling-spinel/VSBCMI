@@ -179,9 +179,14 @@ It also fails to detect SoundBlaster when `/CF1` option is given to VSBCMI.
 
 ### Inherit the Earth: Quest for the Orb (CD-ROM)
 
+HDPMI32I.EXE needs to be loaded with `a` suffix to the `-x` command line argument, i.e.
+```
+HDPMI32I.EXE -xa
+```
+which requires that a fairly recent build of HDPMI32I.EXE is used. One such testing version can be found in
+[github issue discussion](https://github.com/Baron-von-Riedesel/VSBHDA/issues/55#issuecomment-3538766992).
 VSBCMI needs to be started with options `/OPL0 /DF10` (i.e. with FM port forwarding) _or_ `/OPL1` (i.e. with software FM emulation).   
-If the game prints `"Cannot initialize scene cache"` message at the start and quits, then the machine has too much physical memory installed for the game to run with VSBCMI. At the moment of writing there was no workaround in HDPMI32 for this.
-On machines with less memory installed (_reasonable_ amount being 32-64 Mb) the game is still extremely sensitive to the sound settings chosen, in particular sound effects and music card combination, probably due to its usage of two independent popular sound driver packages __at once__.
+The game is sensitive to the sound settings chosen, in particular sound effects and music card combination.
 Here are the settings that have worked with VSBCMI so far (note that ports, IRQ and DMA need to correspond to VSBCMI own configuration):
 ```
 REM Sound Blaster Pro with FM music
