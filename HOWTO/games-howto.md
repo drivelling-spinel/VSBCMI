@@ -46,15 +46,18 @@ _The below is copied from `vsbhda.txt`_
 ## Part 3 - Games that need VSBCMI16
 
 Games running in 16-bit protected mode require the 16-bit variant of the driver, `VSBCMI16`.  
-This in turn should be run with `HDPMI16I.EXE` extender loaded.
+This in turn should be run with `HDPMI16I.EXE` extender loaded.   
+
+Good indicator that a game needs `HDPMI16I.EXE` is the presense of files `RTM.EXE` and `DPMI16BI.OVL`.
+In this case the game may also suffer from the "Run time error 200" bug. VSBCMI16 offers `/CF8` switch to address this,
+however a more reliable way of dealing with the problem is patching game executable files using `CTBPPAT`.   
+**Please remember to back up the files before attempting any patching.**
 
 * Tyrian 2000
+* Total Control
 
-## Part 4 - Game compatibility tips
+## Part 4 - VSBHDA notes
 
-_NOTE: work is in progress with this section, including the sections that already have some content in them_
-
-### VSBHDA notes
 _The below is copied from `vsbhda.txt`_
 
 Here are some programs/games listed that require special actions:
@@ -85,6 +88,9 @@ Here are some programs/games listed that require special actions:
 - The Flight of the Amazon Queen: requires SETPVI.
 - X128 (Sinclair Spectrum Emulator): requires Jemm's NOVCPI option.
 
+## Part 5 - Game compatibility tips
+
+**Please remember to back up the files before attempting any patching suggested in the sections below.**
 
 
 ### Legend of Kyrandia CD-ROM
@@ -198,8 +204,10 @@ install.exe /mci /mp0x330 /scb /sa0x220 /si7 /sd1
 
 ### Quake
 
-_-sspeed option and sound pack mods_
-
+Out of the box original Quake does not sound very nice with VSBCMI resampling. Starting the game with `-sspeed 48000` option improves this, 
+as it moves resampling from the TSR into the game iteself (note that the value 48000 should match what has been supplied to VSBCMI with `-F` argument when loading it).    
+For a slightly cleaner sounding version of the game (and Hexen II as well), please check out [these builds](https://github.com/drivelling-spinel/Quake), 
+which add sample interpolation and make other small adjustments to the playback. These require `-sspeed 48000` as well to sound nicer.
 
 
 2025,  

@@ -565,7 +565,7 @@ static int SNDISR_Interrupt( void )
          * the program may want to instantly initiate another DSP play cmd.
          * v1.8: returned to filling the rest with silence...
          */
-#if 1
+#if 0
         for( i = IdxSm; i < samples; i++ )
             *(isr.pPCM + i*2+1) = *(isr.pPCM + i*2) = 0;
 #else
