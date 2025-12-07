@@ -12,7 +12,7 @@ Game compatibility will differ depending on which hardare and software conponent
 |----------------|------------------------------------------------------------------------------------------|
 | Motherboard    | Gigabyte GA-G41M-Combo G41                                                               |
 | CPU            | Core 2 Quad Q9550                                                                        |
-| Memory         | 2x4Gb DDR3 downclocked to ...                                                            |
+| Memory         | 2x4Gb DDR3 downclocked to 1066 MHz                                                       |
 | Chipset        | Intel ICH7                                                                               |
 | Video          | Intel integrated video (see above) with VGA/D-SUB output                                 |
 | HDD            | WDC 80Gb IDE (3 primary and 3 logical partitions, 9 to 29 Gb each)                       |
@@ -21,10 +21,10 @@ Game compatibility will differ depending on which hardare and software conponent
 | Floppy         | 3.5" FDD (with integrated USB hub and card reader)                                       |
 | OS             | FreeDOS 1.3-RC3 release 2020-05-31                                                       |
 |                | JemmEx v5.85                                                                             |
-| Input          | A4Tech ML160 (BIOS USB compatibility on) + PS/2 wired keyboard                           | 
+| Input          | A4Tech ML160 (BIOS USB compatibility on) + PS/2 wired keyboard                           |
 |                | Logitech mouse driver v7.02 (__without__ CLOAKING)                                       |
 | Joysticks      | InterAct PC Flight Force SV-242 + SV-240 connected to game port                          |
-| Soundcard      | Leadtek WinFast 4X (PCI, CMI-8738) with TOSLINK bracket                                  |
+| Soundcard      | Trust SC-5250 5.1 (PCI, CMI-8738) with TOSLINK bracket                                   |
 |                | PCIAUDIO.COM v1.98, C3DMIX.COM v0.4                                                      |
 | MIDI module    | X3MB (Buran edition) connected to game port                                              |
 
@@ -32,8 +32,7 @@ Game compatibility will differ depending on which hardare and software conponent
 ## Part 2 - Incompatible games
 
 These games currently are known to crash, hang, play no sound or misbehave is some other way:
-* Strike Commander 
-* San & Max Hit the Road
+* Strike Commander   
 
 _The below is copied from `vsbhda.txt`_
 * Comanche
@@ -41,6 +40,11 @@ _The below is copied from `vsbhda.txt`_
 * Rayman
 * SuperFrog
 * Zone 66
+
+Speed-sensitive games which work best on hardware they were originally intended to be run on;   
+(as such the usefulness of VSBCMI is limited with them, since they would normally work best with an ISA soundcard)
+* Sam & Max Hit the Road 
+* Theme Park
 
 
 ## Part 3 - Games that need VSBCMI16
@@ -206,8 +210,9 @@ install.exe /mci /mp0x330 /scb /sa0x220 /si7 /sd1
 
 Out of the box original Quake does not sound very nice with VSBCMI resampling. Starting the game with `-sspeed 48000` option improves this, 
 as it moves resampling from the TSR into the game iteself (note that the value 48000 should match what has been supplied to VSBCMI with `-F` argument when loading it).    
+
 For a slightly cleaner sounding version of the game (and Hexen II as well), please check out [these builds](https://github.com/drivelling-spinel/Quake), 
-which add sample interpolation and make other small adjustments to the playback. These require `-sspeed 48000` as well to sound nicer.
+which add sample interpolation and make other small adjustments to the sound playback. These require `-sspeed 48000` as well to sound nicer.
 
 
 2025,  
