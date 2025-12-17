@@ -66,7 +66,7 @@ OBJFILES = &
 	$(OUTD)/stackio.obj		$(OUTD)/stackisr.obj	$(OUTD)/sbisr.obj		$(OUTD)/int31.obj		$(OUTD)/rmwrap.obj		$(OUTD)/mixer.obj &
 	$(OUTD)/hapi.obj		$(OUTD)/dprintf.obj		$(OUTD)/vioout.obj		$(OUTD)/djdpmi.obj		$(OUTD)/uninst.obj &
 	$(OUTD)/auimp16.obj		$(OUTD)/ldmod16.obj		$(OUTD)/sbrk.obj		$(OUTD)/malloc.obj		$(OUTD)/rte200.obj &
-	$(OUTD)/fileacc.obj &
+	$(OUTD)/fileacc.obj		$(OUTD)/logfile.obj &
 	$(OUTD)/timer.obj 	$(OUTD)/joytsr.obj 	$(OUTD)/joyasm.obj
 
 OBJFILES2 = &
@@ -74,7 +74,7 @@ OBJFILES2 = &
 	$(OUTD)/dmabuff.obj		$(OUTD)/pcibios.obj		$(OUTD)/physmem.obj		$(OUTD)/timer.obj&
 	$(OUTD)/sc_cmi.obj		$(OUTD)/sc_e1371.obj		$(OUTD)/sc_ich.obj		$(OUTD)/sc_inthd.obj		$(OUTD)/sc_via82.obj		$(OUTD)/sc_sbliv.obj	$(OUTD)/sc_sbl24.obj &
 	$(OUTD)/djdpmi.obj		$(OUTD)/dprintf.obj		$(OUTD)/vioout.obj		$(OUTD)/sbrk.obj		$(OUTD)/malloc.obj &
-	$(OUTD)/libmain.obj   
+	$(OUTD)/libmain.obj
 
 C_OPT_FLAGS=-q -oxa -ms -ecc -5s -fp5 -fpi87 -wcd=111
 # OW's wpp386 doesn't like the -ecc option ("function modifier cannot be used ...")
@@ -158,6 +158,7 @@ $(OUTD)/fileacc.obj:   src\fileacc.asm
 $(OUTD)/hapi.obj:      src\hapi.asm
 $(OUTD)/int31.obj:     src\int31.asm
 $(OUTD)/linear.obj:    src\linear.c
+$(OUTD)/logfile.obj:   src\logfile.asm
 $(OUTD)/main.obj:      src\main.c
 $(OUTD)/mixer.obj:     src\mixer.asm
 $(OUTD)/pic.obj:       src\pic.c

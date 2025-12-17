@@ -61,7 +61,7 @@ NAME=vsbcmi
 !if $(DEBUG)
 OUTD=owd
 OUTD16=ow16d
-C_DEBUG_FLAGS=-D_DEBUG
+C_DEBUG_FLAGS=-D_DEBUG -DSNDISRLOG
 A_DEBUG_FLAGS=-D_DEBUG -Fl$* -Sg
 !else
 OUTD=ow
@@ -85,7 +85,7 @@ OBJFILES = &
 	$(OUTD)/sc_cmi.obj		$(OUTD)/sc_e1371.obj		$(OUTD)/sc_ich.obj		$(OUTD)/sc_inthd.obj		$(OUTD)/sc_via82.obj		$(OUTD)/sc_sbliv.obj		$(OUTD)/sc_sbl24.obj &
 	$(OUTD)/stackio.obj		$(OUTD)/stackisr.obj		$(OUTD)/sbisr.obj		$(OUTD)/int31.obj		$(OUTD)/rmwrap.obj		$(OUTD)/mixer.obj &
 	$(OUTD)/hapi.obj		$(OUTD)/dprintf.obj		$(OUTD)/vioout.obj		$(OUTD)/djdpmi.obj		$(OUTD)/uninst.obj &
-	$(OUTD)/malloc.obj		$(OUTD)/sbrk.obj		$(OUTD)/fileacc.obj &
+	$(OUTD)/malloc.obj		$(OUTD)/sbrk.obj		$(OUTD)/fileacc.obj		$(OUTD)/logfile.obj &
 	$(OUTD)/joytsr.obj $(OUTD)/joyasm.obj
 	
 C_OPT_FLAGS=-q -mf -oxa -ecc -5s -fp5 -fpi87 -wcd=111
@@ -160,6 +160,7 @@ $(OUTD)/fileacc.obj:   src\fileacc.asm
 $(OUTD)/hapi.obj:      src\hapi.asm
 $(OUTD)/int31.obj:     src\int31.asm
 $(OUTD)/linear.obj:    src\linear.c
+$(OUTD)/logfile.obj:   src\logfile.asm
 $(OUTD)/main.obj:      src\main.c
 $(OUTD)/mixer.obj:     src\mixer.asm
 $(OUTD)/pic.obj:       src\pic.c

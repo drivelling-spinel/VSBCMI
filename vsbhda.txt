@@ -221,7 +221,6 @@
    API to detect the presence of such a host. However, a program may ignore an
    installed DPMI host and use the so-called VCPI API instead to run its very
    own low-level code; this will actually deactivate VSBHDA for the program. To
-   cover such cases, Jemm386/JemmEx offers the NOVCPI option. This option must
    cover such cases, Jemm386/JemmEx offers the NOVCPI option.
     The NOVCPI option must be set *after* VSBHDA has been loaded and *before*
    the program is launched; just run "jemm386 novcpi" ( or "jemmex novcpi" )
