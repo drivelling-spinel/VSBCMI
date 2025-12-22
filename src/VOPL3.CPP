@@ -98,10 +98,14 @@ void VOPL3_Passthrough(void *hAU)
 void VOPL3_Reinit(int samplerate)
 /////////////////////////////////
 {
-	opl3.Chip->Setup(samplerate);
-#if NOSILENTGEN
-	opl3.bWritten = false;
-#endif
+# if NOSILENTGEN
+    if ( opl3.bWritten ) {
+        opl3.Chip->Setup(samplerate);
+        opl3.bWritten = false;
+    }
+# else
+    opl3.Chip->Setup(samplerate);
+# endif
 }
 #endif
 
