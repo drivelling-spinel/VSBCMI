@@ -215,6 +215,11 @@ For a slightly cleaner sounding version of the game (and Hexen II as well), plea
 which add sample interpolation and make other small adjustments to the sound playback. These require `-sspeed 48000` as well to sound nicer.
 
 
+### Rebel Assault 2
+
+If speech ends abruptly or gets interrupted during video sequences, setting Interrupt Timer Rate to lowest possible value in Advanced settings of the game's own launcher can help.
+
+
 2025,  
 [CC BY-NC]( "https://creativecommons.org/licenses/by-nc/4.0/),  
 Ludicrous_peridot
