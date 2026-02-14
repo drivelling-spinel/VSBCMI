@@ -19,9 +19,9 @@ Game compatibility will differ depending on which hardare and software conponent
 | DVD-ROM        | A-Open 16x IDE                                                                           |
 |                | VIDE-CDD.SYS version 2.14, SHSUCD version 3-6, SHSU-CDH version 2.1                      |
 | Floppy         | 3.5" FDD (with integrated USB hub and card reader)                                       |
-| OS             | FreeDOS 1.3-RC3 release 2020-05-31                                                       |
+| OS             | FreeDOS 1.4 RELEASE 2025-04-02                                                           |
 |                | JemmEx v5.85                                                                             |
-| Input          | A4Tech ML160 (BIOS USB compatibility on) + PS/2 wired keyboard                           |
+| Input          | Logitech M35 3-button COM mouse + PS/2 wired keyboard                                    |
 |                | Logitech mouse driver v7.02 (__without__ CLOAKING)                                       |
 | Joysticks      | InterAct PC Flight Force SV-242 + SV-240 connected to game port                          |
 | Soundcard      | Trust SC-5250 5.1 (PCI, CMI-8738) with TOSLINK bracket                                   |
@@ -43,7 +43,6 @@ _The below is copied from `vsbhda.txt`_
 
 Speed-sensitive games which work best on hardware they were originally intended to be run on;   
 (as such the usefulness of VSBCMI is limited with them, since they would normally work best with an ISA soundcard)
-* Sam & Max Hit the Road 
 * Theme Park
 
 
@@ -157,8 +156,40 @@ Floppy version, however, needs VSBCMI started with `/CF1` option.
 ### Monkey Island 2
 
 As with X-Wing above, with floppy version `/CF1` option is requried with VSBCMI. This applies also if game has \@NewRisingSun sound drivers patch applied.   
-CD-ROM version from 1996 does not require the special option.   
-The "Ultimate Talkie Edition" also does not require the special option, but may need system slowdown utility in order to work correctly with digitized speech. [CpuSpd](https://www.vogons.org/viewtopic.php?t=74359) is a recommended tool for that.
+CD-ROM version from 1996 and the "Ultimate Talkie Edition" do not require the special option.
+
+### Sam & Max Hit the Road ###
+
+It is recommended to use VSBCMI with `/CF4` option when running the game, as it may sporadically hang otherwise.
+While CD-ROM version is considered speed sensitive and may have issues (crashes) with digital sound playback on newer machines, it is possible to downgrade SCUMM interpreter and sound system to a real-mode version that is compatible with VSBCMI. In this case VSBCMI needs to be started with option `/CF4`.   
+In order to downgrade the following steps are required:   
+- Download demo version with `Interpreter Version 6.5.0 (Nov 17 1993 14:32:10)`   
+  The version is available from [LucasArts Demos archive page](https://mixnmojo.com/dreamm-demos/) where it's designated as **Sam and Max Hit the Road PC (German)**.   
+- Unpack the demo files   
+- Copy the following file from the CD-ROM version into the same directory:   
+          MONSTER.SOU
+          SAMNMAX.S00
+          SAMNMAX.S001
+- Rename the following files:
+          SDEMO.EXE   ->  SAMNMAX.EXE
+          SAMNMAX.S00 ->  SAMNMAX.SM0
+          SAMNMAX.S01 ->  SAMNMAX.SM1
+- Run SETMUSE.EXE to select sound and music card and save the settings, but _avoid testing_ sound settings from the programm   
+ 
+Using this older interpreter with CD-ROM version assets introduces incompatibilities for which workarounds exist:
+1. Sound effects are played at wrong sampling frequency.   
+   Sound Blaster series card drivers can be patched to configure sound playback with the correct timing constant:
+   - `SBCLONE.WDR`:  ```000006AA: EB 74```
+   - `SBPRO.WDR`:    ```000006C4: EB 74```
+   - `SB16.WDR`:     ```00000512: EB 74```
+2. Message saying `Heap State: Unplayable` is show every time the game is started.   
+   Only an annoyance, the message only requires that the players dismiss it once at the start. A [patcher tool](https://github.com/drivelling-spinel/scumm-patcher) is available, that can be built in DOS with DJGPP, which removes the message altogether.
+
+
+### Rebel Assault 2
+
+If speech ends abruptly or gets interrupted during video sequences, setting Interrupt Timer Rate to lowest possible value in Advanced settings of the game's own launcher can help.
+
 
 ### Kasparov's Gambit
 
@@ -184,8 +215,9 @@ The same could apply for other X-Land games, such as "The Adventures of Robbo" a
 
 ### Whizz
 
-Game is not compatible with FreeDOS and requires MS-DOS to run.
-It also fails to detect SoundBlaster when `/CF1` option is given to VSBCMI.
+VSBCMI needs to be started with options `/OPL0 /DF10` (i.e. with FM port forwarding) _or_ `/OPL1` (i.e. with software FM emulation). Option `/CF1` __should not be set__ as game will fail to detect sound card with it.   
+Game is not compatible with FreeDOS out of the box and requires MS-DOS to run.   
+Alertnatively game executables can be unpacked using [UNP](https://bencastricum.nl/unp/), in which case all `*.EXE`, `*.PRG` and `SCORE.CEP` need to be unpacked.
 
 ### Inherit the Earth: Quest for the Orb (CD-ROM)
 
@@ -215,12 +247,9 @@ For a slightly cleaner sounding version of the game (and Hexen II as well), plea
 which add sample interpolation and make other small adjustments to the sound playback. These require `-sspeed 48000` as well to sound nicer.
 
 
-### Rebel Assault 2
-
-If speech ends abruptly or gets interrupted during video sequences, setting Interrupt Timer Rate to lowest possible value in Advanced settings of the game's own launcher can help.
 
 
-2025,  
+2026,  
 [CC BY-NC]( "https://creativecommons.org/licenses/by-nc/4.0/),  
 Ludicrous_peridot
 
