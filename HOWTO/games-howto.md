@@ -209,8 +209,8 @@ Sound Blaster (i.e. not Pro) should work fine most of the time.
 
 ### Electro Man
 
-It is recommended that the game is used with C-Media proprietary driver instead of VSBCMI.
-If crashes or loss of keyboard control are observed after some time spent playing (also even with C-Media driver), switching from FreeDOS to MS-DOS may help.
+The game can be played with C-Media proprietary driver or with VSBCMI.
+If crashes or loss of keyboard control are observed after some time playing, switching to a more recent version of FreeDOS or to MS-DOS may help.
 The same could apply for other X-Land games, such as "The Adventures of Robbo" and "Heartlight".
 
 ### Whizz
