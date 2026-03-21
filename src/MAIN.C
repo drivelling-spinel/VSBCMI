@@ -26,6 +26,7 @@
 #include "SNDISR.H"
 #include "VMPU.H"
 #include "VERSION.H"
+#include "JOYTSR.H"
 
 #include "AU.H"
 
@@ -133,6 +134,7 @@ NULL, /* /SF: */
 VOICES_DEFAULT, /* /MV */
 #endif
 0, /* CF */
+0  /* joytsr */
 };
 
 static const struct {
@@ -169,6 +171,7 @@ static const struct {
     "SF:", "Set sound font file name", (int *)&gvars.soundfont,
     "MV", "Set voice limit [0-256, def 64]", &gvars.voices,
 #endif
+    "J",  "Joystick TSR compatibility mode (port 201h)", &gvars.joytsr,
     "CF", "Set compatibility flags [def 0]", &gvars.compatflags,
     "DF", "Set developer override flags (see README.MD) [def 0, hexadecimal]", &gm.devOpts,
     NULL, NULL, 0,
@@ -527,6 +530,10 @@ int main(int argc, char* argv[])
 
     VPIC_Init( AU_getirq( gm.hAU ) );
 
+    if( gvars.joytsr ) {
+        JOY_FindTSR();
+    }
+
 #ifdef NOFM
     gvars.opl3 = 0;
 #else
@@ -543,7 +550,7 @@ int main(int argc, char* argv[])
 #else
         gvars.opl3,
 #endif
-        gvars.base, gvars.dma, gvars.hdma, AU_getirq( gm.hAU ) );
+        gvars.base, gvars.dma, gvars.hdma, AU_getirq( gm.hAU ));
 #else
 	PTRAP_Prepare(
 #if OWNFM && !defined(NOFM)
@@ -551,7 +558,7 @@ int main(int argc, char* argv[])
 #else
         gvars.opl3,
 #endif
-        gvars.base, gvars.dma, 0, AU_getirq( gm.hAU ) );
+        gvars.base, gvars.dma, 0, AU_getirq( gm.hAU ));
 #endif
 
 #if SB16

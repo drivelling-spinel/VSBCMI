@@ -19,6 +19,8 @@ Changes from [VSBHDA](https://github.com/Baron-von-Riedesel/VSBHDA) and [SBEMU](
    and option to upsample to 48000 added (/F48000) 
    There is also a compile time option to switch off interpolation when resampling.
  * SoundFont support is switched off by default (compile time) in favor of UART port forwarding
+ * /J option to enable Joystick TSR driver compatibility mode  
+   Only port 201H is supported. Check HOWTO for more details and instructions.
  * /DF option added to provide bit flags in hexadecimal format that control behavior of the TSR. 
    Several flags can be combined by summing up the values, but only a single /DF option is accepted.
    The following flags are supported:

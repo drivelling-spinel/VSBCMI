@@ -66,7 +66,8 @@ OBJFILES = &
 	$(OUTD)/stackio.obj		$(OUTD)/stackisr.obj	$(OUTD)/sbisr.obj		$(OUTD)/int31.obj		$(OUTD)/rmwrap.obj		$(OUTD)/mixer.obj &
 	$(OUTD)/hapi.obj		$(OUTD)/dprintf.obj		$(OUTD)/vioout.obj		$(OUTD)/djdpmi.obj		$(OUTD)/uninst.obj &
 	$(OUTD)/auimp16.obj		$(OUTD)/ldmod16.obj		$(OUTD)/sbrk.obj		$(OUTD)/malloc.obj		$(OUTD)/rte200.obj &
-	$(OUTD)/fileacc.obj
+	$(OUTD)/fileacc.obj &
+	$(OUTD)/joytsr.obj 
 
 OBJFILES2 = &
 	$(OUTD)/ac97mix.obj		$(OUTD)/au_cards.obj &

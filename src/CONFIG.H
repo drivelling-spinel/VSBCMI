@@ -57,13 +57,14 @@ struct globalvars {
 	int pin;
 	int device;
 	int period_size;
-        int dig_out_override;
-        int cd_in_disable;
-        int fm_pass_override;
-        int legacy_fm_disable;
-        int legacy_uart_enable;
-        int try_slower_uart;
-        int nudge_sb;
+	int dig_out_override;
+	int cd_in_disable;
+	int fm_pass_override;
+	int legacy_fm_disable;
+	int legacy_uart_enable;
+	int try_slower_uart;
+	int nudge_sb;
+	int joytsr;
 };
 
 /* compatflags bits */

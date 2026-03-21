@@ -30,6 +30,7 @@
 #if VMPU
 #include "VMPU.H"
 #endif
+#include "JOYTSR.H"
 
 #define DOSMEMSTART 0x60 /* offset in PSP, bits 0-3 must be zero */
 #define HDPMI_MAXRANGE 8 /* hdpmi is restricted to 8 port ranges */
@@ -97,6 +98,7 @@ static uint16_t PortTable[] = {
 	0xC4, 0xC6,                   /* ch 5; will be modified if HDMA != 5 */
 	0xD0, 0xD2, 0xD4, 0xD6, 0xD8, 0xDA, 0xDC, 0xDE | 0x8000,
 #endif
+	0x201,
 	0x220, 0x221, 0x222, 0x223, /* FM */
 	0x224, 0x225, 0x226,
 	0x228, 0x229, /* FM */
@@ -124,6 +126,7 @@ static PORT_TRAP_HANDLER PortHandler[] = {
 	VDMA_Acc, VDMA_Acc,    /* base+cnt for ch 5; will be modified if HDMA != 5 */
 	VDMA_Acc, VDMA_Acc, VDMA_Acc, VDMA_Acc, VDMA_Acc, VDMA_Acc, VDMA_Acc, VDMA_Acc, /* 0xD0-0xDE */
 #endif
+	JOY_Port_Acc,                               /* 0x201 */
 	VOPL3_388, VOPL3_389, VOPL3_38A, VOPL3_38B, /* 0x220-0x223 */
 	VSB_MixerAddr, VSB_MixerData,               /* 0x224-0x225 */
 	VSB_DSP_Reset,                              /* 0x226 */
@@ -603,22 +606,28 @@ void PTRAP_Prepare( int opl, int sbaddr, int dma, int hdma, int sndirq )
 #endif
     /* adjust the SB ports to the selected base */
     if ( sbaddr != 0x220 )
-        for( i = portranges[SB_PDT]; i < portranges[SB_PDT+1]; i++ )
+        for( i = portranges[SB_PDT]; i < portranges[SB_PDT+1]; i++ ) {
+            if(PortTable[i] == 0x201) continue;
             PortTable[i] += sbaddr - 0x220;
+        }
 
     /* if no OPL3 emulation, skip ports 0x388-0x38b, 0x220-0x223 and 0x228-0x229 */
 #if OWNFM
     if ( opl < 0 ) {
         PDT_DelEntries( portranges[OPL3_PDT], maxports, 4 );
-        PDT_DelEntries( portranges[SB_PDT]+3, maxports, 2 );
+        PDT_DelEntries( portranges[SB_PDT]+4, maxports, 2 );
     }
     else
 #endif
     if ( !opl ) {
         PDT_DelEntries( portranges[OPL3_PDT], maxports, 4 );
-        PDT_DelEntries( portranges[SB_PDT], maxports, 4 );
+        PDT_DelEntries( portranges[SB_PDT]+1, maxports, 4 );
         /* v1.8: also remove ports 0x228-0x229; +3 to skip ports 0x224,0x225,0x226 */
-        PDT_DelEntries( portranges[SB_PDT]+3, maxports, 2 );
+        PDT_DelEntries( portranges[SB_PDT]+4, maxports, 2 );
+    }
+
+    if ( !gvars.joytsr ) {
+        PDT_DelEntries( portranges[SB_PDT], maxports, 1 );
     }
 
     /* delete empty port ranges */
