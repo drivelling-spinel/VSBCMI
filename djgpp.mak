@@ -46,7 +46,8 @@ OBJFILES=\
 	$(OUTD)/dmabuff.o	$(OUTD)/pcibios.o	$(OUTD)/physmem.o	$(OUTD)/timer.o\
 	$(OUTD)/sc_e1371.o	$(OUTD)/sc_cmi.o	$(OUTD)/sc_ich.o	$(OUTD)/sc_inthd.o	$(OUTD)/sc_via82.o	$(OUTD)/sc_sbliv.o	$(OUTD)/sc_sbl24.o\
 	$(OUTD)/stackio.o	$(OUTD)/stackisr.o	$(OUTD)/sbisr.o		$(OUTD)/int31.o		$(OUTD)/rmwrap.o	$(OUTD)/mixer.o\
-	$(OUTD)/hapi.o		$(OUTD)/dprintf.o	$(OUTD)/vioout.o	$(OUTD)/djdpmi.o	$(OUTD)/uninst.o	$(OUTD)/fileacc.o
+	$(OUTD)/hapi.o		$(OUTD)/dprintf.o	$(OUTD)/vioout.o	$(OUTD)/djdpmi.o	$(OUTD)/uninst.o	$(OUTD)/fileacc.o\
+	$(OUTD)/joytsr.o	$(OUTD)/joyasm.o
 
 INCLUDE_DIRS=src mpxplay
 SRC_DIRS=src mpxplay
@@ -141,6 +142,10 @@ $(OUTD)/stackio.o::  stackio.asm
 $(OUTD)/stackisr.o:: stackisr.asm
 $(OUTD)/uninst.o::   uninst.asm
 $(OUTD)/vioout.o::   vioout.asm
+
+
+$(OUTD)/joytsr.o::   joytsr.c    linear.h platform.h ptrap.h config.h 
+$(OUTD)/joyasm.o::   joyasm.asm
 
 clean::
 	del $(OUTD)\$(NAME_D).exe

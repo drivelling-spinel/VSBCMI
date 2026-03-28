@@ -67,7 +67,7 @@ OBJFILES = &
 	$(OUTD)/hapi.obj		$(OUTD)/dprintf.obj		$(OUTD)/vioout.obj		$(OUTD)/djdpmi.obj		$(OUTD)/uninst.obj &
 	$(OUTD)/auimp16.obj		$(OUTD)/ldmod16.obj		$(OUTD)/sbrk.obj		$(OUTD)/malloc.obj		$(OUTD)/rte200.obj &
 	$(OUTD)/fileacc.obj &
-	$(OUTD)/joytsr.obj 
+	$(OUTD)/joytsr.obj 	$(OUTD)/joyasm.obj
 
 OBJFILES2 = &
 	$(OUTD)/ac97mix.obj		$(OUTD)/au_cards.obj &
@@ -180,6 +180,9 @@ $(OUTD)/dbopl.obj:     src\dbopl.cpp
 $(OUTD)/vopl3.obj:     src\vopl3.cpp
 	*@$(CPP) $(C_DEBUG_FLAGS) -q -oxa -ms -bc -ecc -5s -fp5 -fpi87 $(C_EXTRA_FLAGS) $(CPPFLAGS) $(INCLUDES) -fo=$@ $<
 !endif
+
+$(OUTD)/joytsr.obj:    src\joytsr.c
+$(OUTD)/joyasm.obj:    src\joyasm.asm
 
 $(OUTD)/cstrt16x.obj:  startup\cstrt16x.asm
 $(OUTD)/dstrt16x.obj:  startup\dstrt16x.asm

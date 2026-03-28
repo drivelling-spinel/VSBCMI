@@ -441,6 +441,10 @@ int main(int argc, char* argv[])
         return(1);
     }
 #endif
+    if (gvars.joytsr > 16 || gvars.joytsr < 0) {
+        printf("Error: only 0-16 supported for joystick routine\n" );
+        return(1);
+    }  
 #if defined(DJGPP)
     __dpmi_get_segment_base_address(_my_ds(), (unsigned long *)&DSBase);
 #endif
@@ -531,7 +535,7 @@ int main(int argc, char* argv[])
     VPIC_Init( AU_getirq( gm.hAU ) );
 
     if( gvars.joytsr ) {
-        JOY_FindTSR();
+        JOY_FindTSR(gm.devOpts & DF_RECKLESS, gvars.joytsr);
     }
 
 #ifdef NOFM

@@ -87,7 +87,7 @@ OBJFILES = &
 	$(OUTD)/stackio.obj		$(OUTD)/stackisr.obj		$(OUTD)/sbisr.obj		$(OUTD)/int31.obj		$(OUTD)/rmwrap.obj		$(OUTD)/mixer.obj &
 	$(OUTD)/hapi.obj		$(OUTD)/dprintf.obj		$(OUTD)/vioout.obj		$(OUTD)/djdpmi.obj		$(OUTD)/uninst.obj &
 	$(OUTD)/malloc.obj		$(OUTD)/sbrk.obj		$(OUTD)/fileacc.obj &
-	$(OUTD)/joytsr.obj
+	$(OUTD)/joytsr.obj $(OUTD)/joyasm.obj
 	
 C_OPT_FLAGS=-q -mf -oxa -ecc -5s -fp5 -fpi87 -wcd=111
 # OW's wpp386 doesn't like the -ecc option
@@ -181,6 +181,8 @@ $(OUTD)/dbopl.obj:     src\dbopl.cpp
 $(OUTD)/vopl3.obj:     src\vopl3.cpp
 	*@$(CPP) $(C_DEBUG_FLAGS) -q -oxa -mf -bc -ecc -5s -fp5 -fpi87 $(C_EXTRA_FLAGS) $(CPPFLAGS) $(INCLUDES) -fo=$@ $<
 !endif
+$(OUTD)/joytsr.obj:    src\joytsr.c
+$(OUTD)/joyasm.obj:    src\joyasm.asm
 $(OUTD)/cstrtdhx.obj:  startup\cstrtdhx.asm
 $(OUTD)/malloc.obj:    startup\malloc.asm
 $(OUTD)/sbrk.obj:      startup\sbrk.asm

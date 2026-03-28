@@ -1,0 +1,46 @@
+!ifndef WATCOM
+WATCOM=\WATCOM
+!endif
+
+CC=$(WATCOM)\binw\wcc386.exe
+CPP=$(WATCOM)\binw\wpp386.exe
+LIB=$(WATCOM)\binw\wlib.exe
+ASM=jwasm.exe
+
+
+FMTHX=hx
+CONSTATTR=segment CONST readonly
+CONST2ATTR=segment CONST2 readonly
+OW19=-DOW19
+OUTD=ow
+
+C_OPT_FLAGS=-q -mf -oxa -ecc -5s -fp5 -fpi87 -wcd=111
+# OW's wpp386 doesn't like the -ecc option
+CPP_OPT_FLAGS=-q -oxa -mf -bc -5s -fp5 -fpi87 
+LD_FLAGS=
+
+INCLUDES=-I$(WATCOM)\h
+LIBS=
+
+.asm{$(OUTD)}.obj
+	*@$(ASM) -q -D?MODEL=flat -Istartup $(A_DEBUG_FLAGS) -Fo$@ $<
+
+.c{$(OUTD)}.obj
+	*@$(CC) $(C_DEBUG_FLAGS) $(C_OPT_FLAGS) $(C_EXTRA_FLAGS) $(CFLAGS) -Isrc $(INCLUDES) -fo=$@ $<
+
+.cpp{$(OUTD)}.obj
+	*@$(CPP) $(C_DEBUG_FLAGS) $(CPP_OPT_FLAGS) $(C_EXTRA_FLAGS) $(CPPFLAGS) -Isrc $(INCLUDES) -fo=$@ $<
+
+{startup}.asm{$(OUTD)}.obj
+	@$(ASM) -q -zcw -D?MODEL=flat $(OW19) $(A_DEBUG_FLAGS) -Fo$@ $<
+
+all: $(OUTD)\joydump.exe 
+
+$(OUTD)\joydump.exe: $(OUTD)\joydump.obj 
+	*@wlink @<<
+system dos4g
+file $(OUTD)\joydump, $(OUTD)\joyasm
+name $@
+<<
+
+

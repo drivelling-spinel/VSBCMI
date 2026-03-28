@@ -10,38 +10,55 @@
 #include "PTRAP.H"
 #include "LINEAR.H"
 
+int JOY_get_tsc(void);
+
 typedef struct 
 {
   const char * prog_name;
   const char * prog_ver_s;
   const int prog_ver;
   const char * author;
-  const int known_offset;
+  const int proc_offset;
+  const int flag_offset;
+  const int buttons_offset;
+  const int axes_offset;
+  const int time_offset;
+  const int timer_mask;
 } version_info_s;
 
 static version_info_s supported_versions[] =
 {
-  { "KEYS2JOY", " 0.03", 3, "  Bret Johnson", 0x506 },
-  { "USBJSTIK", " 0.11", 0x11,"  Bret Johnson", 0x1AAC } 
+  { "KEYS2JOY", " 0.03", 3, "  Bret Johnson", 0x506, 0, 0, 0, 0, 0 },
+  { "USBJSTIK", " 0.11", 0x11,"  Bret Johnson", 0x1AAC, 0x125, 0x133, 0x134, 0x194, 0x4} 
 };
 
 #define NUM_VERSIONS (sizeof(supported_versions) / sizeof (supported_versions[0]))
-#define DOS_STR_PTR(r) (char *)((void *)((r.x.es << 4) + r.x.di))
+#define MK_LINEAR(s, a) (((s) << 4) + (a))
+#define DOS_ADDR(r) MK_LINEAR(r.x.es, r.x.di)
 #define IS_JUNK_PTR(r) (r.x.es == 0)
 
 
 #define PORT_WRITE 0x4
 #define PORT_READ  0
 
-typedef int (* virt_io_f)(uint16_t byte, uint16_t port, uint16_t dummy, uint16_t op);
-
 typedef struct 
 {
   int handle; 
   int found;
   int seg;
-  int offs;
-  virt_io_f fun; 
+  int proc_offs;
+  int flag_offs;
+  int data_offs;
+  unsigned char *flag;
+  unsigned short *axes; 
+  unsigned char *buttons;
+  unsigned short *time;
+  unsigned char mask;
+  int reads;
+  int writes;
+  unsigned stamp;
+  unsigned char state;
+  int factor;
 } tsr_info_s;
 
 static tsr_info_s tsr_info;
@@ -51,7 +68,7 @@ static void print_version(version_info_s * ver)
   printf("%s %s %s", ver->prog_name, ver->prog_ver_s, ver->author);
 }
 
-void JOY_FindTSR()
+void JOY_FindTSR(int verbosity, int factor)
 {
   int handle = 0xc0;
   int score[NUM_VERSIONS];
@@ -63,7 +80,6 @@ void JOY_FindTSR()
     __dpmi_regs r;
     const char * str;
     int i;
-
     memset(&r, 0, sizeof(r));
     r.x.ax = (handle << 8);
     __dpmi_simulate_real_mode_interrupt(0x2f, &r);
@@ -75,10 +91,10 @@ void JOY_FindTSR()
  
     if(IS_JUNK_PTR(r)) continue;   
     for(i = 0 ; i < NUM_VERSIONS ; i++) {
-      if(!strncmp(DOS_STR_PTR(r), supported_versions[i].prog_name,
+      if(!strncmp(NearPtr(DOS_ADDR(r)), supported_versions[i].prog_name,
           strlen(supported_versions[i].prog_name))) score[i]++;
     }
-    
+
     memset(&r, 0, sizeof(r));
     r.x.ax = (handle << 8) | 2;
     __dpmi_simulate_real_mode_interrupt(0x2f, &r);
@@ -89,9 +105,10 @@ void JOY_FindTSR()
     memset(&r, 0, sizeof(r));
     r.x.ax = (handle << 8) | 3;
     __dpmi_simulate_real_mode_interrupt(0x2f, &r);
+
     if(IS_JUNK_PTR(r)) continue;   
     for(i = 0 ; i < NUM_VERSIONS ; i++) {
-      if(!strncmp(DOS_STR_PTR(r), supported_versions[i].author,
+      if(!strncmp(NearPtr(DOS_ADDR(r)), supported_versions[i].author,
          strlen(supported_versions[i].author))) score[i]++;
     }
 
@@ -99,10 +116,24 @@ void JOY_FindTSR()
       if(i == found) continue;
       if(score[i] == 3 && found < 0) {
         found = i;
+        memset(&tsr_info, 0, sizeof(tsr_info));
         tsr_info.found = i;
         tsr_info.seg = r.x.es;
-        tsr_info.offs = supported_versions[i].known_offset;
+        tsr_info.proc_offs = supported_versions[i].proc_offset;
+        if(supported_versions[i].flag_offset)
+        {
+          tsr_info.flag = (unsigned char *) NearPtr(
+                            MK_LINEAR(tsr_info.seg, supported_versions[i].flag_offset));
+          tsr_info.time = (unsigned short *) NearPtr(
+                            MK_LINEAR(tsr_info.seg, supported_versions[i].time_offset));
+          tsr_info.buttons = (unsigned char *) NearPtr(
+                            MK_LINEAR(tsr_info.seg, supported_versions[i].buttons_offset));
+          tsr_info.axes = (unsigned short *) NearPtr(
+                            MK_LINEAR(tsr_info.seg, supported_versions[i].axes_offset));
+          tsr_info.mask = supported_versions[i].timer_mask; 
+        } 
         tsr_info.handle = handle;
+        tsr_info.factor = factor;
       }
       else if(score[i] == 3) {
         printf("Found at least two compatible TRS versions:\n");
@@ -114,6 +145,7 @@ void JOY_FindTSR()
         exit(1);
       }
     }
+
   }
 
   if(found < 0) {
@@ -128,25 +160,31 @@ void JOY_FindTSR()
 
   {
     int i;
-    void * code = (void *)((tsr_info.seg << 4) + tsr_info.offs);
+    void * code = NearPtr(MK_LINEAR(tsr_info.seg, tsr_info.proc_offs));
     if(((uint8_t *)code)[0] == 0xe8) memset(code, 0x90, 5);
-    for(i = 0; i < 0x100 ; i ++ )
+    for(i = 0; verbosity && i < 0x100 ; i ++ )
     {
       if(i%16==0) printf("%08x", i);
       if(i%8==0) printf(" ");
       printf("%02x", ((uint8_t *) code)[i]);
       if((i+1)%16==0) printf("\n");
     }
-   
-    tsr_info.fun = (virt_io_f) code;
-  }
 
+    if(verbosity && tsr_info.mask)
+    {
+      printf("data: %02x %02x %04x %04x %04x %04x %04x\n",
+             *tsr_info.flag, *tsr_info.buttons, 
+             tsr_info.axes[0], tsr_info.axes[1],
+             tsr_info.axes[2], tsr_info.axes[3],
+             *tsr_info.time);
+    }
+   
+  }
+  
 }
 
 static int JOY_Call_TSR(uint16_t val, uint16_t port, uint16_t dir)
 {
-  //ah if it only were so easy...
-  //return tsr_info.fun(port, val, 0, dir);
   __dpmi_regs r;
 
   memset(&r, 0, sizeof(r));
@@ -154,7 +192,7 @@ static int JOY_Call_TSR(uint16_t val, uint16_t port, uint16_t dir)
   r.x.dx = port;
   r.x.cx = dir;
   r.x.cs = r.x.ds = tsr_info.seg;
-  r.x.ip = tsr_info.offs;
+  r.x.ip = tsr_info.proc_offs;
   if(__dpmi_simulate_real_mode_procedure_retf(&r) == 0) {
     if(!(r.x.flags&CPU_CFLAG)) return r.x.ax;
   }
@@ -162,14 +200,55 @@ static int JOY_Call_TSR(uint16_t val, uint16_t port, uint16_t dir)
   return 0xff;
 }
 
+static int JOY_Handle_Read()
+{
+  unsigned now = 0, then = tsr_info.stamp, diff;
+  int i = 0;
+
+  diff = JOY_get_tsc() - then;
+
+  if(tsr_info.reads != tsr_info.writes)
+  {
+    tsr_info.state = 0xf;
+    tsr_info.reads++;
+  } 
+  
+  for(i = 0 ; i < 4 ; i += 1)
+  {
+    unsigned val;
+    if(!(tsr_info.state & (1 << i))) continue;
+    val = tsr_info.axes[i];
+    val <<= tsr_info.factor + 4;
+    if(diff >= val) tsr_info.state &= ~(1 << i);
+  }  
+
+  return tsr_info.state | *tsr_info.buttons;
+}
+
+static int JOY_Handle_Write()
+{
+  unsigned now;
+
+  now = JOY_get_tsc();
+
+  tsr_info.stamp = now;
+  tsr_info.writes ++;  
+
+  return 0;
+}
+
 
 uint8_t JOY_Port_Acc(uint16_t port, uint8_t val, uint16_t flags)
 {
   if(tsr_info.found >= 0)
   {
-    return JOY_Call_TSR(val, port, (flags & TRAPF_OUT) ? PORT_WRITE : PORT_READ);
+    int dir = (flags & TRAPF_OUT) ? PORT_WRITE : PORT_READ;
+    if(!tsr_info.mask)
+      return JOY_Call_TSR(val, port, dir);
+    return dir == PORT_READ ? JOY_Handle_Read() : JOY_Handle_Write();
   }
   
   return 0xcc;
 }
+
 
