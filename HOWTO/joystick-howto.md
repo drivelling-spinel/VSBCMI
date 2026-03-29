@@ -26,6 +26,9 @@ _The guide is licensed by it's author under the terms of [CC BY-NC license](http
   For example, for a Core 2 Quad Q9550 CPU a value of 10 works.
   For odler CPUs a smaller value is recommended, and for faster machines, a greater one.
   
+When adding this configuration into `AUTOEXEC.BAT` to load automatically, 
+if this results in crashes, consider placing USB- and VSBHDA-related commands _after_ CD-ROM driver.
+  
 ## Altering joystick mappings
 
   Use the following command to update joystick mappings. No reboot is requied in this case.   

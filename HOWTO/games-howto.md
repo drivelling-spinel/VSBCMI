@@ -247,6 +247,20 @@ For a slightly cleaner sounding version of the game (and Hexen II as well), plea
 which add sample interpolation and make other small adjustments to the sound playback. These require `-sspeed 48000` as well to sound nicer.
 
 
+### Tyrian / Tyrian 2000
+
+The game is playable with `VSBCMI16` but occasionally locks up, e.g. when switching music on or off while in the mission, or during boss fights.   
+While no _perfect_ solution is available at the moment of writing, a workaround exists, which requires patching the `FILE0001.EXE` to prevent suppression of interrupts.  
+For Tyrian 2000 available from GOG, the two locations to patch are:   
+```
+35F56: E5 60 06 9C FA    -> E5 60 06 9C 90 
+37BB2: 9C FA E8 1B FC 9D -> 9C 90 E8 1B FC 9D
+```
+A patcher tool is available on VOGONS message boards for this version of the game, which makes this change automatically.   
+If game locks up while assigning keyboard mappings in options menu, it is advised to restart the computer without `HDPMI16I` nor `VSBCMI16` and run the game 
+with no sound just for the purpose of configuring keyboard.
+
+Additionally, older versions of Tyrian require either option `/CF8` to be provided to `VSBCMI16`, or patching *.EXE files with [CTBPPAT.EXE](https://ftp.gwdg.de/pub/magazine/ct/ctsi/).
 
 
 2026,  
