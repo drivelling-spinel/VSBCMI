@@ -71,15 +71,18 @@ static void print_version(version_info_s * ver)
 void JOY_FindTSR(int verbosity, int factor)
 {
   int handle = 0xc0;
-  int score[NUM_VERSIONS];
   int found = -1;
 
   memset(&tsr_info, 0, sizeof(tsr_info));
-  memset(score, 0, sizeof(score));
   for( handle = 0xc0 ; handle <= 0xff ; handle++) {
+    int score[NUM_VERSIONS];
     __dpmi_regs r;
     const char * str;
     int i;
+
+    memset(score, 0, sizeof(score));
+
+
     memset(&r, 0, sizeof(r));
     r.x.ax = (handle << 8);
     __dpmi_simulate_real_mode_interrupt(0x2f, &r);
