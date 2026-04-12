@@ -21,7 +21,7 @@ Changes from [VSBHDA](https://github.com/Baron-von-Riedesel/VSBHDA) and [SBEMU](
  * SoundFont support is switched off by default (compile time) in favor of UART port forwarding
  * /JXX option to enable Joystick TSR driver compatibility mode. Currently only port 201H,
    and only Bret Johnson's USBJSTIK.COM are supported. Numeric value provided will be used to adjust for 
-   machine speed when generating virtualized port readings. Check HOWTO for more details and instructions.
+   machine speed when generating virtualized game port readings. Check Joystick HOWTO for further details and instructions.
  * /DF option added to provide bit flags in hexadecimal format that control behavior of the TSR. 
    Several flags can be combined by summing up the values, but only a single /DF option is accepted.
    The following flags are supported:

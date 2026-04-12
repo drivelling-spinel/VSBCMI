@@ -56,7 +56,7 @@ In this case the game may also suffer from the "Run time error 200" bug. VSBCMI1
 however a more reliable way of dealing with the problem is patching game executable files using `CTBPPAT`.   
 **Please remember to back up the files before attempting any patching.**
 
-* Tyrian 2000
+* Tyrian 2000 (__see individual game hints section for additional notes__)
 * Total Control
 
 ## Part 4 - VSBHDA notes
@@ -161,7 +161,7 @@ CD-ROM version from 1996 and the "Ultimate Talkie Edition" do not require the sp
 ### Sam & Max Hit the Road ###
 
 It is recommended to use VSBCMI with `/CF4` option when running the game, as it may sporadically hang otherwise.
-While CD-ROM version is considered speed sensitive and may have issues (crashes) with digital sound playback on newer machines, it is possible to downgrade SCUMM interpreter and sound system to a real-mode version that is compatible with VSBCMI. In this case VSBCMI needs to be started with option `/CF4`.   
+While CD-ROM version is considered speed sensitive and may have issues (crashes) with digital sound playback on newer machines, it is possible to downgrade SCUMM interpreter and sound system to a real-mode version that is compatible with VSBCMI. In this case VSBCMI needs to be started with option `/CF4` __and without option `/J`_.   
 In order to downgrade the following steps are required:   
 - Download demo version with `Interpreter Version 6.5.0 (Nov 17 1993 14:32:10)`   
   The version is available from [LucasArts Demos archive page](https://mixnmojo.com/dreamm-demos/) where it's designated as **Sam and Max Hit the Road PC (German)**.   
@@ -218,6 +218,7 @@ The same could apply for other X-Land games, such as "The Adventures of Robbo" a
 VSBCMI needs to be started with options `/OPL0 /DF10` (i.e. with FM port forwarding) _or_ `/OPL1` (i.e. with software FM emulation). Option `/CF1` __should not be set__ as game will fail to detect sound card with it.   
 Game is not compatible with FreeDOS out of the box and requires MS-DOS to run.   
 Alertnatively game executables can be unpacked using [UNP](https://bencastricum.nl/unp/), in which case all `*.EXE`, `*.PRG` and `SCORE.CEP` need to be unpacked.
+When VSBCMI is loaded with `/J` argument, the game locks up, unless patched. See __joystick-howto__ for more details. 
 
 ### Inherit the Earth: Quest for the Orb (CD-ROM)
 

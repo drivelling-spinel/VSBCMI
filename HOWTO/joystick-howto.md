@@ -13,11 +13,11 @@ _The guide is licensed by it's author under the terms of [CC BY-NC license](http
   VSBCMI has only been tested with the specific version of the driver availble on Bret Johnson's homepage
   at the moment of writing so may not work equally well with other package versions._
 * [VSBCMI 1.8.4](https://github.com/drivelling-spinel/VSBCMI/releases/tag/v1.8.4.103) or later.   
-  See __CM8738-howto__ for details on configuring VSBCMI. 
-* _Optionally_, e.g. for Saitek ST30 Plug & Play USB Joystick, apply the patch found in VSBCMI distribution by:   
-  * Copying `JOYPATCH.COM` to the same directory where `USBJSTIK.COM` is found
-  * Backing up the original `USBJSTIK.COM`
-  * Running `JOYPATCH.COM`
+  See __CM8738-howto__ for details on configuring VSBCMI. Additionally, consult __games-howto__ on individual game compatibility status.
+* _Optionally_, e.g. for Saitek ST30 (aka Impact X7-33U) Plug & Play USB Joystick, apply the patch found in VSBCMI distribution:   
+  * Copy `JOYPATCH.COM` to the same directory where `USBJSTIK.COM` is found
+  * Back up the original `USBJSTIK.COM`
+  * Run `JOYPATCH.COM`
 
 
 ## Configuration and startup
@@ -25,14 +25,13 @@ _The guide is licensed by it's author under the terms of [CC BY-NC license](http
 * ``USBUHCIL``
 * _optionally in case joysticks are connected to a USB hub_ ``USBHUB``
 * ``USBJSTIK``
-* Finally, start ``VSBCMI`` as usual, only appending ``/JXX`` command line argument,   
+* Start ``VSBCMI`` normally, also appending ``/JXX`` command line argument,   
   XX being a number from 1 to 16 that corresponds to "speed rating" of the machine.
   The faster the machine the bigger the recommended number is.
-  For example, for a Core 2 Quad Q9550 CPU a value of 10 works.
-  For odler CPUs a smaller value is recommended, and for faster machines, a greater one.
+  For example, for a Core 2 Quad Q9550 CPU a value of 9 works.
+  For older CPUs a smaller value is recommended, and for faster machines, a bigger one.
   
-When adding this configuration into `AUTOEXEC.BAT` to load automatically, 
-if this results in crashes, consider placing USB- and VSBHDA-related commands _after_ CD-ROM driver.
+If loading the above via `AUTOEXEC.BAT` on startup causes crashes, consider placing USB- and VSBHDA-related commands _after_ CD-ROM driver.
   
 ## Altering joystick mappings
 
@@ -53,7 +52,8 @@ if this results in crashes, consider placing USB- and VSBHDA-related commands _a
 
 #### Two joysticks
 
-For head to head battles on the same PC. Tested with __Wacky Wheels__.
+For head to head battles on the same PC. Tested with __Wacky Wheels__, __Speedball II__ and 
+__Super Street Fighter II The New Challengers__.
 
          Map AX from Joy0,Axis,0
          Map AY from Joy0,Axis,1
@@ -86,6 +86,25 @@ For 6-button joysticks / gamepads - tested with __Super Street Fighter II The Ne
          Map B02 from Joy0,Btn,4
          Map BX from Joy0,Btn,2,6
          Map BY from Joy0,Btn,5,7
+
+
+## Game compatibility
+
+### Super Steet Fighter II The New Challengers
+
+The game is compatbile with VSBCMI and USBJSTIK, but has a bug preventing two players from using joysticks for head to head battles. 
+A patch fixing the bug has been provided on VOGONS message board.
+
+### Whizz
+
+Whizz, in unmodified form, does not work with USBJSTIK (even if the steps from __games-howto__ have been followed). 
+An unoficial patch has been produced that fixes the issue, that is yet to be published.
+
+### Incompatible games
+
+In addition to the games listed as incompatible with VSBCMI in __games-howto__, the following games do not work if option `/J` is given:
+
+* Sam & Max Hit the Road
 
 
 2026,  
