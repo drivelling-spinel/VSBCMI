@@ -12,13 +12,18 @@ _The guide is licensed by it's author under the terms of [CC BY-NC license](http
   _Note that while similar drivers package may be available on the target machine, or as part of FreeDOS distribution
   VSBCMI has only been tested with the specific version of the driver availble on Bret Johnson's homepage
   at the moment of writing so may not work equally well with other package versions._
-* [VSBCMI 1.8.4](https://github.com/drivelling-spinel/VSBCMI/releases/tag/v1.8.4.103-beta) or later.   
+* [VSBCMI 1.8.4](https://github.com/drivelling-spinel/VSBCMI/releases/tag/v1.8.4.103) or later.   
   See __CM8738-howto__ for details on configuring VSBCMI. 
+* _Optionally_, e.g. for Saitek ST30 Plug & Play USB Joystick, apply the patch found in VSBCMI distribution by:   
+  * Copying `JOYPATCH.COM` to the same directory where `USBJSTIK.COM` is found
+  * Backing up the original `USBJSTIK.COM`
+  * Running `JOYPATCH.COM`
+
 
 ## Configuration and startup
 
 * ``USBUHCIL``
-* _optionally in case a USB hub is connected_ ``USBHUB``
+* _optionally in case joysticks are connected to a USB hub_ ``USBHUB``
 * ``USBJSTIK``
 * Finally, start ``VSBCMI`` as usual, only appending ``/JXX`` command line argument,   
   XX being a number from 1 to 16 that corresponds to "speed rating" of the machine.
@@ -33,15 +38,55 @@ if this results in crashes, consider placing USB- and VSBHDA-related commands _a
 
   Use the following command to update joystick mappings. No reboot is requied in this case.   
   ```USBJSTIK < CONFIG.CFG```   
-  As an example, ```CONFIG.CFG``` contents follow:   
+  As an example, ```CONFIG.CFG``` contents follow, where joystick buttons are remapped:   
 
           ;P:20
           Map A01 from Joy0,Btn,0
           Map A02 from Joy0,Btn,3
-          Map B01 from Joy0,Btn,1
-          Map B02 from Joy0,Btn,4
-          Map BX from Joy0,Btn,2,6
-          Map BY from Joy0,Btn,5,7
+          Map A03 from Joy0,Btn,1
+          Map A04 from Joy0,Btn,4
+
+  `USBINTRO.DOC` included with USBDOS package has detailed information on setting up the mappings.  
+  Below several ready to use recipes are included:
+  
+### Joystick mapping recipes
+
+#### Two joysticks
+
+For head to head battles on the same PC. Tested with __Wacky Wheels__.
+
+         Map AX from Joy0,Axis,0
+         Map AY from Joy0,Axis,1
+         Map A01 from Joy0,Btn,0
+         Map A02 from Joy0,Btn,1
+         Map B01 from Joy1,Btn,0
+         Map B02 from Joy1,Btn,1
+         Map BX from Joy1,Axis,0
+         Map BY from Joy1,Axis,1
+
+#### Thrustmaster joystick
+
+Configures POV hat and slider. Tested with __Wing Commander III__ (Thrustmaster joystick patch applied),   
+and also in __Allegro__ setup utility, where this type of joystick is referred to as Logitech Wingman Extreme.   
+
+         T:Y
+         Map AX Joy 0 Axis 0
+         Map AY Joy 0 Axis 1
+         Map AZ Joy 0 Axis 2
+         Map BX Joy 0 Dpad 0 X
+         Map BY Joy 0 Dpad 0 Y
+
+#### Capcom gamepad
+
+For 6-button joysticks / gamepads - tested with __Super Street Fighter II The New Challengers__.   
+
+         Map A01 from Joy0,Btn,0
+         Map A02 from Joy0,Btn,3
+         Map B01 from Joy0,Btn,1
+         Map B02 from Joy0,Btn,4
+         Map BX from Joy0,Btn,2,6
+         Map BY from Joy0,Btn,5,7
+
 
 2026,  
 [CC BY-NC]( "https://creativecommons.org/licenses/by-nc/4.0/),  
