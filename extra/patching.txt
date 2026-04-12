@@ -1,0 +1,351 @@
+offset 0x121A:
+
+0x0000000000000000:  53             push bx
+0x0000000000000001:  8A 1E D0 0D    mov  bl, byte ptr [0xdd0]
+0x0000000000000005:  A0 D2 0D       mov  al, byte ptr [0xdd2]
+0x0000000000000008:  80 FB 01       cmp  bl, 1
+0x000000000000000b:  74 11          je   0x1e
+0x000000000000000d:  80 FB 02       cmp  bl, 2
+0x0000000000000010:  74 3A          je   0x4c
+0x0000000000000012:  80 FB 05       cmp  bl, 5
+0x0000000000000015:  74 49          je   0x60
+0x0000000000000017:  80 FB 09       cmp  bl, 9
+0x000000000000001a:  74 60          je   0x7c
+0x000000000000001c:  EB 3E          jmp  0x5c
+
+0x000000000000001e:  B3 05          mov  bl, 5
+0x0000000000000020:  3C 30          cmp  al, 0x30
+0x0000000000000022:  72 38          jb   0x5c
+0x0000000000000024:  3C 35          cmp  al, 0x35
+0x0000000000000026:  76 36          jbe  0x5e
+
+0x0000000000000028:  B3 03          mov  bl, 3
+0x000000000000002a:  3C 36          cmp  al, 0x36
+0x000000000000002c:  74 30          je   0x5e
+0x000000000000002e:  3C 37          cmp  al, 0x37
+0x0000000000000030:  74 2C          je   0x5e
+0x0000000000000032:  B3 02          mov  bl, 2
+0x0000000000000034:  3C 39          cmp  al, 0x39
+0x0000000000000036:  74 26          je   0x5e
+0x0000000000000038:  3C 90          cmp  al, 0x90
+0x000000000000003a:  72 04          jb   0x40
+0x000000000000003c:  3C 93          cmp  al, 0x93
+0x000000000000003e:  76 1E          jbe  0x5e
+0x0000000000000040:  B3 01          mov  bl, 1
+0x0000000000000042:  3C 3D          cmp  al, 0x3d
+0x0000000000000044:  72 3A          jb   0x80
+0x0000000000000046:  3C 3E          cmp  al, 0x3e
+0x0000000000000048:  76 14          jbe  0x5e
+0x000000000000004a:  EB 10          jmp  0x5c
+
+0x000000000000004c:  B3 05          mov  bl, 5
+0x000000000000004e:  3C 20          cmp  al, 0x20
+0x0000000000000050:  72 0A          jb   0x5c
+0x0000000000000052:  3C 21          cmp  al, 0x21
+0x0000000000000054:  76 08          jbe  0x5e
+0x0000000000000056:  B3 04          mov  bl, 4
+0x0000000000000058:  3C BB          cmp  al, 0xbb
+0x000000000000005a:  74 02          je   0x5e
+0x000000000000005c:  EB 22          jmp  0x80
+0x000000000000005e:  EB 25          jmp  0x85
+0x0000000000000060:  B3 02          mov  bl, 2
+0x0000000000000062:  3C 20          cmp  al, 0x20
+0x0000000000000064:  74 1F          je   0x85
+0x0000000000000066:  B3 05          mov  bl, 5
+0x0000000000000068:  3C 21          cmp  al, 0x21
+0x000000000000006a:  72 14          jb   0x80
+0x000000000000006c:  3C 29          cmp  al, 0x29
+0x000000000000006e:  76 15          jbe  0x85
+0x0000000000000070:  B3 01          mov  bl, 1
+0x0000000000000072:  3C 2A          cmp  al, 0x2a
+0x0000000000000074:  76 0A          jbe  0x80
+0x0000000000000076:  3C 39          cmp  al, 0x39
+0x0000000000000078:  76 0B          jbe  0x85
+0x000000000000007a:  EB 04          jmp  0x80
+0x000000000000007c:  B3 01          mov  bl, 1
+0x000000000000007e:  EB 05          jmp  0x85
+0x0000000000000080:  32 C0          xor  al, al
+0x0000000000000082:  F9             stc  
+0x0000000000000083:  EB 03          jmp  0x88
+0x0000000000000085:  8A C3          mov  al, bl
+0x0000000000000087:  F8             clc  
+0x0000000000000088:  5B             pop  bx
+0x0000000000000089:  C3             ret  
+
+
+<< 53 8A 1E D0 0D A0 D2 0D 80 FB 01 74 11 80 FB 02 74 3A 80 FB 05 74 49 80 FB 09 74 60 EB 3E 
+>> 53 8a 1e d0 0d a0 d2 0d 80 fb 01 74 11 80 fb 02 74 3a 80 fb 05 74 49 80 fb 09 74 60 eb 3e 
+
+ b3 05 90 90 90 90 90 90 90 90 eb 12 
+
+<< B3 05 3C 30 72 38 3C 35 76 36 
+>> b3 05 90 90 90 90 90 90 90 90 eb 10 
+
+
+>> B3 03 3C 36 74 30 3C 37 74 2C B3 02 3C 39 74 26 3C 90 72 04 3C 93 76 1E B3 01 3C 3D 72 3A 3C 3E 76 14 EB 10 
+<< b3 03 3c 36 74 3a 3c 37 74 36 b3 02 3c 39 74 30 3c 90 72 04 3c 93 76 28 b3 01 3c 3d 72 04 3c 3e 76 1e
+
+B3 05 3C 20 72 0A 3C 21 76 08 B3 04 3C BB 74 02 EB 22 EB 25 B3 02 3C 20 74 1F B3 05 3C 21 72 14 3C 29 76 15 B3 01 3C 2A 76 0A 3C 39 76 0B EB 04 B3 01 EB 05 32 C0 F9 EB 03 8A C3 F8 5B C3 
+
+
+
+
+
+
+
+
+ push bx
+ mov  bl, byte ptr [0xdd0]
+ mov  al, byte ptr [0xdd2]
+ cmp  bl, 1
+ je   0x1e
+ cmp  bl, 2
+ je   0x4c
+ cmp  bl, 5
+ je   0x60
+ cmp  bl, 9
+ je   0x7c
+ jmp  0x5c
+ 
+ mov  bl, 3
+ cmp  al, 0x36
+ je   0x5e
+ cmp  al, 0x37
+ je   0x5e
+ mov  bl, 2
+ cmp  al, 0x39
+ je   0x5e
+ cmp  al, 0x90
+ jb   nondpad
+ cmp  al, 0x93
+ jbe  0x5e
+nondpad:
+ mov  bl, 1
+ cmp  al, 0x3d
+ jb   axis
+ cmp  al, 0x3e
+ jbe  0x5e
+axis:
+ mov  bl, 5
+ nop
+ nop
+ nop
+ nop
+ nop
+ nop
+ nop
+ nop
+ jmp  0x5e
+
+...
+
+53 8a 1e d0 0d a0 d2 0d 80 fb 01 74 11 80 fb 02 74 3a 80 fb 05 74 49 80 fb 09 74 60 eb 3e b3 03 3c 36 74 3a 3c 37 74 36 b3 02 3c 39 74 30 3c 90 72 04 3c 93 76 28 b3 01 3c 3d 72 04 3c 3e 76 1e b3 05 90 90 90 90 90 90 90 90 eb 12 
+
+
+
+offset 12D8
+
+
+0x0000000000000000:  50             push  ax
+0x0000000000000001:  53             push  bx
+0x0000000000000002:  51             push  cx
+0x0000000000000003:  52             push  dx
+0x0000000000000004:  A1 E0 0D       mov   ax, word ptr [0xde0]
+0x0000000000000007:  8B 1E E2 0D    mov   bx, word ptr [0xde2]
+0x000000000000000b:  39 D8          cmp   ax, bx
+0x000000000000000d:  72 24          jb    0x33
+0x000000000000000f:  0A E4          or    ah, ah
+0x0000000000000011:  75 01          jne   0x14
+0x0000000000000013:  98             cwde  
+0x0000000000000014:  8B 0E E4 0D    mov   cx, word ptr [0xde4]
+0x0000000000000018:  8B 16 E6 0D    mov   dx, word ptr [0xde6]
+0x000000000000001c:  0B C9          or    cx, cx
+0x000000000000001e:  75 13          jne   0x33
+0x0000000000000020:  29 CA          sub   dx, cx
+0x0000000000000022:  74 0F          je    0x33
+0x0000000000000024:  8B CB          mov   cx, bx
+0x0000000000000026:  2B C8          sub   cx, ax
+0x0000000000000028:  39 D1          cmp   cx, dx
+0x000000000000002a:  75 07          jne   0x33
+0x000000000000002c:  A1 E4 0D       mov   ax, word ptr [0xde4]
+0x000000000000002f:  8B 1E E6 0D    mov   bx, word ptr [0xde6]
+0x0000000000000033:  89 45 04       mov   word ptr [di + 4], ax
+0x0000000000000036:  89 5D 06       mov   word ptr [di + 6], bx
+0x0000000000000039:  5A             pop   dx
+0x000000000000003a:  59             pop   cx
+0x000000000000003b:  5B             pop   bx
+0x000000000000003c:  58             pop   ax
+0x000000000000003d:  C3             ret
+
+>> 50 53 51 52 
+<< 60
+
+>> A1 E0 0D 8B 1E E2 0D 39 D8 72 24 0A E4 75 01 98 
+<< a1 e0 0d 8b 1e e2 0d 39 d8 72 28 08 e4 75 01 98 39 d8 7c 1f 
+
+8B 0E E4 0D 8B 16 E6 0D 0B C9 75 13 29 CA 74 0F 8B CB 2B C8 39 D1 75 07 A1 E4 0D 8B 1E E6 0D 89 45 04 89 5D 06 
+8b 0e e4 0d 8b 16 e6 0d 09 c9 75 13 29 ca 74 0f 89 d9 29 c1 39 d1 75 07 a1 e4 0d 8b 1e e6 0d 89 45 04 89 5d 06  
+
+>> 5A 59 5B 58 
+<< 61 90 90 
+
+C3  
+c3
+
+ pusha
+ mov  ax, word ptr [0xde0]
+ mov  bx, word ptr [0xde2]
+ cmp ax, bx
+ jb 0x34
+ or  ah, ah
+ jne  L10
+ cwde 
+L10:
+ cmp  ax, bx
+ jl   0x34 
+ mov  cx, word ptr [0xde4]
+ mov  dx, word ptr [0xde6]
+ or   cx, cx
+ jne  0x34
+ sub  dx, cx
+ je   0x34
+ mov  cx, bx
+ sub  cx, ax
+ cmp  cx, dx
+ jne  0x34
+ mov  ax, word ptr [0xde4]
+ mov  bx, word ptr [0xde6]
+ mov  word ptr [di + 4], ax
+ mov  word ptr [di + 6], bx
+ popa
+ nop
+ nop
+ ret  
+
+
+60 a1 e0 0d 8b 1e e2 0d 39 d8 72 28 08 e4 75 02 98 39 d8 7c 1e 8b 0e e4 0d 8b 16 e6 0d 09 c9 75 12 29 ca 74 0e 89 d9 29 c1 39 d1 75 06 a1 e4 0d 8b 1e e6 0d 89 45 04 89 5d 06 61 90 90 66 c3 
+
+
+
+offset 1738
+
+0x0000000000000000:  53             push bx
+0x0000000000000001:  51             push cx
+0x0000000000000002:  52             push dx
+0x0000000000000003:  E8 35 00       call 0x3b
+0x0000000000000006:  72 2B          jb   0x33
+0x0000000000000008:  E8 92 00       call 0x9d
+0x000000000000000b:  2B C1          sub  ax, cx
+0x000000000000000d:  29 CA          sub  dx, cx
+0x000000000000000f:  89 D3          mov  bx, dx
+0x0000000000000011:  F7 26 2F 01    mul  word ptr [0x12f]
+0x0000000000000015:  F7 F3          div  bx
+0x0000000000000017:  D1 EB          shr  bx, 1
+0x0000000000000019:  3B D3          cmp  dx, bx
+0x000000000000001b:  72 01          jb   0x1e
+0x000000000000001d:  40             inc  ax
+0x000000000000001e:  3D 01 00       cmp  ax, 1
+0x0000000000000021:  73 05          jae  0x28
+0x0000000000000023:  B8 01 00       mov  ax, 1
+0x0000000000000026:  EB 0E          jmp  0x36
+0x0000000000000028:  3B 06 2F 01    cmp  ax, word ptr [0x12f]
+0x000000000000002c:  76 08          jbe  0x36
+0x000000000000002e:  A1 2F 01       mov  ax, word ptr [0x12f]
+0x0000000000000031:  EB 03          jmp  0x36
+0x0000000000000033:  F9             stc  
+0x0000000000000034:  EB 01          jmp  0x37
+0x0000000000000036:  F8             clc  
+0x0000000000000037:  5A             pop  dx
+0x0000000000000038:  59             pop  cx
+0x0000000000000039:  5B             pop  bx
+0x000000000000003a:  C3             ret  
+
+
+53 51 52 E8 35 00 72 2B E8 92 00 
+
+<<2B C1 29 CA 89 D3 F7 26 2F 01 F7 F3 D1 EB 3B D3 72 01 40 
+>>85 c9 79 01 98 29 c8 29 ca 89 d3 f7 26 2f 01 f7 f3 90 90 
+
+3D 01 00 73 05 B8 01 00 EB 0E 3B 06 2F 01 76 08 A1 2F 01 EB 03 F9 EB 01 F8 5A 59 5B C3
+
+
+ push bx
+ push cx
+ push dx
+ call 0x3b
+ jb   Z70
+ call 0x9d
+ sub  ax, cx
+ sub  dx, cx
+ mov  bx, dx
+ mul  word ptr [0x12f]
+ div  bx
+ shr  bx, 1
+ cmp  dx, bx
+ jb   Z30
+ inc  ax
+Z30: 
+ cmp  ax, 1
+ jae  Z40
+ mov  ax, 1
+ jmp  Z80
+Z40: 
+ cmp  ax, word ptr [0x12f]
+ jbe  Z80
+ mov  ax, word ptr [0x12f]
+ jmp  Z80
+Z70: 
+ stc  
+ jmp  Z90
+Z80: 
+ clc  
+Z90: 
+ pop  dx
+ pop  cx
+ pop  bx
+ ret  
+
+
+ push bx
+ push cx
+ push dx
+ call 0x3b
+ jb   Z70
+ call 0x9d
+ test cx, cx
+ jns Z20
+ cbw
+Z20:
+ sub  ax, cx
+ sub  dx, cx
+ mov  bx, dx
+ mul  word ptr [0x12f]
+ div  bx
+Z30: 
+ cmp  ax, 1
+ jae  Z40
+ mov  ax, 1
+ jmp  Z80
+Z40: 
+ cmp  ax, word ptr [0x12f]
+ jbe  Z80
+ mov  ax, word ptr [0x12f]
+ jmp  Z80
+Z70: 
+ stc  
+ jmp  Z90
+Z80: 
+ clc  
+Z90: 
+ pop  dx
+ pop  cx
+ pop  bx
+ ret  
+
+53 51 52 66 e8 32 00 00 00 72 2c 66 e8 8c 00 00 00 85 c9 79 01 98 29 c8 29 ca 89 d3 f7 26 2f 01 f7 f3 83 f8 01 73 05 b8 01 00 eb 0e 3b 06 2f 01 76 08 a1 2f 01 eb 03 f9 eb 01 f8 5a 59 5b 66 c3 
+
+
+
+
+
+
