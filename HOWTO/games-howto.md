@@ -22,11 +22,12 @@ Game compatibility will differ depending on which hardare and software conponent
 | OS             | FreeDOS 1.4 RELEASE 2025-04-02                                                           |
 |                | JemmEx v5.85                                                                             |
 | Input          | Logitech M35 3-button COM mouse + PS/2 wired keyboard                                    |
-|                | Logitech mouse driver v7.02 (__without__ CLOAKING)                                       |
-| Joysticks      | InterAct PC Flight Force SV-242 + SV-240 connected to game port                          |
+|                | Mouse driver V6.00 ("Petero Chen")                                                       |
+| Joysticks      | Saitek ST-30 Plug & Play USB Joystick                                                    |
+|                | _patched_ Bret Johnson's USBDOS - January 30, 2010 version                               |
 | Soundcard      | Trust SC-5250 5.1 (PCI, CMI-8738) with TOSLINK bracket                                   |
 |                | PCIAUDIO.COM v1.98, C3DMIX.COM v0.4                                                      |
-| MIDI module    | X3MB (Buran edition) connected to game port                                              |
+| MIDI module    | Roland CM-300 connected to game port / X3MB (Buran edition) via cable splitter           |
 
 
 ## Part 2 - Incompatible games
@@ -41,11 +42,6 @@ _The below is copied from `vsbhda.txt`_
 * Rayman
 * SuperFrog
 * Zone 66
-
-Speed-sensitive games which work best on hardware they were originally intended to be run on;   
-(as such the usefulness of VSBCMI is limited with them, since they would normally work best with an ISA soundcard)
-* Theme Park
-
 
 ## Part 3 - Games that need VSBCMI16
 
@@ -268,6 +264,25 @@ If game locks up while assigning keyboard mappings in options menu, it is advise
 with no sound just for the purpose of configuring keyboard.
 
 Additionally, older versions of Tyrian require either option `/CF8` to be provided to `VSBCMI16`, or patching *.EXE files with [CTBPPAT.EXE](https://ftp.gwdg.de/pub/magazine/ct/ctsi/).
+
+### Theme Park
+
+Game is speed sensitive and is best played with a slowdown tool. CPUSPD is one such recommended program.
+For the CD-ROM version the following workaround can be applied in case when digital sound is garbled or does not work:
+1. Use installer to set up the the game as usual, also configuring sound as appropriate 
+2. Copy contents of `GAME` directory from the CD-ROM to a separate directory on the hard drive, e.g. `C:\THEME`.   
+   `GAME` directory normally contains files like `INTRO.EXE`, `MAIN.EXE` and directories `DATA` and `SAVE`.
+3. Remove files `DATA\SNDS0-2.DAT` and `DATA\SNDS0-2.TAB` from the hard drvie copy of the game
+4. Copy `THEME.BAT` and `SNDSETUP.INF` from the original installation to the hard drive copy
+5. Update `THEME.BAT` to use the path of the hard drive copy instead of the CD-ROM, e.g.:
+```
+C:
+CD C:\THEME
+:START
+intro -C:/THEME
+main -cC:/THEME/ -dC:/THEME/ -l1
+IF ERRORLEVEL 10 GOTO START
+```
 
 
 2026,  
