@@ -158,7 +158,12 @@ Floppy version, however, needs VSBCMI started with `/CF1` option.
 As with X-Wing above, with floppy version `/CF1` option is requried with VSBCMI. This applies also if game has \@NewRisingSun sound drivers patch applied.   
 CD-ROM version from 1996 and the "Ultimate Talkie Edition" do not require the special option.
 
-### Sam & Max Hit the Road ###
+### Day of the Tentacle 
+
+VSBCMI needs to be started with options `/OPL0 /DF10` (i.e. with FM port forwarding) _or_ `/OPL1` (i.e. with software FM emulation) _and_ `/CF4`.
+Note that with `/CF1` flag the game will not be able to detect digital audio and will hang sporadically if `/JXX` command line argument is given.
+
+### Sam & Max Hit the Road 
 
 It is recommended to use VSBCMI with `/CF4` option when running the game, as it may sporadically hang otherwise.
 While CD-ROM version is considered speed sensitive and may have issues (crashes) with digital sound playback on newer machines, it is possible to downgrade SCUMM interpreter and sound system to a real-mode version that is compatible with VSBCMI. In this case VSBCMI needs to be started with option `/CF4` __and without option `/J`_.   

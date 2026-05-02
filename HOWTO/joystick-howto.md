@@ -105,7 +105,7 @@ An unoficial patch has been produced that fixes the issue, that is yet to be pub
 In addition to the games listed as incompatible with VSBCMI in __games-howto__, the following games do not work if option `/J` is given:
 
 * Sam & Max Hit the Road
-
+* Day of the Tentacle
 
 2026,  
 [CC BY-NC]( "https://creativecommons.org/licenses/by-nc/4.0/),  
