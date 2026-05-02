@@ -163,7 +163,7 @@ Note that with `/CF1` flag the game will not be able to detect digital audio and
 ### Sam & Max Hit the Road 
 
 It is recommended to use VSBCMI with `/CF4` option when running the game, as it may sporadically hang otherwise.
-While CD-ROM version is considered speed sensitive and may have issues (crashes) with digital sound playback on newer machines, it is possible to downgrade SCUMM interpreter and sound system to a real-mode version that is compatible with VSBCMI. In this case VSBCMI needs to be started with option `/CF4` __and without option `/J`_.   
+While CD-ROM version is considered speed sensitive and may have issues (crashes) with digital sound playback on newer machines, it is possible to downgrade SCUMM interpreter and sound system to a real-mode version that is compatible with VSBCMI. In this case VSBCMI needs to be started with option `/CF4` __and without option__ `/J`.   
 In order to downgrade the following steps are required:   
 - Download demo version with `Interpreter Version 6.5.0 (Nov 17 1993 14:32:10)`   
   The version is available from [LucasArts Demos archive page](https://mixnmojo.com/dreamm-demos/) where it's designated as **Sam and Max Hit the Road PC (German)**.   
