@@ -34,7 +34,6 @@ Game compatibility will differ depending on which hardare and software conponent
 
 These games currently are known to crash, hang, play no sound or misbehave is some other way:
 * Strike Commander
-* Super Street Fighter II Turbo
 
 _The below is copied from `vsbhda.txt`_
 * Comanche
@@ -290,6 +289,19 @@ main -cC:/THEME/ -dC:/THEME/ -l1
 IF ERRORLEVEL 10 GOTO START
 ```
 
+### Super Street Fighter II Turbo
+
+_This section is specifically for the __Turbo__ version of the game published by Gaketek_
+In order to run the game with VSBCMI the following steps are required:
+1. `SF2TURBO.EXE` needs to be patched to make it compatible wtih HDPMI:   
+```
+49858: 50 1E FC    -> 60 1E FC
+49818: CD 31 58 CF -> CD 31 61 CF
+```
+2. before `HDPMI32I.EXE` is loaded, the following command must be run to set `HDPMI` environment variable :   
+```
+HDPMI=2048
+```
 
 2026,  
 [CC BY-NC]( "https://creativecommons.org/licenses/by-nc/4.0/),  
