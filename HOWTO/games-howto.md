@@ -165,25 +165,31 @@ Note that with `/CF1` flag the game will not be able to detect digital audio and
 It is recommended to use VSBCMI with `/CF4` option when running the game, as it may sporadically hang otherwise.
 While CD-ROM version is considered speed sensitive and may have issues (crashes) with digital sound playback on newer machines, it is possible to downgrade SCUMM interpreter and sound system to a real-mode version that is compatible with VSBCMI. In this case VSBCMI needs to be started with option `/CF4` __and without option__ `/J`.   
 In order to downgrade the following steps are required:   
-- Download demo version with `Interpreter Version 6.5.0 (Nov 17 1993 14:32:10)`   
-  The version is available from [LucasArts Demos archive page](https://mixnmojo.com/dreamm-demos/) where it's designated as **Sam and Max Hit the Road PC (German)**.   
-- Unpack the demo files   
-- Copy the following file from the CD-ROM version into the same directory:   
+1. Download demo version with `Interpreter Version 6.5.0 (Nov 17 1993 14:32:10)`   
+   The version is available from [LucasArts Demos archive page](https://mixnmojo.com/dreamm-demos/) where it's designated as **Sam and Max Hit the Road PC (German)**.   
+2. Unpack the demo files   
+3. Copy the following file from the CD-ROM version into the same directory:   
+```
           MONSTER.SOU
           SAMNMAX.S00
           SAMNMAX.S001
-- Rename the following files:
+```
+4. Rename the following files:
+```
           SDEMO.EXE   ->  SAMNMAX.EXE
           SAMNMAX.S00 ->  SAMNMAX.SM0
           SAMNMAX.S01 ->  SAMNMAX.SM1
-- Run SETMUSE.EXE to select sound and music card and save the settings, but _avoid testing_ sound settings from the programm   
+```
+5. Run SETMUSE.EXE to select sound and music card and save the settings, but _avoid testing_ sound settings from the program   
  
 Using this older interpreter with CD-ROM version assets introduces incompatibilities for which workarounds exist:
 1. Sound effects are played at wrong sampling frequency.   
    Sound Blaster series card drivers can be patched to configure sound playback with the correct timing constant:
-   - `SBCLONE.WDR`:  ```000006AA: EB 74```
-   - `SBPRO.WDR`:    ```000006C4: EB 74```
-   - `SB16.WDR`:     ```00000512: EB 74```
+```   
+   SBCLONE.WDR:    000006AA: EB 74
+   SBPRO.WDR:      000006C4: EB 74
+   SB16.WDR:       00000512: EB 74
+```
 2. Message saying `Heap State: Unplayable` is show every time the game is started.   
    Only an annoyance, the message only requires that the players dismiss it once at the start. A [patcher tool](https://github.com/drivelling-spinel/scumm-patcher) is available, that can be built in DOS with DJGPP, which removes the message altogether.
 
