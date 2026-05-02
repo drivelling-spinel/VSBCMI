@@ -32,7 +32,8 @@ Game compatibility will differ depending on which hardare and software conponent
 ## Part 2 - Incompatible games
 
 These games currently are known to crash, hang, play no sound or misbehave is some other way:
-* Strike Commander   
+* Strike Commander
+* Super Street Fighter II Turbo
 
 _The below is copied from `vsbhda.txt`_
 * Comanche
