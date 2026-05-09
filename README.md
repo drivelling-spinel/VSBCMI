@@ -28,14 +28,15 @@ Changes from [VSBHDA](https://github.com/Baron-von-Riedesel/VSBHDA) and [SBEMU](
    
    | flag   | meaning
    |--------|------------------------------------------------------------------------------------------|
-   | 01     | Bypass certain sanity checks when installing TSR and print additional debug information  |
-   | 02     | Enable forwarding of wave and FM sound to S/PDIF Out even for newer chips (rev. after 37)|
-   | 04     | Do not enable recording of CD-Audio dital in                                             |
-   | 08     | Disable chip built in OPL emulation on port 388                                          |
-   | 10     | Virtualize port 220 (and 388 if possible) and forward to currently active OPL ports      |
-   | 20     | Enable chip internal MPU-401 UART emulation on port 330 (unless /PXXX is given)          |
-   | 40     | Use longer delays for UART passthrough with older chips (rev. up to 37)                  |
-   | 80     | Let XXC DSP port make unsolicited status changes that some games expect                  |
+   |  01    | Bypass certain sanity checks when installing TSR and print additional debug information  |
+   |  02    | Enable forwarding of wave and FM sound to S/PDIF Out even for newer chips (rev. after 37)|
+   |  04    | Do not enable recording of CD-Audio dital in                                             |
+   |  08    | Disable chip built in OPL emulation on port 388                                          |
+   |  10    | Virtualize port 220 (and 388 if possible) and forward to currently active OPL ports      |
+   |  20    | Enable chip internal MPU-401 UART emulation on port 330 (unless /PXXX is given)          |
+   |  40    | Use longer delays for UART passthrough with older chips (rev. up to 37)                  |
+   |  80    | Let XXC DSP port make unsolicited status changes that some games expect                  |
+   | 100    | Insert a small delay into virtualized port 201h calls                                    |
 
 A [HOWTO document](/HOWTO/CM8738-howto.md) for CMI8738-based cards is also included.
 

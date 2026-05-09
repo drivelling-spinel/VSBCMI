@@ -1,4 +1,3 @@
-
 # Create vsbhda.exe with Open Watcom and JWasm.
 # To create the binary, enter
 #   wmake
@@ -154,7 +153,7 @@ $(OUTD)/sc_inthd.obj:  mpxplay\sc_inthd.c
 $(OUTD)/sc_sbl24.obj:  mpxplay\sc_sbl24.c
 $(OUTD)/sc_sbliv.obj:  mpxplay\sc_sbliv.c
 $(OUTD)/sc_via82.obj:  mpxplay\sc_via82.c
-$(OUTD)/timer.obj:     mpxplay\timer.c
+$(OUTD)/timer.obj:     src\timer.c
 $(OUTD)/djdpmi.obj:    src\djdpmi.asm
 $(OUTD)/dprintf.obj:   src\dprintf.asm
 $(OUTD)/fileacc.obj:   src\fileacc.asm

@@ -6,7 +6,7 @@ extern "C"
 {
 #endif
 
-void JOY_FindTSR(int verbosity, int factor);
+void JOY_FindTSR(int verbosity, int factor, int delay);
 uint8_t JOY_Port_Acc(uint16_t port, uint8_t val, uint16_t flags);
 
 #ifdef __cplusplus

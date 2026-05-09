@@ -67,11 +67,11 @@ OBJFILES = &
 	$(OUTD)/hapi.obj		$(OUTD)/dprintf.obj		$(OUTD)/vioout.obj		$(OUTD)/djdpmi.obj		$(OUTD)/uninst.obj &
 	$(OUTD)/auimp16.obj		$(OUTD)/ldmod16.obj		$(OUTD)/sbrk.obj		$(OUTD)/malloc.obj		$(OUTD)/rte200.obj &
 	$(OUTD)/fileacc.obj &
-	$(OUTD)/joytsr.obj 	$(OUTD)/joyasm.obj
+	$(OUTD)/timer.obj 	$(OUTD)/joytsr.obj 	$(OUTD)/joyasm.obj
 
 OBJFILES2 = &
 	$(OUTD)/ac97mix.obj		$(OUTD)/au_cards.obj &
-	$(OUTD)/dmabuff.obj		$(OUTD)/pcibios.obj		$(OUTD)/physmem.obj		$(OUTD)/timer.obj &
+	$(OUTD)/dmabuff.obj		$(OUTD)/pcibios.obj		$(OUTD)/physmem.obj		$(OUTD)/timer.obj&
 	$(OUTD)/sc_cmi.obj		$(OUTD)/sc_e1371.obj		$(OUTD)/sc_ich.obj		$(OUTD)/sc_inthd.obj		$(OUTD)/sc_via82.obj		$(OUTD)/sc_sbliv.obj	$(OUTD)/sc_sbl24.obj &
 	$(OUTD)/djdpmi.obj		$(OUTD)/dprintf.obj		$(OUTD)/vioout.obj		$(OUTD)/sbrk.obj		$(OUTD)/malloc.obj &
 	$(OUTD)/libmain.obj   
@@ -148,8 +148,8 @@ $(OUTD)/sc_inthd.obj:  mpxplay\sc_inthd.c
 $(OUTD)/sc_sbl24.obj:  mpxplay\sc_sbl24.c
 $(OUTD)/sc_sbliv.obj:  mpxplay\sc_sbliv.c
 $(OUTD)/sc_via82.obj:  mpxplay\sc_via82.c
-$(OUTD)/timer.obj:     mpxplay\timer.c
 
+$(OUTD)/timer.obj:     src\timer.c
 $(OUTD)/auimp16.obj:   src\auimp16.asm
 $(OUTD)/auexp16.obj:   src\auexp16.asm
 $(OUTD)/djdpmi.obj:    src\djdpmi.asm

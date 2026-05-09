@@ -9,6 +9,7 @@
 #include "PLATFORM.H"
 #include "PTRAP.H"
 #include "LINEAR.H"
+#include "TIMER.H"
 
 int JOY_get_tsc(void);
 
@@ -59,6 +60,7 @@ typedef struct
   unsigned stamp;
   unsigned char state;
   int factor;
+  int delay;
 } tsr_info_s;
 
 static tsr_info_s tsr_info;
@@ -68,7 +70,7 @@ static void print_version(version_info_s * ver)
   printf("%s %s %s", ver->prog_name, ver->prog_ver_s, ver->author);
 }
 
-void JOY_FindTSR(int verbosity, int factor)
+void JOY_FindTSR(int verbosity, int factor, int delay)
 {
   int handle = 0xc0;
   int found = -1;
@@ -137,6 +139,7 @@ void JOY_FindTSR(int verbosity, int factor)
         } 
         tsr_info.handle = handle;
         tsr_info.factor = factor;
+        tsr_info.delay = delay;
       }
       else if(score[i] == 3) {
         printf("Found at least two compatible TRS versions:\n");
@@ -224,6 +227,9 @@ static int JOY_Handle_Read()
     val <<= tsr_info.factor + 4;
     if(diff >= val) tsr_info.state &= ~(1 << i);
   }  
+
+  if(tsr_info.delay) pds_delay_10us(3);  
+
 
   return tsr_info.state | *tsr_info.buttons;
 }

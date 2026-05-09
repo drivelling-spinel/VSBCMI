@@ -48,14 +48,15 @@
 #endif
 #define VOL_DEFAULT 7
 
-#define DF_RECKLESS     (1)
-#define DF_DIG_OVERRIDE (2)
-#define DF_CD_DISABLE   (4)
-#define DF_FM_DISABLE   (8)
-#define DF_FM_FORWARD   (0x10)
-#define DF_UART_ENABLE  (0x20)
-#define DF_SLOWER_UART  (0x40)
-#define DF_NUDGE_SB     (0x80)
+#define DF_RECKLESS      (1)
+#define DF_DIG_OVERRIDE  (2)
+#define DF_CD_DISABLE    (4)
+#define DF_FM_DISABLE    (8)
+#define DF_FM_FORWARD    (0x10)
+#define DF_UART_ENABLE   (0x20)
+#define DF_SLOWER_UART   (0x40)
+#define DF_NUDGE_SB      (0x80)
+#define DF_SLOW_JOYSTICK (0x100)
 
 bool _InstallInt31( struct globalvars * );
 bool _UninstallInt31( void );
@@ -535,7 +536,8 @@ int main(int argc, char* argv[])
     VPIC_Init( AU_getirq( gm.hAU ) );
 
     if( gvars.joytsr ) {
-        JOY_FindTSR(gm.devOpts & DF_RECKLESS, gvars.joytsr);
+        JOY_FindTSR(gm.devOpts & DF_RECKLESS, gvars.joytsr,
+                    (gm.devOpts & DF_SLOW_JOYSTICK) ? gvars.joytsr : 0);
     }
 
 #ifdef NOFM
