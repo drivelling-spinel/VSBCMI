@@ -92,13 +92,35 @@ For 6-button joysticks / gamepads - tested with __Super Street Fighter II The Ne
 
 ### Super Steet Fighter II The New Challengers
 
-The game is compatbile with VSBCMI and USBJSTIK, but has a bug preventing two players from using joysticks for head to head battles. 
+The game is compatbile with VSBCMI and USBJSTIK, but has a bug preventing two players from using joysticks for head to head battles.
 A patch fixing the bug has been provided on VOGONS message board.
+
+### Super Street Fighter II Turbo 
+
+The game can play sound via VSBCMI, provided patching and configuration are performed as per __games-howto__. 
+For joystick support with USBJSTIK, additional steps are required after steps in __games-howto__ have been followed:
+
+1. Patches found in extra need to be run: `1-HDPMI.BAT`, `2-USBDOS.BAT` and `3-SLOWDN.BAT`. All require `FPATCH.COM`. 
+2. Faster computers need to be _moderately_ slown down with a utility, however be warned that slowing too much will likely shut off USBDOS and USBJSTIK. 
+3. In game Options menu Frame Lock option needs to be On for faster PCs.
+4. `3-SLOWDN.BAT` accepts optional argument to specify the degree by which game joystick polling routine is made slower. 
+   Appropriate value for a particular PC can be determined by experimenting, and by default patch runs wtih the value of `200h`.   
+   In order to update the value in .EXE file, run `3-SLOWDN.BAT` again with the desired argument.   
+   _Note the space between the value's octets and that these are hex numbers_
+
+         3-SLOWDN.BAT 3 00
+
+    or
+
+         3-SLOWDN.BAT ff 
+
+5. Also note that every time the game starts joystick calibration from Options menu is required
+
 
 ### Whizz
 
-Whizz, in unmodified form, does not work with USBJSTIK (even if the steps from __games-howto__ have been followed). 
-An unoficial patch has been produced that fixes the issue, that is yet to be published.
+Whizz, in unmodified form, does not work with USBJSTIK (even if the steps from __games-howto__ have been followed).
+Look for DOS batch file for patching the game in extra directory of source code repository.
 
 ### Incompatible games
 

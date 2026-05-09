@@ -291,20 +291,21 @@ IF ERRORLEVEL 10 GOTO START
 
 ### Super Street Fighter II Turbo
 
-_This section is specifically for the __Turbo__ version of the game published by Gaketek_   
+_This section is specifically for the __Turbo__ version of the game published by Gametek_   
 In order to run the game with VSBCMI the following steps are required:
 1. `SF2TURBO.EXE` needs to be patched to make it compatible wtih HDPMI:   
 ```
-49858: 50 1E FC    -> 60 1E FC
-49918: CD 31 58 CF -> CD 31 61 CF
+50 1E FC    -> 60 1E FC
+CD 31 58 CF -> CD 31 61 CF
 ```
+_alternatively_ patch file `1-HDPMI.BAT` found in source code repository extra directory can be used 
+(it requires `FPATCH.COM` tool).
 2. Before `HDPMI32I.EXE` is loaded, the following command must be run to set `HDPMI` environment variable :   
 ```
 HDPMI=2048
 ```
-3. VSBCMI needs to be started with the following compatibility flag set: `/CF4`
-4. On faster machines a slowdown tool, such as CPUSPD, is recommended   
-   as well as setting FRAME LOCK option to ON in game Options menu 
+3. VSBCMI needs to be started with the following compatibility flag set: `/CF4`.
+4. On faster machines a slowdown tool, such as CPUSPD, is recommended as well as setting FRAME LOCK option to ON in game Options menu.
 
 
 2026,  
