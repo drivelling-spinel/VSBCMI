@@ -93,7 +93,7 @@ __Super Street Fighter II Turbo__.
 ### Super Steet Fighter II The New Challengers
 
 The game is compatbile with VSBCMI and USBJSTIK, but has a bug preventing two players from using joysticks for head to head battles.
-A patch fixing the bug has been provided on VOGONS message board.
+A patch fixing the bug has been provided in extra directory of source code repository.
 
 ### Super Street Fighter II Turbo 
 
