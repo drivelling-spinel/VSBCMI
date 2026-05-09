@@ -303,6 +303,8 @@ In order to run the game with VSBCMI the following steps are required:
 HDPMI=2048
 ```
 3. VSBCMI needs to be started with the following compatibility flag set: `/CF4`
+4. On faster machines a slowdown tool, such as CPUSPD, is recommended   
+   as well as setting FRAME LOCK option to ON in game Options menu 
 
 
 2026,  
