@@ -52,7 +52,7 @@ If loading the above via `AUTOEXEC.BAT` on startup causes crashes, consider plac
 
 #### Two joysticks
 
-For head to head battles on the same PC. Tested with __Wacky Wheels__, __Speedball II__ and 
+For head to head battles on the same PC. Tested with __Wacky Wheels__, __Speedball II__ ,and 
 __Super Street Fighter II The New Challengers__.
 
          Map AX from Joy0,Axis,0
@@ -78,15 +78,15 @@ and also in __Allegro__ setup utility, where this type of joystick is referred t
 
 #### Capcom gamepad
 
-For 6-button joysticks / gamepads - tested with __Super Street Fighter II The New Challengers__.   
+For 6-button joysticks / gamepads - tested with __Super Street Fighter II The New Challengers__ and.
+__Super Street Fighter II Turbo__.   
 
          Map A01 from Joy0,Btn,0
-         Map A02 from Joy0,Btn,3
-         Map B01 from Joy0,Btn,1
+         Map A02 from Joy0,Btn,1
+         Map B01 from Joy0,Btn,3
          Map B02 from Joy0,Btn,4
          Map BX from Joy0,Btn,2,6
          Map BY from Joy0,Btn,5,7
-
 
 ## Game compatibility
 
