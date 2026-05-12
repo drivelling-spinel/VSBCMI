@@ -339,12 +339,13 @@
     - The Flight of the Amazon Queen: requires SETPVI.
     - Tyrian 2000: this is a 16-bit game, needs VSBHDA16.EXE; the unpatched
       variant may cause crashes since it doesn't expect to run with IOPL 0.
-      The patch may be found at https://github.com/drivelling-spinel/VSBCMI.
+      The patch may be found at https://github.com/drivelling-spinel/VSBCMI. 
     - X128 (Sinclair Spectrum Emulator): requires Jemm's NOVCPI option.
 
     The following (incomplete) list shows games that won't run with VSBHDA
     because they are incompatible with either Jemm/Qemm or HDPMI:
 
+    - Comanche Maximum Overkill (original, unpatched)
     - Privateer
     - Rayman
     - Strike Commander
