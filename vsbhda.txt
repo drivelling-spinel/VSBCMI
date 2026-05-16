@@ -25,7 +25,7 @@
                 Instead of Jemm, Qemm may be used; however, JHDPMI.DLL can
                 be loaded and used by Jemm only.
 
-     As cpu at least a Pentium is required. However, since the emulation needs
+    As cpu at least a Pentium is required. However, since the emulation needs
    quite a bit of processing power, such a cpu very likely isn't sufficient.
    Tests revealed that a Pentium II with 266 MHz is able to handle simple games;
    a Pentium III with 500 MHz gave the impression that it could handle both
@@ -33,6 +33,15 @@
    of FPU power - reducing the voice maximum ( see option /MV below ) may be
    needed. Adjusting the frequency ( /F cmdline option ) to the minimum may
    also reduce cpu overstrain.
+
+    Supported sound hardware:
+
+   - Intel HDA
+   - Intel ICH, Nvidia nForce, SiS 7012
+   - VIA VT82C686, VT8233/35/37, but not VT8233A
+   - Creative Labs SB Live and SB Audigy (EMU10K1, EMU10K2)
+   - SB PCI cards based on ES1371/ES1373
+   - SB PCI cards based on CA0106 (SB Live24, SB Audigy LS) [untested]
 
 
    3. Usage
@@ -146,9 +155,9 @@
 
    4.1 JHDPMI.DLL
 
-    This JLM is recommended to be loaded before the vsbhda binary. It doesn't
+    This JLM is recommended to be loaded before the HDPMI binary. It doesn't
    supply any features for VSBHDA directly, but enhances DPMI compliance of
-   hdpmi. It ensures that the DPMI host will be the first to receive interrupt
+   HDPMI. It ensures that the DPMI host will be the first to receive interrupt
    requests that occur in v86-mode, without the need to modify IVT vectors.
     The utility JHDPMIS.EXE makes JHDPMI display its status. One may see what
    IVT vectors are hooked and how often the hook address has been called.
@@ -208,12 +217,17 @@
    4.4 Jemm's NOVCPI Option
 
     If VSBHDA is to work for DOS protected-mode programs, they have to use the
-   HDPMI32i/HDPMI16i DPMI host. This is usually no problem, because there's an
+   HDPMI32i/HDPMI16i DPMI host. Usually this is no problem, because there's an
    API to detect the presence of such a host. However, a program may ignore an
    installed DPMI host and use the so-called VCPI API instead to run its very
    own low-level code; this will actually deactivate VSBHDA for the program. To
    cover such cases, Jemm386/JemmEx offers the NOVCPI option. This option must
-   be set *after* VSBHDA has been loaded and *before* the program is launched.
+   cover such cases, Jemm386/JemmEx offers the NOVCPI option.
+    The NOVCPI option must be set *after* VSBHDA has been loaded and *before*
+   the program is launched; just run "jemm386 novcpi" ( or "jemmex novcpi" )
+   from the command line, without further options. After the program has run,
+   it's a good idea to restore the old state with "jemm386 vcpi" ( or "jemmex
+   vcpi" ).
 
 
    4.5 SoundBlaster IRQ Setting
@@ -294,11 +308,14 @@
     Here are some programs/games listed that require special actions:
 
     - Aladdin: requires EMS, max. XMS memory is 31MB (XMSRes 31).
+    - Betrayal at Krondor: assumes SB IRQ 7; needs EMS memory.
     - Blood: setting SB IRQ to 2 or 5 may be required. Generally, on some
       machines the DOS/4GW DOS extender has problems with IRQ 7.
+    - Comanche Maximum Overkill (patched): needs Jemm's NOVCPI option.
     - Creative's SB16 diagnose.exe: needs cmdline option /CF1.
     - Daggerfall: uses the CauseWay DOS extender - requires either Jemm's
       NOVCPI option or environment variable CAUSEWAY=DPMI.
+    - DynaBlaster: requires VSBHDA option /CF1.
     - FastTracker 2: requires Jemm's NOVCPI option AND option /CF4.
     - Jazz Jackrabbit: unpatched version requires /CF8.
     - Jungle Book: needs SETPVI.EXE to be run before launched.
@@ -321,6 +338,9 @@
       HDPMI32i.
     - Terminal Velocity: set max. XMS memory to 31MB (XMSRes 31).
     - The Flight of the Amazon Queen: requires SETPVI.
+    - Tyrian 2000: this is a 16-bit game, needs VSBHDA16.EXE; the unpatched
+      variant may cause crashes since it doesn't expect to run with IOPL 0.
+      The patch may be found at https://github.com/drivelling-spinel/VSBCMI.
     - X128 (Sinclair Spectrum Emulator): requires Jemm's NOVCPI option.
 
     The following (incomplete) list shows games that won't run with VSBHDA

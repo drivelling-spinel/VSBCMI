@@ -61,11 +61,13 @@ _The below is copied from `vsbhda.txt`_
 Here are some programs/games listed that require special actions:
 
 - Aladdin: requires EMS, max. XMS memory is 31MB (XMSRes 31).
+- Betrayal at Krondor: assumes SB IRQ 7; needs EMS memory.
 - Blood: setting SB IRQ to 2 or 5 may be required. Generally, on some
   machines the DOS/4GW DOS extender has problems with IRQ 7.
 - Creative's SB16 diagnose.exe: needs cmdline option /CF1.
 - Daggerfall: uses the CauseWay DOS extender - requires either Jemm's
   NOVCPI option or environment variable CAUSEWAY=DPMI.
+- DynaBlaster: requires VSBHDA option /CF1.
 - FastTracker 2: requires Jemm's NOVCPI option AND option /CF4.
 - Jazz Jackrabbit: unpatched version requires /CF8.
 - Jungle Book: needs SETPVI.EXE to be run before launched.
@@ -81,7 +83,8 @@ Here are some programs/games listed that require special actions:
   program has been run.
 - Sword and Fairy 1 (Chinese Paladin): allocates a sound buffer in
   extended memory - see notes in 4.3.2).
-- System Shock: set max. XMS memory to 31MB (XMSRes 31) before running HDPMI32i.
+- System Shock: set max. XMS memory to 31MB (XMSRes 31) before running
+  HDPMI32i.
 - Terminal Velocity: set max. XMS memory to 31MB (XMSRes 31).
 - The Flight of the Amazon Queen: requires SETPVI.
 - X128 (Sinclair Spectrum Emulator): requires Jemm's NOVCPI option.

@@ -66,7 +66,7 @@ __Super Street Fighter II The New Challengers__.
 
 #### Thrustmaster joystick
 
-Configures POV hat and slider. Tested with __Wing Commander III__ (Thrustmaster joystick patch applied),   
+Configures POV hat and slider. Tested with __Wing Commander III__ (Thrustmaster joystick patch applied), __Terminal Velocity__
 and also in __Allegro__ setup utility, where this type of joystick is referred to as Logitech Wingman Extreme.   
 
          T:Y
