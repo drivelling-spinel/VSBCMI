@@ -52,7 +52,7 @@ If loading the above via `AUTOEXEC.BAT` on startup causes crashes, consider plac
 
 #### Two joysticks
 
-For head to head battles on the same PC. Tested with __Wacky Wheels__, __Speedball II__ ,and 
+For head to head battles on the same PC. Tested with __Wacky Wheels__, __Speedball II__ ,and
 __Super Street Fighter II The New Challengers__.
 
          Map AX from Joy0,Axis,0
@@ -78,7 +78,7 @@ and also in __Allegro__ setup utility, where this type of joystick is referred t
 
 #### Capcom gamepad
 
-For 6-button joysticks / gamepads - tested with __Super Street Fighter II The New Challengers__ and.
+For 6-button joysticks / gamepads - tested with __Super Street Fighter II The New Challengers__ and
 __Super Street Fighter II Turbo__.   
 
          Map A01 from Joy0,Btn,0
@@ -93,14 +93,14 @@ __Super Street Fighter II Turbo__.
 ### Super Steet Fighter II The New Challengers
 
 The game is compatbile with VSBCMI and USBJSTIK, but has a bug preventing two players from using joysticks for head to head battles.
-A patch fixing the bug has been provided in extra directory of source code repository.
+A patch fixing the bug has been provided in `extra` directory of source code repository.
 
 ### Super Street Fighter II Turbo 
 
 The game can play sound via VSBCMI, provided patching and configuration are performed as per __games-howto__. 
 For joystick support with USBJSTIK, additional steps are required after steps in __games-howto__ have been followed:
 
-1. Patches found in extra need to be run: `1-HDPMI.BAT`, `2-USBDOS.BAT` and `3-SLOWDN.BAT`. All require `FPATCH.COM`. 
+1. Patches found in `extra` need to be run: `1-HDPMI.BAT`, `2-USBDOS.BAT` and `3-SLOWDN.BAT`. All require `FPATCH.COM`. 
 2. Faster computers need to be _moderately_ slown down with a utility, however be warned that slowing too much will likely shut off USBDOS and USBJSTIK. 
 3. In game Options menu Frame Lock option needs to be On for faster PCs.
 4. `3-SLOWDN.BAT` accepts optional argument to specify the degree by which game joystick polling routine is made slower. 
@@ -110,7 +110,7 @@ For joystick support with USBJSTIK, additional steps are required after steps in
 
          3-SLOWDN.BAT 3 00
 
-    or
+   or
 
          3-SLOWDN.BAT ff 
 
@@ -120,7 +120,7 @@ For joystick support with USBJSTIK, additional steps are required after steps in
 ### Whizz
 
 Whizz, in unmodified form, does not work with USBJSTIK (even if the steps from __games-howto__ have been followed).
-Look for DOS batch file for patching the game in extra directory of source code repository.
+Look for DOS batch file for patching the game in `extra` directory of source code repository.
 
 ### Incompatible games
 

@@ -297,8 +297,8 @@ In order to run the game with VSBCMI the following steps are required:
 50 1E FC    -> 60 1E FC
 CD 31 58 CF -> CD 31 61 CF
 ```
-_alternatively_ patch file `1-HDPMI.BAT` found in source code repository extra directory can be used 
-(it requires `FPATCH.COM` tool).   
+   _alternatively_ patch file `1-HDPMI.BAT` found in source code repository extra directory can be used 
+   (it requires `FPATCH.COM` tool).   
 2. Before `HDPMI32I.EXE` is loaded, the following command must be run to set `HDPMI` environment variable :   
 ```
 HDPMI=2048
