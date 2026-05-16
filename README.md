@@ -46,7 +46,7 @@ A note on commit tags/version numbers used in VSBCMI (e.g. seen when VSBCMI.EXE 
           3.        - version of VSBCMI-specifc code on top of merged VSBHDA tag
             103     - last merged VSBHDA commit number
 
-Forked from v1.7 of ...
+Forked from ...
 
 # VSBHDA
 Sound blaster emulation for HDA (and AC97/SBLive); a fork of crazii's SBEMU: https://github.com/crazii/SBEMU
@@ -55,6 +55,7 @@ Works with unmodified HDPMI binaries, making it compatible with HX.
 
 Supported Sound cards:
  * HDA ( Intel High Definition Audio )
+ * C-Media CM8738/CM8338
  * Intel ICH, Nvidia nForce, SiS 7012
  * VIA VT82C686, VT8233/35/37
  * SB Live, SB Audigy
@@ -76,8 +77,7 @@ VSBHDA uses some source codes from:
 
 To create the binaries, stable version of [Open Watcom v1.9](https://openwatcom.org/ftp/install) is recommended. 
 Open Watcom v2.0 ([specifically this version](https://github.com/open-watcom/open-watcom-v2/releases/tag/2024-02-02-Build)) or 
-~DJGPP v2.05 may also be used, but the latter cannot create the 16-bit variant of VSBHD.~ 
-_DJGPP build is currently only maintained at best effort and OpenWatcom is recommended._
+DJGPP v2.05 may also be used, but the latter cannot create the 16-bit variant of VSBHD. 
 In all cases the [JWasm assembler](https://github.com/Baron-von-Riedesel/JWasm) (v2.17 or better) is also needed 
 and [jwlink](https://github.com/Baron-von-Riedesel/jwlink) is recommended.
 

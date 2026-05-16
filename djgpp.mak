@@ -144,7 +144,7 @@ $(OUTD)/uninst.o::   uninst.asm
 $(OUTD)/vioout.o::   vioout.asm
 
 
-$(OUTD)/joytsr.o::   joytsr.c    linear.h platform.h ptrap.h config.h 
+$(OUTD)/joytsr.o::   joytsr.c    linear.h platform.h ptrap.h config.h timer.h
 $(OUTD)/joyasm.o::   joyasm.asm
 
 clean::
