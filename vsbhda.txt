@@ -326,7 +326,6 @@
     The following (incomplete) list shows games that won't run with VSBHDA
     because they are incompatible with either Jemm/Qemm or HDPMI:
 
-    - Comanche
     - Privateer
     - Rayman
     - Strike Commander

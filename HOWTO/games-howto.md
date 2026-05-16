@@ -36,7 +36,6 @@ These games currently are known to crash, hang, play no sound or misbehave is so
 * Strike Commander
 
 _The below is copied from `vsbhda.txt`_
-* Comanche
 * Privateer
 * Rayman
 * SuperFrog
@@ -307,6 +306,13 @@ HDPMI=2048
 3. VSBCMI needs to be started with the following compatibility flag set: `/CF4`.
 4. On faster machines a slowdown tool, such as CPUSPD, is recommended as well as setting FRAME LOCK option to ON in game Options menu.
 
+### Comanche: Maximum Overkill
+
+The game requires official patch found in `CMOM3H.EXE` to make it compatible with EMM managers. The version found on "DOS Days" website works. 
+When using JEMM368, VCPI needs to be switched off before starting the game (see vsbhda.txt section 4.4 for more details), e.g.:
+```
+JEMMEX NOVCPI
+```
 
 2026,  
 [CC BY-NC]( "https://creativecommons.org/licenses/by-nc/4.0/),  
