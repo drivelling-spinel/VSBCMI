@@ -94,16 +94,18 @@ __Super Street Fighter II Turbo__.
 
 The game is compatbile with VSBCMI and USBJSTIK, but has a bug preventing two players from using joysticks for head to head battles.
 A patch fixing the bug has been provided in `extra` directory of source code repository.
+Pease make sure that all game files are backed up before running the patch.
 
 ### Super Street Fighter II Turbo 
 
 The game can play sound via VSBCMI, provided patching and configuration are performed as per __games-howto__. 
 For joystick support with USBJSTIK, additional steps are required after steps in __games-howto__ have been followed:
 
-1. Patches found in `extra` need to be run: `1-HDPMI.BAT`, `2-USBDOS.BAT` and `3-SLOWDN.BAT`. All require `FPATCH.COM`. 
+1. Patches found in `extra` need to be run: `1-HDPMI.BAT`, `2-USBDOS.BAT` and `3-SLOWDN.BAT`. All require `FPATCH.COM`.   
+   Please make sure that all game files are backed up before running these or other patches.
 2. Faster computers need to be _moderately_ slown down with a utility, however be warned that slowing too much will likely shut off USBDOS and USBJSTIK. 
 3. In game Options menu Frame Lock option needs to be On for faster PCs.
-4. `3-SLOWDN.BAT` accepts optional argument to specify the degree by which game joystick polling routine is made slower. 
+4. `3-SLOWDN.BAT` accepts optional argument to specify the degree by which game joystick polling routine is made slower.   
    Appropriate value for a particular PC can be determined by experimenting, and by default patch runs wtih the value of `200h`.   
    In order to update the value in .EXE file, run `3-SLOWDN.BAT` again with the desired argument.   
    _Note the space between the value's octets and that these are hex numbers_
@@ -121,6 +123,25 @@ For joystick support with USBJSTIK, additional steps are required after steps in
 
 Whizz, in unmodified form, does not work with USBJSTIK (even if the steps from __games-howto__ have been followed).
 Look for DOS batch file for patching the game in `extra` directory of source code repository.
+Pease make sure that all game files are backed up before running the patch.
+
+### Wing Commander III: Heart of the Tiger
+
+For cases when after running `SETPVI.EXE` (as suggested in __games-howto__) joystick readings become irregular, drift appears in game flow screens
+and view sporadically changes from cockpit to alternative camera during missions, patch `WC3JOYTM.BAT` is provided in `extra` directory. 
+__Note:__ patch requires that a specific [joystick driver for Wing Commander 3](https://www.wcnews.com/wcpedia/Thrustmaster_Joystick_Patch) is installed,
+and will not work correctly with other drivers. Please make sure that all game files are backed up before following the below steps:
+
+1. Obtain the original Origin Systems' `WC3JOYTM.EXE` and place it in `C:\WC3`   
+   (regardless where saved games and game data are stored on the PC)
+2. Run `WC3JOYTM.EXE` (note `.EXE` suffix)
+3. Place `WC3JOYTM.BAT` and `FPATCH.COM` in `C:\WC3`
+4. Run `WC3JOYTM.BAT` (note `.BAT` suffix)
+5. Run the game as ususal
+
+Also note that every time the game starts joystick calibration is required. This can be done by pressing `[Alt]+[J]` from the first game flow screen
+that is shown after the introduction.
+
 
 ### Incompatible games
 
@@ -128,6 +149,9 @@ In addition to the games listed as incompatible with VSBCMI in __games-howto__, 
 
 * Sam & Max Hit the Road
 * Day of the Tentacle
+
+
+
 
 2026,  
 [CC BY-NC]( "https://creativecommons.org/licenses/by-nc/4.0/),  

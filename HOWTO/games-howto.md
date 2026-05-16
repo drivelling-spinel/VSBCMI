@@ -316,6 +316,9 @@ When using JEMM368, VCPI needs to be switched off before starting the game (see 
 ```
 JEMMEX NOVCPI
 ```
+### Wing Commander III: Heart of the Tiger
+
+If game crashes after player's ship is shot down, running `SETPVI.EXE` prior to running the game may help (see vsbhda.txt section 4.2 for more details).
 
 2026,  
 [CC BY-NC]( "https://creativecommons.org/licenses/by-nc/4.0/),  
