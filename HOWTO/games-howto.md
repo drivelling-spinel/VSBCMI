@@ -141,7 +141,7 @@ If one wants music via external MIDI device in Dark Forces there's the [Dark For
 
 ### Tie Fighter 
 
-But what about Tie Fighter? Look no further than [TIEIMUSE.COM](https://ludicrous-site.vercel.app/other#tie-fighter-cd-rom-midi-fix), which patches Tie Fighter CD-ROM version of IMUSE.EXE, thus preventing the game from entering an infinite loop. Alternatively, [an iMuse patcher](https://ctpax-cheater.losthost.org/htmldocs/trouble.htm#imusefix) is available from the same group that created Dark Forcer DeHacker.
+But what about Tie Fighter? [An iMuse patcher](https://ctpax-cheater.losthost.org/htmldocs/trouble.htm#imusefix) is available from the same group that created Dark Forcer DeHacker.
 
 ### X-Wing
 
@@ -298,7 +298,7 @@ In order to run the game with VSBCMI the following steps are required:
 CD 31 58 CF -> CD 31 61 CF
 ```
 _alternatively_ patch file `1-HDPMI.BAT` found in source code repository extra directory can be used 
-(it requires `FPATCH.COM` tool).
+(it requires `FPATCH.COM` tool).   
 2. Before `HDPMI32I.EXE` is loaded, the following command must be run to set `HDPMI` environment variable :   
 ```
 HDPMI=2048
