@@ -500,7 +500,7 @@ static int SNDISR_Interrupt( void )
                 dbgprintf(("isr(%u): DMA Idx/Cnt=0x%X/0x%X, samplesize=%u, channels=%u\n", loop, DMA_Index, DMA_Count, samplesize, channels ));
 #endif
                 /* v1.8: if dma autoinit then restart dma; else exit & stop digital sound. */
-                if ( !VDMA_GetAuto(dmachannel) || DMA_Index == 0 )
+                if ( !VDMA_IsAuto(dmachannel) || DMA_Index == 0 )
                     break;
                 DMA_Index = VDMA_SetIndexCount(dmachannel, DMA_Index, 0 );
                 continue;
@@ -549,7 +549,7 @@ static int SNDISR_Interrupt( void )
 #ifdef SNDISRLOG
             dbgprintf(("isr(%u): s/c/b=0x%02X/0x%02X/0x%03X SB Pos/Size=0x%X/0x%X DMA Idx/Cnt=%X/%X\n", loop, samples, count, bytes, SB_Pos, SB_BuffSize, DMA_Index, DMA_Count ));
 #endif
-            if ( VSB_GetAuto() )
+            if ( VSB_IsAuto() )
                 VSB_SetPos(0);
             else
                 VSB_Stop(); /* v1.8: does no longer reset SB position */
@@ -565,7 +565,7 @@ static int SNDISR_Interrupt( void )
              *       however, exit if DMA autoinit isn't active should be ok.
              */
             //break;
-            if ( !VDMA_GetAuto(dmachannel) ) break;
+            if ( !VDMA_IsAuto(dmachannel) ) break;
         }
     };
 
