@@ -779,7 +779,7 @@ static int SNDISR_Interrupt( void )
         fpu_restore( fpu_buffer );
     }
 #endif
-    AU_writedata( isr.hAU, samples * 2, isr.pPCM );
+    AU_writedata( isr.hAU, isr.pPCM, samples * 2 );
 
     if ( nudge_count >= 10 ) {
        nudge_count = 0;
