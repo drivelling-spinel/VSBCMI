@@ -344,7 +344,6 @@ void MAIN_ReinitOPL( void )
 int main(int argc, char* argv[])
 ////////////////////////////////
 {
-
     //parse BLASTER env first.
     int i;
     void * p;
