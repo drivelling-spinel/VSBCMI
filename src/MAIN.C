@@ -421,7 +421,7 @@ int main(int argc, char* argv[])
         "." VERCOMMT
 #endif
 #endif
-        "; Sound Blaster emulation via HDA/AC97/PCI. Usage:\n");
+        "; Sound Blaster emulation via HDA/AC97/PCI. Options:\n");
 
         for( i = 0; GOptions[i].option; i++ ) {
             char *tmp;
