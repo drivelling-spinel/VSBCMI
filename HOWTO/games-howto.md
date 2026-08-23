@@ -104,14 +104,16 @@ Producing an ISO of the game CD with patched sound drivers is necessary.
 
 ### The Hand of Fate CD-ROM
 
-Producing an ISO of the game CD with patched sound drivers is necessary. 
+The game may hang at certain points unless option `/DF90` is given to VSBCMI (TODO: to be checked if /DF10 is sufficient)
+and sporadic crashes have been observed with `/J` option so it's recommended not to switch joystick support with it.
+Moreover, as per `vsbhda.txt`, it allocates a sound buffer in extended memory, so will benefit from running `XMSRES /L 15` command (see notes in section 4.3.2 in `vsbhda.txt` on "Extended Memory Address").
+In case of issues, also consider configuring your sound card to use IRQ 5 - using IRQ 7 may not always work with this game.
+
+Additionally, producing an ISO of the game CD with patched sound drivers may be necessary to avoid crashes or distorted sound in the introduction.
 1. Using [WestPak2](https://sourceforge.net/projects/westpak2/files/) extract SB*.ADV from DRIVERS.PAK on the CD-ROM.
 2. Using the same tool patch INTRODRV.PAK replacing all SB*.ADV files with the extracted ones.
 3. Overwrite INTRODRV.PAK with the patched version.
 4. Create (and optionally) burn the ISO with [ImgBurn](https://www.imgburn.com).
-5. Consider configuring your sound card to use IRQ 5 - using IRQ 7 may not always work with this game.
-
-Additionally, as per `vsbhda.txt`, allocates a sound buffer in extended memory, so will benefit from running `XMSRES /L 15` command (see notes in section 4.3.2 in `vsbhda.txt` on "Extended Memory Address").
 
 ### Lands of Lore 2
 
@@ -319,6 +321,11 @@ JEMMEX NOVCPI
 ### Wing Commander III: Heart of the Tiger
 
 If game crashes after player's ship is shot down, running `SETPVI.EXE` prior to running the game may help (see vsbhda.txt section 4.2 for more details).
+
+### The Settlers
+
+For the game to successfully configure Sound Blaster sound driver, VSBCMI needs to be started with option `/DF90` (TODO: to be checked if /DF10 is sufficient).
+
 
 2026,  
 [CC BY-NC]( "https://creativecommons.org/licenses/by-nc/4.0/),  

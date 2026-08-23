@@ -149,7 +149,7 @@ In addition to the games listed as incompatible with VSBCMI in __games-howto__, 
 
 * Sam & Max Hit the Road
 * Day of the Tentacle
-
+* Hand of Fate CD-ROM 
 
 
 
