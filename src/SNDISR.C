@@ -550,7 +550,7 @@ static int SNDISR_Interrupt( void )
                 DMA_Count = VDMA_GetCount( dmachannel );
 #endif
             }
-#if PREV2RESAMPLE
+#if !PREV2RESAMPLE
             /* v2.0: copy 1 more sample for cv_rate() */
             if ( resample ) {
                 /* copy the next sample is the best strategy, but
@@ -660,10 +660,10 @@ static int SNDISR_Interrupt( void )
          * x = src-smpl * dst-freq / dst-smpls
          */
         uint32_t SB_Rate = IdxSm * freq / samples;
-
+#if !PREV2RESAMPLE
         /* v2.0: cv_rate() now expects an extra, final sample */
         *(pDest + IdxSm) = *(pDest + IdxSm - 1);
-
+#endif
         //dbgprintf(("isr, direct samples: IdxSm=%d, samples=%d, rate=%u\n", IdxSm, samples, SB_Rate ));
         cv_bits_8_to_16( isr.pPCM, IdxSm + 1, 0 );
         IdxSm = cv_rate( isr.pPCM, IdxSm, 1, SB_Rate, freq );
