@@ -31,7 +31,7 @@
 #define CMI_DEBUG_OUTPUT stdout
 
 #include "CONFIG.H"
-#include "MPXPLAY.H"
+#include "AU_CARDS.H"
 #include "DMABUFF.H"
 #include "PCIBIOS.H"
 #include "AC97MIX.H"
@@ -381,6 +381,27 @@ struct cmi8x38_card_s
 
 extern unsigned int intsoundconfig,intsoundcontrol;
 
+//for Linux/GCC/ALSA routines
+#ifndef outb
+#define outb(reg,val) outp(reg,val)
+#endif
+#ifndef outw
+#define outw(reg,val) outpw(reg,val)
+#endif
+#ifndef outl
+#define outl(reg,val) outpd(reg,val)
+#endif
+#ifndef inb
+#define inb(reg) inp(reg)
+#endif
+#ifndef inw
+#define inw(reg) inpw(reg)
+#endif
+#ifndef inl
+#define inl(reg) inpd(reg)
+#endif
+
+
 //-------------------------------------------------------------------------
 // low level write & read
 
@@ -600,15 +621,11 @@ static unsigned int snd_cmi_buffer_init(struct cmi8x38_card_s *card, struct audi
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 {
     unsigned int bytes_per_sample = 2;
-    card->pcmout_bufsize = MDma_get_max_pcmoutbufsize( aui, 0,
-      aui->gvars->period_size ? aui->gvars->period_size : PCMBUFFERPAGESIZE, bytes_per_sample, 48000 );
+    card->pcmout_bufsize = MDma_get_bufsize( aui, 0, PCMBUFFERPAGESIZE );
     if (!MDma_alloc_cardmem( &card->dm, PCMBUFFERALIGNMENT + card->pcmout_bufsize)) return 0;
     /* pagetable requires 8 byte align; MDma_alloc_cardmem() returns 1kB aligned ptr */
     card->pcmout_buffer=(void *)(((uint32_t)card->dm.pMem + PCMBUFFERALIGNMENT-1)&(~(PCMBUFFERALIGNMENT-1))); // buffer begins on page (4096 bytes) boundary
-    aui->card_DMABUFF = card->pcmout_buffer;
-#if 0 //def SBEMU
-    memset(card->pcmout_buffer, 0, card->pcmout_bufsize);
-#endif
+    aui->card_pDmaBuffer = card->pcmout_buffer;
     dbgprintf(("snd_cmi_buffer init: pcmoutbuf:%X size:%d\n",(unsigned long)card->pcmout_buffer,card->pcmout_bufsize));
     return 1;
 }
@@ -616,12 +633,7 @@ static unsigned int snd_cmi_buffer_init(struct cmi8x38_card_s *card, struct audi
 
 static int CMI8X38_adetect(struct audioout_info_s *aui)
 {
- struct cmi8x38_card_s *card;
-
- card=(struct cmi8x38_card_s *)calloc(1,sizeof(struct cmi8x38_card_s));
- if(!card)
-  return 0;
- aui->card_private_data=card;
+ struct cmi8x38_card_s *card = (struct cmi8x38_card_s *)aui->card_private_data;
 
  if(pcibios_search_devices(cmi_devices,&card->pci_dev)!=PCI_SUCCESSFUL)
   goto err_adetect;
@@ -662,9 +674,7 @@ static void CMI8X38_close(struct audioout_info_s *aui)
  if(card){
   if(card->iobase)
    cmi8x38_chip_close(card);
-  MDma_free_cardmem(&card->dm);
-  free(card);
-  aui->card_private_data=NULL;
+   MDma_free_cardmem(&card->dm);
  }
 }
 
@@ -686,8 +696,7 @@ static void CMI8X38_setrate(struct audioout_info_s *aui)
  aui->bits_card=16;
  aui->card_wave_id=WAVEID_PCM_SLE;
 
- dmabufsize=MDma_init_pcmoutbuf(aui, card->pcmout_bufsize,
-   aui->gvars->period_size ? aui->gvars->period_size : PCMBUFFERPAGESIZE,48000);
+ dmabufsize=MDma_initbuf(aui, card->pcmout_bufsize);
 
  //format cfg
  card->fmt=0;
@@ -835,12 +844,11 @@ static void CMI8X38_stop(struct audioout_info_s *aui)
  snd_cmipci_write_32(card, CM_REG_FUNCTRL0, card->ctrl & ~CM_RST_CH0);
 }
 
-static long CMI8X38_getbufpos(struct audioout_info_s *aui)
+static unsigned int CMI8X38_getbufpos(struct audioout_info_s *aui)
 {
  struct cmi8x38_card_s *card=aui->card_private_data;
- unsigned long bufpos;
 
-#if 1 //SBEMU
+//#if 1 //SBEMU
  // From the Linux driver
  unsigned int reg = CM_REG_CH0_FRAME2;
  unsigned int rem, tries;
@@ -848,22 +856,18 @@ static long CMI8X38_getbufpos(struct audioout_info_s *aui)
    do {rem = snd_cmipci_read_16(card, reg); //note: current sample count can be 0
    }while(rem == 0xFFFF && card->dma_size-1 != 0xFFFF);
    if (rem < card->dma_size)
-     goto ok;
+     return (card->dma_size - (rem + 1)) << card->shift;
  }
- return aui->card_dma_lastgoodpos;
- ok:
-  bufpos = (card->dma_size - (rem + 1)) << card->shift;
-#endif
-
-  if (bufpos < aui->card_dmasize)
-    aui->card_dma_lastgoodpos = bufpos;
-  return aui->card_dma_lastgoodpos;
+ return 0;
+//#endif
 }
 
+#if 0 /* v2.0: removed */
 static void CMI8X38_clearbuf(struct audioout_info_s *aui)
 {
  MDma_clearbuf(aui);
 }
+#endif
 
 //--------------------------------------------------------------------------
 //mixer
@@ -1009,12 +1013,13 @@ struct sndcard_info_s CMI8X38_sndcard_info={
 
  &MDma_writedata,
  &CMI8X38_getbufpos,
- &CMI8X38_clearbuf,
  &CMI8X38_IRQRoutine,
 
  &CMI8X38_writeMIXER,
  &CMI8X38_readMIXER,
  cmi8x38_mixerset,
+
+ sizeof(struct cmi8x38_card_s),
 
  &CMI8X38_write_uart,
  &CMI8X38_read_uart,

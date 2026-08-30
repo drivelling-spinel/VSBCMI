@@ -196,7 +196,6 @@ $(OUTD)/sbrk.obj:      src\startup\sbrk.asm
 $(OUTD)/strtol.obj:    src\startup\strtol.asm
 $(OUTD)/_matherr.obj:  src\startup\_matherr.asm
 $(OUTD)/libmain.obj:   src\startup\libmain.c
->>>>>>> b0b9248 (source paths reorganized)
 
 # the 16-bit code is included in binary format into rmwrap.asm.
 

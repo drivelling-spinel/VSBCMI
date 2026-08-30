@@ -36,7 +36,7 @@ USE19=1
 !endif
 # use jwlink (1) or wlink (0)
 !ifndef USEJWL
-USEJWL=0
+USEJWL=1
 !endif
 # activate next line if FM synth should be deactivated
 #NOFM=1

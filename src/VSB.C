@@ -610,7 +610,7 @@ static void DSP_DoCommand( uint32_t flags )
         }
         vsb.Bits = (vsb.dsp_cmd <= SB_DSP_2BIT_OUT_AUTO) ? 2 : ( vsb.dsp_cmd & 0x2 ) ? 3 : 4;
         adpcm_state.useRef = ( vsb.dsp_cmd & 1 );
-        adpcm_state.step = 0;
+        adpcm_state.scale = 0;
         vsb.MixerRegs[SB_MIXERREG_MODEFILTER] &= ~SB_MIXERREG_MODEFILTER_STEREO; /* reset stereo */
         vsb.Silent = false;
         vsb.Signed = false;

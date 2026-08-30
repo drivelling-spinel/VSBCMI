@@ -156,6 +156,7 @@ static void delay_10us(unsigned int ticks)
  *
  */
 
+#if PREV2RESAMPLE
 // originally from MPXPlay
 static unsigned int mixer_speed_lq(PCM_CV_TYPE_S* source, unsigned int sourcesample, unsigned int channels, unsigned int samplerate, unsigned int newrate)
 {
@@ -224,12 +225,12 @@ static unsigned int mixer_speed_lq(PCM_CV_TYPE_S* source, unsigned int sourcesam
 #endif
  return pcm - source;
 }
-
+#endif
 
 static unsigned int cv_rate( PCM_CV_TYPE_S *pcmsrc, const unsigned int nSamples, const unsigned int channels, unsigned int srcrate, unsigned int dstrate)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 {
-#if 1
+#if PREV2RESAMPLE
 	return mixer_speed_lq(pcmsrc, nSamples, channels, srcrate, dstrate);
 #else
 	//const unsigned int instep = ((srcrate / dstrate) << 12) | (((4096 * (srcrate % dstrate) - 1) / (dstrate - 1)) & 0xFFF);
@@ -513,7 +514,11 @@ static int SNDISR_Interrupt( void )
 
         /* copy samples to our PCM buffer */
         if( IsSilent ) {
+#if PREV2RESAMPLE
+            memset( isr.pPCM + IdxSm * 2, 0, bytes);
+#else
             memset( isr.pPCM + IdxSm * 2, 0, bytes + 1 ); /* v2.0: one extra byte for resampling */
+#endif
         } else {
             char *pDest = (char *)(isr.pPCM + IdxSm * 2);
             if ( DMA_Count < bytes ) {
@@ -545,6 +550,7 @@ static int SNDISR_Interrupt( void )
                 DMA_Count = VDMA_GetCount( dmachannel );
 #endif
             }
+#if PREV2RESAMPLE
             /* v2.0: copy 1 more sample for cv_rate() */
             if ( resample ) {
                 /* copy the next sample is the best strategy, but
@@ -558,6 +564,7 @@ static int SNDISR_Interrupt( void )
                        NearPtr(isr.DMA_linearBase + ( DMA_Base - isr.DMA_Base) + DMA_Index ),
                        samplesize * channels );
             }
+#endif
         }
 
         /* update DSP regs */
@@ -628,12 +635,12 @@ static int SNDISR_Interrupt( void )
     };
 
     if (IdxSm) {
+#if STUBSILENCE
         /* in case there weren't enough samples copied, fill the rest with silence.
          * v1.5: it's better to reduce samples to IdxSm. If mode isn't autoinit,
          * the program may want to instantly initiate another DSP play cmd.
          * v1.8: returned to filling the rest with silence...
          */
-#if 0
 # ifdef SNDISRLOG
         if ( IdxSm < samples )
             dbgprintf(("isr: %u samples to add\n", samples - IdxSm ));
