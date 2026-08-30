@@ -1,4 +1,4 @@
-# VSBCMI v2.0.4
+# VSBCMI v2.0.1
 
 Sound Blaster emulation for DOS via CMI/HDA/AC97/SBLive/Ensoniq.
 
@@ -43,7 +43,7 @@ A [HOWTO document](/HOWTO/CM8738-howto.md) for CMI8738-based cards is also inclu
 A note on commit tags/version numbers used in VSBCMI (e.g. seen when VSBCMI.EXE is run with /?):
 
       2.0.          - last merged tag of VSBHDA 
-          4.        - version of VSBCMI-specifc code on top of merged VSBHDA tag
+          1.        - version of VSBCMI-specifc code on top of merged VSBHDA tag
             130     - last merged VSBHDA commit number
 
 Forked from ...
