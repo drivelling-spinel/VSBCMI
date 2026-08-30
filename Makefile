@@ -1,4 +1,4 @@
-# Create vsbhda.exe with Open Watcom and JWasm.
+# Build executables with Open Watcom and JWasm.
 # Enter
 #   wmake
 # Optionally, for a debug version, enter
@@ -8,13 +8,6 @@
 # 2. Adjust USE19  - should be 1 if OW v1.9 is to be used.
 # 3. Adjust USEJWL - should be 0 if JWLink isn't available
 #                    and OW's WLink is to be used.
-#
-# The Makefile assumes that the OW Win32 branch is used.
-# To use it unmodified in DOS requires the HX DOS extender and
-# to setup HX for full Win32 emulation:
-#  C:\>HDPMI32 -a -r
-#  C:\>SET DPMILDR=8
-#  C:\>HXLDR32
 #
 # A few modules from the HX DOS extender development package are used.
 # They are included as binaries in directory res:
@@ -200,8 +193,8 @@ $(OUTD)/rmwrap.obj:    src\rmwrap.asm src\rmcode1.asm src\rmcode2.asm
 	@$(ASM) -q -bin -Fl$(OUTD)\ -Fo$(OUTD)\rmcode2.bin src\rmcode2.asm
 	@$(ASM) -q -D?MODEL=flat $(OW19) -Fo$@ -DOUTD=$(OUTD) src\rmwrap.asm
 
-$(OUTD)\UNINST.EXE:    uninst\uninst.asm
-	@$(ASM) -q -mz -Fo$(OUTD)\UNINST.EXE uninst\uninst.asm
+$(OUTD)\UNINST.EXE:    tools\uninst\uninst.asm
+	@$(ASM) -q -mz -Fo$(OUTD)\UNINST.EXE tools\uninst\uninst.asm
 
 clean: .SYMBOLIC
 	@wmake -h -f OW16.mak debug=$(DEBUG) clean

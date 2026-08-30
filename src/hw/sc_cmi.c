@@ -634,6 +634,7 @@ static unsigned int snd_cmi_buffer_init(struct cmi8x38_card_s *card, struct audi
 static int CMI8X38_adetect(struct audioout_info_s *aui)
 {
  struct cmi8x38_card_s *card = (struct cmi8x38_card_s *)aui->card_private_data;
+ char *s = cmi8x38_shortname;
 
  if(pcibios_search_devices(cmi_devices,&card->pci_dev)!=PCI_SUCCESSFUL)
   goto err_adetect;
@@ -654,7 +655,14 @@ static int CMI8X38_adetect(struct audioout_info_s *aui)
  // init chip
  cmi8x38_chip_init(card);
 
- sprintf(cmi8x38_shortname, CMI8X38_CARD " (%u)", card->chip_version % 1000);
+ //sprintf(cmi8x38_shortname, CMI8X38_CARD " (%u)", card->chip_version % 1000);
+ strcpy(s, CMI8X38_CARD);
+ s+=strlen(s);
+ *s++ = '(';
+ itoa(card->chip_version % 1000, s, 10);
+ s+=strlen(s);
+ *s++ = ')';
+ *s++ = 0;
 
  card->uart_in = card->uart_out = 0;
  snd_cmipci_read_8(card, CM_REG_MPU_PCI + 1);

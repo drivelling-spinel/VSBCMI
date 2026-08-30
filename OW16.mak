@@ -24,7 +24,7 @@ WATCOM=\WATCOM
 USE19=1
 !endif
 !ifndef USEJWL
-USEJWL=0
+USEJWL=1
 !endif
 
 # activate next line if FM synth should be deactivated
@@ -142,7 +142,7 @@ $(OUTD)/au_cards.obj:  src\hw\au_cards.c
 $(OUTD)/dmabuff.obj:   src\hw\dmabuff.c
 $(OUTD)/physmem.obj:   src\hw\physmem.c
 $(OUTD)/pcibios.obj:   src\hw\pcibios.c
-$(OUTD)/sc_cmi.obj:    mpxplay\sc_cmi.c
+$(OUTD)/sc_cmi.obj:    src\hw\sc_cmi.c
 $(OUTD)/sc_e1371.obj:  src\hw\sc_e1371.c
 $(OUTD)/sc_ich.obj:    src\hw\sc_ich.c
 $(OUTD)/sc_inthd.obj:  src\hw\sc_inthd.c
