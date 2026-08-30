@@ -4,6 +4,18 @@
 
 _The guide is licensed by it's author under the terms of [CC BY-NC license](https://creativecommons.org/licenses/by-nc/4.0/). The author is not affiliated with Microsoft, IBM, C-Media Electronics or any other bodies that hold right over any of the commercial works (software, intellectual or otherwise) referenced in the guide. No claims are being made over the rights (full or partial) for any commercial works (software, intellectual or otherwise) referenced in this guide and they remain with the owning bodies in accorance with the appropriate law (or laws). The guide is presented in hopes of being useful, but with no warranty, nor even implied warranty of merchantability of fitness for a particular purpose. The author will not be held accountable for any damage caused to the persons, their data, hardware or any other property, following any actions taken by those persons in connection (direct or indirect) with activities described in the guide._
 
+## Disclaimer
+
+Joystick support in VSBCMI is an experimental feature and is not guaranteed to work with every game.
+Some games (id original Doom engine games) crash when Bret Johnson's driver and VSBCMI are both loaded, even without joystick emulation on.
+Others crash when VSBCMI joystick support is activated (Lands of Lore II), hang at startup (Black Zone), 
+and then there are those which only start if joystick is actually connected (Tyrian 2000),
+or randomly crash after running fine for some time (Hand of Fate).   
+
+It is thus advised that joystick support is only activated in order to test a particular game,
+or play one that has been confirmed to work (such as Tie Fighter, X-Wing, Speed Ball II or other games mentioned in this guide),
+and not kept as the permanent startup option for VSBCMI.
+
 ## Prereqiuisites
 
 * USB joystick or "controller" (gamepad) that is compatible with __USB 1__ standard
@@ -145,12 +157,15 @@ that is shown after the introduction.
 
 ### Incompatible games
 
-In addition to the games listed as incompatible with VSBCMI in __games-howto__, the following games do not work if option `/J` is given:
+In addition to the games listed as incompatible with VSBCMI in __games-howto__, the following games do not work if option `/J` is given,
+or if Bret Johnson's drivers are loaded:
 
 * Sam & Max Hit the Road
 * Day of the Tentacle
 * Hand of Fate CD-ROM 
-
+* Doom, Doom II, Final Doom, Heretic and Hexen
+* Lands of Lore II
+* Black Zone
 
 
 2026,  
