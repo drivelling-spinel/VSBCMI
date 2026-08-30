@@ -1,4 +1,4 @@
-# VSBCMI v1.8.4
+# VSBCMI v2.0.4
 
 Sound Blaster emulation for DOS via CMI/HDA/AC97/SBLive/Ensoniq.
 
@@ -42,9 +42,9 @@ A [HOWTO document](/HOWTO/CM8738-howto.md) for CMI8738-based cards is also inclu
 
 A note on commit tags/version numbers used in VSBCMI (e.g. seen when VSBCMI.EXE is run with /?):
 
-      1.8.          - last merged tag of VSBHDA 
-          3.        - version of VSBCMI-specifc code on top of merged VSBHDA tag
-            103     - last merged VSBHDA commit number
+      2.0.          - last merged tag of VSBHDA 
+          4.        - version of VSBCMI-specifc code on top of merged VSBHDA tag
+            130     - last merged VSBHDA commit number
 
 Forked from ...
 
@@ -77,7 +77,6 @@ VSBHDA uses some source codes from:
 
 A few makefiles are supplied to create the binaries:
  * Makefile/OW16.mak: for Windows/DOS using Open Watcom (v1.9 or v2.0) and JWasm/JWlink
- * Linux.mak/Linux16.mak: for Linux using Open Watcom (v1.9 or v2.0) and JWasm/JWlink
  * djgpp.mak: for DOS using DJGPP v2.05 and JWasm; cannot create the 16-bit variant of VSBHDA
 
 To create the binaries, stable version of [Open Watcom v1.9](https://openwatcom.org/ftp/install) is recommended. 
