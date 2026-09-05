@@ -21,13 +21,14 @@ Game compatibility will differ depending on which hardare and software conponent
 | Floppy         | 3.5" FDD (with integrated USB hub and card reader)                                       |
 | OS             | FreeDOS 1.4 RELEASE 2025-04-02                                                           |
 |                | JemmEx v5.85                                                                             |
-| Input          | Logitech M35 3-button COM mouse + PS/2 wired keyboard                                    |
+| Input          | Microsoft Wheel Mouse Optical 1.1A USB & PS/2 + Logitech M35 3-button COM mouse          |
+|                | + PS/2 wired keyboard                                                                    |
 |                | Mouse driver V6.00 ("Petero Chen")                                                       |
 | Joysticks      | Saitek ST-30 Plug & Play USB Joystick                                                    |
 |                | _patched_ Bret Johnson's USBDOS - January 30, 2010 version                               |
 | Soundcard      | Trust SC-5250 5.1 (PCI, CMI-8738) with TOSLINK bracket                                   |
 |                | PCIAUDIO.COM v1.98, C3DMIX.COM v0.4                                                      |
-| MIDI module    | Roland CM-300 connected to game port / X3MB (Buran edition) via cable splitter           |
+| MIDI module    | Roland CM-300 GS connected to game port / X3MB (Buran edition) via cable splitter        |
 
 
 ## Part 2 - Incompatible games
