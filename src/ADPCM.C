@@ -182,13 +182,11 @@ int DecodeADPCM( uint8_t *pcm, int count, int bits )
     case 3:  dst = decode_ADPCM_3_samples( dst, src, count, &adpcm_state ); break;
     default: dst = decode_ADPCM_4_samples( dst, src, count, &adpcm_state ); break;
     }
-#if !PREV2RESAMPLE
 #if !USENEXTBITS
     /* v2.0: cv_rate() now expects one byte more to be present; for ADPCM, this extra byte
      * can only be set NOW, after decoding!
      */
     *dst = *(dst-1);
-#endif
 #endif
     dbgprintf(("DecodeADPCM( %X, cnt=%u, bits=%u ): useRef=%u, new count=%u\n", pcm, count, bits, start, dst - pcm ));
 # ifdef _DEBUG
