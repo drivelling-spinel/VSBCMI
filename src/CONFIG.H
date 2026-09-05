@@ -25,8 +25,8 @@
 #define HW_BITS 16
 #define HW_BUFFERS_DEFAULT 8  /* v2.0; default value for /B */
 
-#define PREV2RESAMPLE 1
-#define STUBSILENCE   0
+#define PREV2RESAMPLE 0
+#define STUBSILENCE   1
 
 #if SOUNDFONT
 #define VOICES_DEFAULT 64

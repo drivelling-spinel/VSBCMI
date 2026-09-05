@@ -78,7 +78,7 @@ static const struct sndcard_info_s *sndcard_info_table[] = {
  * if ADPCM is 2-bit, SB freq is 4110 and hardware freq is 41100
  * there may be 3 * 10 exceeding samples = 120 bytes!
  */
-#define BUFFER_PROTECTION_DEFAULT 64
+#define BUFFER_PROTECTION_DEFAULT 96
 
 #ifdef _DEBUG
 int max_spaceexc; /* max no of bytes exceeding free dma buffer space */
