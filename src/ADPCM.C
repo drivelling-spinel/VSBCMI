@@ -189,6 +189,7 @@ int DecodeADPCM( uint8_t *pcm, int count, int bits )
      */
     *dst = *(dst-1);
 #endif
+#endif
     dbgprintf(("DecodeADPCM( %X, cnt=%u, bits=%u ): useRef=%u, new count=%u\n", pcm, count, bits, start, dst - pcm ));
 # ifdef _DEBUG
 #  if 0 /* src bytes (ADPCM encoded data) to be displayed? */

@@ -60,6 +60,7 @@ void writepcm16data(short);
 
 #define mpxplay_debugf(s, ...) dbgprintf((__VA_ARGS__))
 
+#define RESAMPLEROUTINE 1
 #define INTERPOLATE
 
 #if SOUNDFONT && VMPU
@@ -148,7 +149,7 @@ static void delay_10us(unsigned int ticks)
  *
  */
 
-#if PREV2RESAMPLE
+#if RESAMPLEROUTINE==1
 // originally from MPXPlay
 static unsigned int mixer_speed_lq(PCM_CV_TYPE_S* source, unsigned int sourcesample, unsigned int channels, unsigned int samplerate, unsigned int newrate)
 {
@@ -215,14 +216,14 @@ static unsigned int mixer_speed_lq(PCM_CV_TYPE_S* source, unsigned int sourcesam
 #if !MALLOCSTATIC
  free(buff);
 #endif
- return pcm - source;
+ return (pcm - source) / channels;
 }
 #endif
 
 static unsigned int cv_rate( PCM_CV_TYPE_S *pcmsrc, const unsigned int nSamples, const unsigned int channels, unsigned int srcrate, unsigned int dstrate)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 {
-#if PREV2RESAMPLE
+#if RESAMPLEROUTINE==1
 	return mixer_speed_lq(pcmsrc, nSamples, channels, srcrate, dstrate);
 #else
 	/* v2.0: new instep calculation seems a bit more intuitive */
@@ -663,13 +664,15 @@ static int SNDISR_Interrupt( void )
 #endif
         for( i = IdxSm; i < nSamples; i++ )
             *(isr.pPCM + i*2+1) = *(isr.pPCM + i*2) = 0;
+#else
+        i = IdxSm;
+#endif
 
 #if 1 /* TEST TEST TEST */
         /* v2.0: adjust nSamples - we don't want to loose generated sound data;
          *       the sound hardware buffers are able to handle this.
          */
         nSamples = i;
-#endif
 #endif
     } else if ( IdxSm = VSB_ReadDirectSamples( (uint8_t *)isr.pPCM ) ) {
 
@@ -680,7 +683,6 @@ static int SNDISR_Interrupt( void )
          * x / dst-freq = src-smpls / dst-smpls
          * x = src-smpl * dst-freq / dst-smpls
          */
-<<<<<<< HEAD
         uint32_t SB_Rate = IdxSm * freq / nSamples;
 #if PREV2RESAMPLE
         cv_bits_8_to_16( isr.pPCM, IdxSm, 0 );
@@ -694,8 +696,12 @@ static int SNDISR_Interrupt( void )
 #endif
         IdxSm = cv_rate( isr.pPCM, IdxSm, 1, SB_Rate, freq );
         cv_channels_1_to_2( isr.pPCM, IdxSm );
+#if STUBSILENCE
         for( i = IdxSm; i < nSamples; i++ )
             *(isr.pPCM + i*2+1) = *(isr.pPCM + i*2) = 0;
+#else
+        nSamples = IdxSm;
+#endif
     }
 
     /* get volumes for software mixer */

@@ -740,8 +740,8 @@ static void CMI8X38_setrate(struct audioout_info_s *aui)
   // set buffer address
  snd_cmipci_write_32(card, CM_REG_CH0_FRAME1, (uint32_t) pds_cardmem_physicalptr(card->dm, card->pcmout_buffer));
  // program sample counts
- snd_cmipci_write_16nv(card, CM_REG_CH0_FRAME2    , card->dma_size);
- snd_cmipci_write_16nv(card, CM_REG_CH0_FRAME2 + 2, card->period_size);
+ snd_cmipci_write_16nv(card, CM_REG_CH0_FRAME2    , card->dma_size - 1);
+ snd_cmipci_write_16nv(card, CM_REG_CH0_FRAME2 + 2, card->period_size - 1);
 
  mpxplay_debugf(CMI_DEBUG_OUTPUT, "1FUNCTRL0: %x",  snd_cmipci_read_32(card, CM_REG_FUNCTRL0));
  mpxplay_debugf(CMI_DEBUG_OUTPUT, "FUNCTRL1: %x",  snd_cmipci_read_32(card, CM_REG_FUNCTRL1));
@@ -862,9 +862,9 @@ static unsigned int CMI8X38_getbufpos(struct audioout_info_s *aui)
  unsigned int rem, tries;
  for (tries = 0; tries < 3; tries++) {
    do {rem = snd_cmipci_read_16(card, reg); //note: current sample count can be 0
-   }while(rem == 0xFFFF && card->dma_size != 0xFFFF);
-   if (rem <= card->dma_size)
-     return (card->dma_size - rem ) << card->shift;
+   }while(rem == 0xFFFF && card->dma_size-1 != 0xFFFF);
+   if (rem < card->dma_size)
+     return (card->dma_size - (rem + 1) ) << card->shift;
  }
  return 0;
 //#endif
