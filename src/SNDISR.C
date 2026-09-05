@@ -470,6 +470,11 @@ static int SNDISR_Interrupt( void )
         }
         /* don't resample if sample rates are close? */
         if( SB_Rate != freq ) {
+#if PREV2RESAMPLE
+            resample = true;
+            count = count * SB_Rate / freq;
+            if ( SB_Rate < freq && SB_Rate % freq ) count++;
+#else
             int tmpcnt = count * SB_Rate / freq;
             resample = true;
             //count = max( channels, count / ( ( freq + SB_Rate-1) / SB_Rate ));
@@ -486,6 +491,7 @@ static int SNDISR_Interrupt( void )
             while ( count > ( tmpcnt * freq / SB_Rate ) )
                 tmpcnt++;
             count = tmpcnt;
+#endif
         } else
             resample = false;
 #ifdef _DEBUG
@@ -585,11 +591,19 @@ static int SNDISR_Interrupt( void )
             }
 # endif
 #endif
+#if PREV2RESAMPLE
+            cv_bits_8_to_16( isr.pPCM + IdxSm * 2, count * channels, VSB_IsSigned() ); /* converts unsigned 8-bit to signed 16-bit */
+#else
             cv_bits_8_to_16( isr.pPCM + IdxSm * 2, (count+1) * channels, VSB_IsSigned() ); /* converts unsigned 8-bit to signed 16-bit */
+#endif
         }
 #if SUP16BITUNSIGNED
         else if ( !VSB_IsSigned() )
+#if PREV2RESAMPLE
+            for ( i = IdxSm * 2, j = i + count * channels; i < j; *(isr.pPCM+i) ^= 0x8000, i++ );
+#else
             for ( i = IdxSm * 2, j = i + (count+1) * channels; i < j; *(isr.pPCM+i) ^= 0x8000, i++ );
+#endif
 #endif
         if( resample ) /* SB_Rate != freq? */
             count = cv_rate( isr.pPCM + IdxSm * 2, count * channels, channels, SB_Rate, freq );
@@ -660,12 +674,14 @@ static int SNDISR_Interrupt( void )
          * x = src-smpl * dst-freq / dst-smpls
          */
         uint32_t SB_Rate = IdxSm * freq / samples;
-#if !PREV2RESAMPLE
+#if PREV2RESAMPLE
+        cv_bits_8_to_16( isr.pPCM, IdxSm, 0 );
+#else
         /* v2.0: cv_rate() now expects an extra, final sample */
         *(pDest + IdxSm) = *(pDest + IdxSm - 1);
-#endif
         //dbgprintf(("isr, direct samples: IdxSm=%d, samples=%d, rate=%u\n", IdxSm, samples, SB_Rate ));
         cv_bits_8_to_16( isr.pPCM, IdxSm + 1, 0 );
+#endif
         IdxSm = cv_rate( isr.pPCM, IdxSm, 1, SB_Rate, freq );
         cv_channels_1_to_2( isr.pPCM, IdxSm );
         for( i = IdxSm; i < samples; i++ )

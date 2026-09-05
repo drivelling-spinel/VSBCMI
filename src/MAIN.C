@@ -403,17 +403,20 @@ int main(int argc, char* argv[])
             printf("%s?\n", argv[i]);
     }
 
+    printf(XSTR(VSBHDA_NAME)" v" VERMAJOR "." VERMINOR
+#ifdef VERPATCH
+           "." VERPATCH
+#ifdef VERCOMMT
+           "." VERCOMMT
+#endif
+#endif
+    );
+    
     /* if -? or unrecognised option was entered, display help and exit */
     if( gm.bHelp ) {
-        gm.bHelp = false;
-        printf(XSTR(VSBHDA_NAME)" v" VERMAJOR "." VERMINOR
-#ifdef VERPATCH
-        "." VERPATCH
-#ifdef VERCOMMT
-        "." VERCOMMT
-#endif
-#endif
+        printf(
         "; Sound Blaster emulation via HDA/AC97/PCI. Options:\n");
+        gm.bHelp = false;
 
         for( i = 0; GOptions[i].option; i++ ) {
             char *tmp;
@@ -431,6 +434,7 @@ int main(int argc, char* argv[])
               );
         return(0);
     }
+    else printf("\n");
 
     if( gvars.base != 0x220 && gvars.base != 0x240 ) {
         printf("Error: valid IO base addresses: 220 or 240\n" );
