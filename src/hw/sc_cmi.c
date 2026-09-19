@@ -562,7 +562,7 @@ static void cmi8x38_chip_init(struct cmi8x38_card_s *cm)
  mpxplay_debugf(CMI_DEBUG_OUTPUT, "MISCCTRL: %x",  snd_cmipci_read_32(cm, CM_REG_MISC_CTRL));
 
  snd_cmipci_write_32m(cm, CM_REG_CHFORMAT, 0, 0xFFFFFF);
- snd_cmipci_set_bit(cm, CM_REG_MISC_CTRL, CM_ENDBDAC|CM_N4SPK3D);
+ snd_cmipci_set_bit(cm, CM_REG_MISC_CTRL, CM_ENDBDAC | (cm->chip_version ? CM_N4SPK3D : 0));
  snd_cmipci_clear_bit(cm, CM_REG_MISC_CTRL, CM_XCHGDAC);
 
  snd_cmipci_clear_bit(cm, CM_REG_MISC_CTRL, CM_SPD32SEL|CM_AC3EN2); //disable 32bit PCM/AC3
@@ -861,8 +861,8 @@ static unsigned int CMI8X38_getbufpos(struct audioout_info_s *aui)
  unsigned int reg = CM_REG_CH0_FRAME2;
  unsigned int rem, tries;
  for (tries = 0; tries < 3; tries++) {
-   do {rem = snd_cmipci_read_16(card, reg); //note: current sample count can be 0
-   }while(rem == 0xFFFF && card->dma_size-1 != 0xFFFF);
+   rem = snd_cmipci_read_16(card, reg); //note: current sample count can be 0
+   if(rem == 0xFFFF && card->dma_size-1 != 0xFFFF) continue;
    if (rem < card->dma_size)
      return (card->dma_size - (rem + 1) ) << card->shift;
  }
@@ -898,21 +898,39 @@ static int CMI8X38_IRQRoutine(struct audioout_info_s* aui)
   unsigned int mask = 0;
   int status = snd_cmipci_read_32(card, CM_REG_INT_STATUS); //read only reg (R)
   if (status == -1) {
+#if 0 //SBEMU
     int timeout = 2000;
+#endif
+    int timeout = 300;
     do {
       status = snd_cmipci_read_32(card, CM_REG_INT_STATUS);
       if (status != -1) break;
     } while (--timeout);
   }
-  if ((card->chip_version > 37 && !(status&CM_INTR)) ||
+#if OWNUART
+  // were unable to confirm chip sent interrupt fast enough
+  if (status == -1) {
+    return -1; // gambling here that potentially tossing someone else's interrupt 
+               // is probably better than not letting go of IRQ
+  }
+  if (
+#else
+  if ((status == -1 ) || 
+#endif
+      (card->chip_version > 37 && !(status&CM_INTR)) ||
       (card->chip_version <= 37 && !(status & CM_INTR_MASK))) { //the summary bit is incorrect for PCI-SX, the interrupt be chained to other shared IRQ device with invalid interrupts
     return 0;
   }
   if (status&CM_MCBINT) //Abort conditions occur during PCI Bus Target/Master Access
   {
     //nothing we can do
+#if OWNUART
+    //but at least letting go of IRQ
+    return -1;
+#endif
   }
 
+#if OWNUART
   if (status&CM_UARTINT)
   {
     const uint8_t backlog = (sizeof(card->uart_backlog) / sizeof(card->uart_backlog[0]));
@@ -924,6 +942,7 @@ static int CMI8X38_IRQRoutine(struct audioout_info_s* aui)
     if(!(status & (CM_CHINT0|CM_CHINT1)))
       return -1;
   }
+#endif
 
   if (status & CM_CHINT0)
     mask |= CM_CH0_INT_EN;
