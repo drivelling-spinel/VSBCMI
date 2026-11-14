@@ -57,7 +57,8 @@ _The guide is licensed by it's author under the terms of [CC BY-NC license](http
 ### Prerequisites
 1. JemmEx (properly Jemm Extended Memory Manager) with JLOAD program. If the machine has FreeDOS installed, JemmEx is probably already there and is configured (at least for boot options that have EMS enabled). It is still advised that an up to date distribution of Jemm is used. For the purpose of the guide [v5.86](https://github.com/Baron-von-Riedesel/Jemm/releases/tag/v5.86pre1) was used.
 2. [VSBHDA v1.8](https://github.com/Baron-von-Riedesel/VSBHDA/releases/tag/v1.8) for all files VSBCMI depends for it's operation.
-3. [VSBCMI](https://github.com/drivelling-spinel/VSBCMI/releases/tag/v1.8.3.103) executable.
+3. [VSBCMI](https://github.com/drivelling-spinel/VSBCMI/releases/tag/v1.8.3.103) executable.   
+   _Later versions of VSBCMI can of course be used when available. Note version correspondence note in README.md when selecting corresponding VSBHDA distribution._
 
 ### Steps
 1. Ensure JemmEx is configured to load in `CONFIG.SYS`/`FDCONFIG.SYS` . For example:
@@ -70,8 +71,8 @@ _The guide is licensed by it's author under the terms of [CC BY-NC license](http
 
 2. Load additional JemmEx modules using `.DLL`-s that are shipped with VSBHDA:
     
-       C:\PATH\TO\JEMMB.586\JLOAD C:\PATH\TO\VSBHDA.17\QPIEMU.DLL
-       C:\PATH\TO\JEMMB.586\JLOAD C:\PATH\TO\VSBHDA.17\JHDPMI.DLL
+       C:\PATH\TO\JEMMB.586\JLOAD C:\PATH\TO\VSBHDA\QPIEMU.DLL
+       C:\PATH\TO\JEMMB.586\JLOAD C:\PATH\TO\VSBHDA\JHDPMI.DLL
 
    These steps can be added to `AUTOEXEC.BAT` if they worked fine.
  
@@ -81,9 +82,11 @@ _The guide is licensed by it's author under the terms of [CC BY-NC license](http
   
 4. Start VSBCMI
 
-       C:\PATH\TO\VSBHDA.17\HDPMI32I
+       C:\PATH\TO\VSBHDA\HDPMI32I
        SET BLASTER=A220 I5 D1 H5 P330 T6
        C:\PATH\TO\VSBCMI\VSBCMI /OPL0
+       REM for versions 2.0.2 and above of VSBCMI 
+       C:\PATH\TO\VSBHDA\SETPVI
 
    Take note of the revision of the chip deteced by the driver. Behavior is slightly different with older cards (revisions 37 or less) and more modern ones (revisions after 37).
    
@@ -115,17 +118,21 @@ It is advised to keep that in mind when assessing the fitness of digital output 
 1. Reboot the PC and use a modified command to load VSBCMI (note `/F44100`). 
 
        REM Assuming .DLL-s are already loaded with JLOAD
-       C:\PATH\TO\VSBHDA.17\HDPMI32I
+       C:\PATH\TO\VSBHDA\HDPMI32I
        SET BLASTER=A220 I5 D1 H5 P330 T6
        C:\PATH\TO\VSBCMI\VSBCMI /OPL0 /F44100 /O3
-       
+       REM for versions 2.0.2 and above of VSBCMI 
+       C:\PATH\TO\VSBHDA\SETPVI
+
 2. Now check sound output with actual game, and if the sound is still a bit too high-pitched when compared with what is heard via analog output, try different frequency (note `/F48000`):
 
        REM Assuming .DLL-s are already loaded with JLOAD
-       C:\PATH\TO\VSBHDA.17\HDPMI32I
+       C:\PATH\TO\VSBHDA\HDPMI32I
        SET BLASTER=A220 I5 D1 H5 P330 T6
        C:\PATH\TO\VSBCMI\VSBCMI /OPL0 /F48000 /O3
-       
+       REM for versions 2.0.2 and above of VSBCMI 
+       C:\PATH\TO\VSBHDA\SETPVI
+
    These steps can be added to `AUTOEXEC.BAT` if they worked fine.
 
 3. _Optional:_ As explained in the warning above, for chip revisions after 37, FM will not be sent to S/PDIF Out by default. As en experiment, one can try running VSBCMI with additional `/DF2` command line argument and see if FM Output then sounds clean or distorted.
@@ -151,6 +158,8 @@ It is advised to keep that in mind when assessing the fitness of digital output 
        REM Assuming the below two lines have been added to AUTOEXEC.BAT
        SET BLASTER=A220 I5 D1 H5 P330 T6
        C:\PATH\TO\VSBCMI\VSBCMI /OPL0 /F44100
+       REM for versions 2.0.2 and above of VSBCMI 
+       C:\PATH\TO\VSBHDA\SETPVI
        REM add mixer call after them
        C:\PATH\TO\PCIAUD\C3DMIX /MFF000 /FFF400 /WDD400 /LDD4DD /E00500 /A00500 /C00500 /P10000 /400000 /R0f0ff  
     
@@ -163,6 +172,8 @@ It is advised to keep that in mind when assessing the fitness of digital output 
        REM Assuming the below two lines have been added to AUTOEXEC.BAT
        SET BLASTER=A220 I5 D1 H5 P330 T6
        C:\PATH\TO\VSBCMI\VSBCMI /OPL0 /F44100
+       REM for versions 2.0.2 and above of VSBCMI 
+       C:\PATH\TO\VSBHDA\SETPVI
        REM add mixer call after them
        CALL C3DMIX_D
 

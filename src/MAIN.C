@@ -412,6 +412,9 @@ int main(int argc, char* argv[])
            "." VERCOMMT
 #endif
 #endif
+#ifdef NOFIXUP
+      "-nofixup"
+#endif
     );
     
     /* if -? or unrecognised option was entered, display help and exit */

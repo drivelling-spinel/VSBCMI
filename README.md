@@ -1,4 +1,4 @@
-# VSBCMI v2.0.1
+# VSBCMI v2.0.2
 
 Sound Blaster emulation for DOS via CMI/HDA/AC97/SBLive/Ensoniq.
 
@@ -7,6 +7,9 @@ __Note:__ for current version testing is only performed with CM8738 cards.
           no guarantee is made VSBCMI will work with them, even if original VSBHDA does.
 
 Changes from [VSBHDA](https://github.com/Baron-von-Riedesel/VSBHDA) and [SBEMU](https://github.com/crazii/SBEMU):
+ * __Versions 2.0.2 and up contain breaking change__ -   
+   PUSHF/CLI/POPF CPU instructions in HDMI clients are no longer fixed up.
+   Games will hang as a result and using VSBBCMI together with SETPVI is strongly recommended to avoid this.
  * Support for CMI8X38 using driver originally from SBEMU, MPXPlay, with some changes specific to these chips:
     * _Detected_ revision of the chip is displayed when TSR is loaded
     * MPU401 UART "passthrough" (following SBEMU implementation) when started with /PXXX

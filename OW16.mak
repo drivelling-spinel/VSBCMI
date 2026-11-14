@@ -82,7 +82,7 @@ OBJFILES2 = &
 C_OPT_FLAGS=-q -oxa -ms -ecc -5s -fp5 -fpi87 -wcd=111
 # OW's wpp386 doesn't like the -ecc option ("function modifier cannot be used ...")
 CPP_OPT_FLAGS=-q -oxa -ms -bc -5s -fp5 -fpi87 
-C_EXTRA_FLAGS=-DNOTFLAT -DNOSBXFI -DVSBHDA_NAME=$(NAME)
+C_EXTRA_FLAGS=-DNOTFLAT -DNOSBXFI -DVSBHDA_NAME=$(NAME) -DNOFIXUP
 !ifdef NOFM
 C_EXTRA_FLAGS= $(C_EXTRA_FLAGS) -DNOFM
 !endif

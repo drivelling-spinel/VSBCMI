@@ -290,7 +290,7 @@ rCS		dd ?
 rEfl	dd ?
 IRETDS ends
  endif
-
+ifndef NOFIXUP
 _hdpmi_CliHandler proc public
 
 	assume ds:nothing
@@ -326,7 +326,7 @@ unchanged:
 	pop ds
 	insIRET
 _hdpmi_CliHandler endp
-
+endif
 endif
 
 	END

@@ -57,7 +57,7 @@ INCLUDE_DIRS=src src/hw
 SRC_DIRS=src src/hw
 
 C_OPT_FLAGS=-Os -fno-asynchronous-unwind-tables
-C_EXTRA_FLAGS=-march=i586 -DNOSBXFI -DVSBHDA_NAME=$(NAME)
+C_EXTRA_FLAGS=-march=i586 -DNOSBXFI -DVSBHDA_NAME=$(NAME) -DNOFIXUP
 LD_FLAGS=$(addprefix -Xlinker ,$(LD_EXTRA_FLAGS))
 LD_EXTRA_FLAGS=-Map $(OUTD)/$(NAME).map
 

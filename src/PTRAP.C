@@ -45,7 +45,9 @@ extern void SNDISR_IrqOnPortAcc( void );
 
 extern struct globalvars gvars;
 uint32_t _hdpmi_rmcbIO( void(*Fn)( __dpmi_regs *), __dpmi_regs *reg, __dpmi_raddr * );
+#ifndef NOFIXUP
 void _hdpmi_CliHandler( void );
+#endif
 void SwitchStackIOIn(  void );
 void SwitchStackIOOut( void );
 
@@ -538,9 +540,11 @@ bool PTRAP_Install_PM_PortTraps( void )
     /* reset hdpmi=32 option in case it is set */
     _hdpmi_set_context_mode( 0 );
 
+#ifndef NOFIXUP
 #ifndef NOTFLAT
     /* install CLI handler */
     _hdpmi_set_cli_handler( _hdpmi_CliHandler );
+#endif
 #endif
     for ( i = 0; i < maxranges; i++ ) {
         if ( portranges[i+1] > portranges[i] ) { /* skip if range is empty */
